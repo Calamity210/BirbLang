@@ -229,13 +229,13 @@ AST parseType(Parser parser, Scope scope) {
     case 'bool':
       type.type = DATATYPE.DATA_TYPE_BOOL;
       break;
-    case 'object':
+    case 'class':
       type.type = DATATYPE.DATA_TYPE_OBJECT;
       break;
     case 'enum':
       type.type = DATATYPE.DATA_TYPE_ENUM;
       break;
-    case 'list':
+    case 'List':
       type.type = DATATYPE.DATA_TYPE_LIST;
       break;
     case 'source':
@@ -464,6 +464,7 @@ AST parseFactor(Parser parser, Scope scope) {
     var a = parseVariable(parser, scope);
 
     if (parser.curToken.type == TokenType.TOKEN_DOT) {
+      eat(parser, TokenType.TOKEN_DOT);
       var ast =
           initASTWithLine(ASTType.AST_ATTRIBUTE_ACCESS, parser.lexer.lineNum);
       ast.binaryOpLeft = a;
@@ -484,13 +485,10 @@ AST parseFactor(Parser parser, Scope scope) {
       a = astListAccess;
     }
 
-    while (parser.curToken.type == TokenType.TOKEN_LPARAN) {
+    while (parser.curToken.type == TokenType.TOKEN_LPARAN)
       a = parseFuncCall(parser, scope, a);
-    }
 
-    if (a != null) {
-      return a;
-    }
+    if (a != null) return a;
   }
 
   /* */
@@ -534,7 +532,6 @@ AST parseTerm(Parser parser, Scope scope) {
   if (parser.curToken.type == TokenType.TOKEN_LPARAN)
     node = parseFuncCall(parser, scope, node);
 
-
   while (parser.curToken.type == TokenType.TOKEN_DIV ||
       parser.curToken.type == TokenType.TOKEN_MUL ||
       parser.curToken.type == TokenType.TOKEN_LESS_THAN ||
@@ -560,7 +557,7 @@ AST parseExpression(Parser parser, Scope scope) {
   AST astBinaryOp;
 
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB ) {
+      parser.curToken.type == TokenType.TOKEN_SUB) {
     var binaryOp = copyToken(parser.curToken);
     eat(parser, binaryOp.type);
 
@@ -713,7 +710,7 @@ AST parseIterate(Parser parser, Scope scope) {
 AST parseAssert(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
   var ast = initASTWithLine(ASTType.AST_ASSERT, parser.lexer.lineNum);
-  ast.newValue = parseExpression(parser, scope);
+  ast.assertExpression = parseExpression(parser, scope);
 
   return ast;
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'AST.dart';
@@ -50,14 +51,8 @@ AST listRemoveFptr(Runtime runtime, AST self, DynamicList args) {
   return self;
 }
 
-String createStr(String str) {
-  var newstr = str;
-
-  return newstr;
-}
-
-void collectAndSweepGarbage(Runtime runtime, DynamicList old_def_list,
-    Scope scope) {
+void collectAndSweepGarbage(
+    Runtime runtime, DynamicList old_def_list, Scope scope) {
   if (scope == runtime.scope) {
     return;
   }
@@ -89,9 +84,7 @@ void collectAndSweepGarbage(Runtime runtime, DynamicList old_def_list,
 AST runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) {
   if (fcall.funcCallArgs.size != fdef.funcDefArgs.size) {
     print(
-      'Error: [Line ${fcall.lineNum}] ${fdef.funcName} Expected ${fdef
-          .funcDefArgs.size} arguments but found ${fcall.funcCallArgs
-          .size} arguments\n',
+      'Error: [Line ${fcall.lineNum}] ${fdef.funcName} Expected ${fdef.funcDefArgs.size} arguments but found ${fcall.funcCallArgs.size} arguments\n',
     );
 
     exit(1);
@@ -142,7 +135,7 @@ AST runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) {
 
 AST runtimeRegisterGlobalFunction(Runtime runtime, String fname, AstFPtr fptr) {
   var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
-  fdef.funcName = createStr(fname);
+  fdef.funcName = fname;
   fdef.fptr = fptr;
   dynamicListAppend(runtime.scope.functionDefinitions, fdef);
   return fdef;
@@ -150,10 +143,10 @@ AST runtimeRegisterGlobalFunction(Runtime runtime, String fname, AstFPtr fptr) {
 
 AST runtimeRegisterGlobalVariable(Runtime runtime, String vname, String vval) {
   var vdef = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  vdef.variableName = createStr(vname);
+  vdef.variableName = vname;
   vdef.variableType = initAST(ASTType.AST_STRING);
   vdef.variableValue = initAST(ASTType.AST_STRING);
-  vdef.variableValue.stringValue = createStr(vval);
+  vdef.variableValue.stringValue = vval;
   dynamicListAppend(runtime.scope.variableDefinitions, vdef);
   return vdef;
 }
@@ -386,7 +379,7 @@ AST runtimeVisitVariable(Runtime runtime, AST node) {
 AST runtimeVisitVarDef(Runtime runtime, AST node) {
   if (node.scope == runtime.scope) {
     var varDefGlobal =
-    getVarDefByName(runtime, runtime.scope, node.variableName);
+        getVarDefByName(runtime, runtime.scope, node.variableName);
 
     if (varDefGlobal != null) {
       multipleVariableDefinitionsError(node.lineNum, node.variableName);
@@ -477,8 +470,7 @@ AST runtimeVisitVarAssignment(Runtime runtime, AST node) {
   }
 
   print(
-      "Error: [Line ${left.lineNum}] Can't set undefined variable ${left
-          .variableName}");
+      "Error: [Line ${left.lineNum}] Can't set undefined variable ${left.variableName}");
 }
 
 AST runtimeVisitVarMod(Runtime runtime, AST node) {
@@ -569,15 +561,13 @@ AST runtimeVisitVarMod(Runtime runtime, AST node) {
 
         default:
           print(
-              'Error: [Line ${node.lineNum}] `${node.binaryOperator
-                  .value}` is not a valid operator');
+              'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
           exit(1);
       }
     }
   }
   print(
-      "Error: [Line ${node.lineNum}] Can't set undefined variable `${node
-          .variableName}`");
+      "Error: [Line ${node.lineNum}] Can't set undefined variable `${node.variableName}`");
   exit(1);
 }
 
@@ -616,7 +606,7 @@ AST runtimeFuncLookup(Runtime runtime, Scope scope, AST node) {
     }
 
     var ret =
-    runtimeVisit(runtime, funcDef.fptr(runtime, funcDef, visitedFptrArgs));
+        runtimeVisit(runtime, funcDef.fptr(runtime, funcDef, visitedFptrArgs));
 
     return ret;
   }
@@ -785,13 +775,63 @@ AST runtimeVisitAttAccess(Runtime runtime, AST node) {
     if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
       if (node.binaryOpRight.variableName == 'length') {
         var intAST = initAST(ASTType.AST_INT);
-        // Getting the length of a list
+
         if (left.type == ASTType.AST_LIST)
           intAST.intVal = left.listChildren.size;
         else if (left.type == ASTType.AST_STRING)
           intAST.intVal = left.stringValue.length;
 
         return intAST;
+      } else if (node.binaryOpRight.variableName == 'input') {
+        var str = left.stringValue;
+        print(str);
+        var astString = initAST(ASTType.AST_STRING);
+        astString.stringValue =
+            stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
+
+        return astString;
+
+      } else if (node.binaryOpRight.variableName == 'toBinary') {
+        var str = left.stringValue;
+        var binarys = str.codeUnits.map((e) => e.toRadixString(2));
+
+        var astList = initAST(ASTType.AST_LIST);
+        astList.listChildren = initDynamicList(0);
+
+        for (String binary in binarys)
+          dynamicListAppend(astList.listChildren, binary);
+
+        return astList;
+      } else if (node.binaryOpRight.variableName == 'toOct') {
+        var str = left.stringValue;
+        var octS = str.codeUnits.map((e) => e.toRadixString(8));
+
+        var astList = initAST(ASTType.AST_LIST);
+        astList.listChildren = initDynamicList(0);
+
+        for (String oct in octS) dynamicListAppend(astList.listChildren, oct);
+
+        return astList;
+      } else if (node.binaryOpRight.variableName == 'toHex') {
+        var str = left.stringValue;
+        var hexS = str.codeUnits.map((e) => e.toRadixString(16));
+
+        var astList = initAST(ASTType.AST_LIST);
+        astList.listChildren = initDynamicList(0);
+
+        for (String hex in hexS) dynamicListAppend(astList.listChildren, hex);
+
+        return astList;
+      } else if (node.binaryOpRight.variableName == 'toDec') {
+        var str = left.stringValue;
+        var astList = initAST(ASTType.AST_LIST);
+        astList.listChildren = initDynamicList(0);
+
+        var decimals = str.codeUnits;
+        for (int decimal in decimals)
+          dynamicListAppend(astList.listChildren, decimal);
+
+        return astList;
       }
     }
   } else if (left.type == ASTType.AST_OBJECT) {
@@ -844,7 +884,7 @@ AST runtimeVisitAttAccess(Runtime runtime, AST node) {
           var objChild = left.objectChildren.items[i] as AST;
 
           if (objChild.type == ASTType.AST_FUNC_DEFINITION) if (objChild
-              .funcName ==
+                  .funcName ==
               funcCallName)
             return runtimeFuncCall(runtime, node.binaryOpRight, objChild);
         }
@@ -853,6 +893,7 @@ AST runtimeVisitAttAccess(Runtime runtime, AST node) {
   }
 
   node.scope = getScope(runtime, left);
+
   var newAST = runtimeVisit(runtime, node.binaryOpRight);
 
   return runtimeVisit(runtime, newAST);
@@ -909,8 +950,7 @@ AST runtimeVisitBinaryOp(Runtime runtime, AST node) {
 
               if (j > child.funcDefArgs.size - 1) {
                 print(
-                    'Error: [Line ${astArg
-                        .lineNum}] Too many arguments for function `$accessName`');
+                    'Error: [Line ${astArg.lineNum}] Too many arguments for function `$accessName`');
                 break;
               }
 
@@ -1381,8 +1421,7 @@ AST runtimeVisitBinaryOp(Runtime runtime, AST node) {
 
     default:
       print(
-          'Error: [Line ${node.lineNum}] `${node.binaryOperator
-              .value}` is not a valid operator');
+          'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
       exit(1);
   }
 
@@ -1421,8 +1460,7 @@ AST runtimeVisitUnaryOp(Runtime runtime, AST node) {
 
     default:
       print(
-          'Error: [Line ${node.lineNum}] `${node.unaryOperator
-              .value}` is not a valid operator');
+          'Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator');
       exit(1);
   }
 
@@ -1455,29 +1493,26 @@ AST runtimeVisitIf(Runtime runtime, AST node) {
   if (boolEval(runtimeVisit(runtime, node.ifExpression))) {
     runtimeVisit(runtime, node.ifBody);
   } else {
-    if (node.ifElse != null)
-      return runtimeVisit(runtime, node.ifElse);
+    if (node.ifElse != null) return runtimeVisit(runtime, node.ifElse);
 
-    if (node.elseBody != null)
-      return runtimeVisit(runtime, node.elseBody);
+    if (node.elseBody != null) return runtimeVisit(runtime, node.elseBody);
   }
 
   return node;
 }
 
 AST runtimeVisitTernary(Runtime runtime, AST node) {
-  return boolEval(runtimeVisit(runtime, node.ternaryExpression)) ? runtimeVisit(
-      runtime, node.ternaryBody) : runtimeVisit(runtime, node.ternaryElseBody);
+  return boolEval(runtimeVisit(runtime, node.ternaryExpression))
+      ? runtimeVisit(runtime, node.ternaryBody)
+      : runtimeVisit(runtime, node.ternaryElseBody);
 }
 
 AST runtimeVisitWhile(Runtime runtime, AST node) {
   while (boolEval(runtimeVisit(runtime, node.whileExpression))) {
     var visited = runtimeVisit(runtime, node.whileBody);
 
-    if (visited.type == ASTType.AST_BREAK)
-      break;
-    if (visited.type == ASTType.AST_CONTINUE)
-      continue;
+    if (visited.type == ASTType.AST_BREAK) break;
+    if (visited.type == ASTType.AST_CONTINUE) continue;
   }
 
   return node;
@@ -1489,10 +1524,8 @@ AST runtimeVisitFor(Runtime runtime, AST node) {
   while (boolEval(runtimeVisit(runtime, node.forConditionStatement))) {
     var visited = runtimeVisit(runtime, node.forBody);
 
-    if (visited.type == ASTType.AST_BREAK)
-      break;
-    if (visited.type == ASTType.AST_CONTINUE)
-      continue;
+    if (visited.type == ASTType.AST_BREAK) break;
+    if (visited.type == ASTType.AST_CONTINUE) continue;
 
     runtimeVisit(runtime, node.forChangeStatement);
   }
@@ -1560,13 +1593,11 @@ AST runtimeVisitIterate(Runtime runtime, AST node) {
     for (; i < astIterable.stringValue.length; i++) {
       newVarDef.variableValue.stringValue = astIterable.stringValue[i];
 
-      if (indexVar != null)
-        indexVar.variableValue.intVal = i;
+      if (indexVar != null) indexVar.variableValue.intVal = i;
 
       runtimeVisit(runtime, fDef.funcDefBody);
     }
-  }
-  else if (astIterable.type == ASTType.AST_LIST) {
+  } else if (astIterable.type == ASTType.AST_LIST) {
     var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
     newVarDef.variableValue =
         runtimeVisit(runtime, astIterable.listChildren.items[i]);
@@ -1578,13 +1609,11 @@ AST runtimeVisitIterate(Runtime runtime, AST node) {
       newVarDef.variableValue =
           runtimeVisit(runtime, (astIterable.listChildren.items[i] as AST));
 
-              if (indexVar != null)
-      indexVar.variableValue.intVal = i;
+      if (indexVar != null) indexVar.variableValue.intVal = i;
 
       runtimeVisit(runtime, fDef.funcDefBody);
     }
   }
-
 
   return INITIALIZED_NOOP;
 }
@@ -1614,14 +1643,13 @@ AST runtimeVisitAssert(Runtime runtime, AST node) {
 
 void runtimeExpectArgs(DynamicList inArgs, List<ASTType> args) {
   if (inArgs.size < args.length) {
-    print('${inArgs.size} argument(s) were provided, while ${args
-        .length} were expected');
+    print(
+        '${inArgs.size} argument(s) were provided, while ${args.length} were expected');
     exit(1);
   }
 
   for (int i = 0; i < args.length; i++) {
-    if (args[i] == ASTType.AST_ANY)
-      continue;
+    if (args[i] == ASTType.AST_ANY) continue;
 
     var ast = inArgs.items[i] as AST;
 

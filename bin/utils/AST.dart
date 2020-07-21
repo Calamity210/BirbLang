@@ -477,7 +477,7 @@ String astToString(AST ast) {
 }
 
 String astObjectToString(AST ast) {
-  return '{ object }';
+  return '{ class }';
 }
 
 String astFunctionDefinitionToString(AST ast) {

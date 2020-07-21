@@ -15,14 +15,13 @@ void initBuiltins(Runtime runtime) {
 
   runtimeRegisterGlobalFunction(runtime, 'include', funcInclude);
   runtimeRegisterGlobalFunction(runtime, 'screm', funcScrem);
+  runtimeRegisterGlobalFunction(runtime, 'exit', funcExit);
   runtimeRegisterGlobalFunction(runtime, 'openFile', funcFileOpen);
   runtimeRegisterGlobalFunction(runtime, 'writeFile', funcFileWrite);
   runtimeRegisterGlobalFunction(runtime, 'input', funcInput);
-  runtimeRegisterGlobalFunction(runtime, 'toBinary', funcToBinary);
-  runtimeRegisterGlobalFunction(runtime, 'toOct', funcToOct);
-  runtimeRegisterGlobalFunction(runtime, 'toDecimal', funcToDec);
-  runtimeRegisterGlobalFunction(runtime, 'toHex', funcToHex);
-  runtimeRegisterGlobalFunction(runtime, 'time', funcTime);
+  runtimeRegisterGlobalFunction(runtime, 'DateTime', funcDateTime);
+  runtimeRegisterGlobalFunction(runtime, 'Date', funcDate);
+  runtimeRegisterGlobalFunction(runtime, 'Time', funcTime);
 }
 
 AST funcScrem(Runtime runtime, AST self, DynamicList args) {
@@ -39,6 +38,14 @@ AST funcScrem(Runtime runtime, AST self, DynamicList args) {
   }
 
   return INITIALIZED_NOOP;
+}
+
+AST funcExit(Runtime runtime, AST self, DynamicList args) {
+  runtimeExpectArgs(args, [ASTType.AST_INT]);
+
+  AST exitAST = args.items[0];
+
+  exit(exitAST.intVal);
 }
 
 AST funcInclude(Runtime runtime, AST self, DynamicList args) {
@@ -123,71 +130,66 @@ AST funcFileWrite(Runtime runtime, AST self, DynamicList args) {
 
 AST funcInput(Runtime runtime, AST self, DynamicList args) {
   var astString = initAST(ASTType.AST_STRING);
-  astString.stringValue = stdin
-      .readLineSync(encoding: Encoding.getByName('utf-8'))
-      .trim();
+  astString.stringValue =
+      stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
   return astString;
 }
 
-AST funcToBinary(Runtime runtime, AST self, DynamicList args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
-  var str = (args.items[0] as AST).stringValue;
-  var binarys = str.codeUnits.map((e) => e.toRadixString(2));
+AST funcDate(Runtime runtime, AST self, DynamicList args) {
+  var astObj = initAST(ASTType.AST_OBJECT);
+  astObj.variableType = initAST(ASTType.AST_TYPE);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
 
-  var astList = initAST(ASTType.AST_LIST);
-  astList.listChildren = initDynamicList(0);
+  // ADD YEAR TO DATE OBJECT
+  var astVarYear = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarYear.variableName = 'year';
+  astVarYear.variableType = initAST(ASTType.AST_TYPE);
+  astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  for (String binary in binarys) {
-    dynamicListAppend(astList.listChildren, binary);
-  }
+  var astIntYear = initAST(ASTType.AST_INT);
+  astIntYear.intVal = DateTime.now().year;
+  astVarYear.variableValue = astIntYear;
 
-  return astList;
-}
+  dynamicListAppend(astObj.objectChildren, astVarYear);
 
-AST funcToOct(Runtime runtime, AST self, DynamicList args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
-  var str = (args.items[0] as AST).stringValue;
-  var octS = str.codeUnits.map((e) => e.toRadixString(8));
+  // ADD MONTH TO DATE OBJECT
+  var astVarMonth = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMonth.variableName = 'month';
+  astVarMonth.variableType = initAST(ASTType.AST_TYPE);
+  astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astList = initAST(ASTType.AST_LIST);
-  astList.listChildren = initDynamicList(0);
+  var astIntMonth = initAST(ASTType.AST_INT);
+  astIntMonth.intVal = DateTime.now().month;
+  astVarMonth.variableValue = astIntMonth;
 
-  for (String oct in octS) {
-    dynamicListAppend(astList.listChildren, oct);
-  }
+  dynamicListAppend(astObj.objectChildren, astVarMonth);
 
-  return astList;
-}
+  // ADD DAYS TO DATE OBJECT
+  var astVarDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarDay.variableName = 'day';
+  astVarDay.variableType = initAST(ASTType.AST_TYPE);
+  astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-AST funcToHex(Runtime runtime, AST self, DynamicList args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
-  var str = (args.items[0] as AST).stringValue;
-  var hexS = str.codeUnits.map((e) => e.toRadixString(16));
+  var astIntDay = initAST(ASTType.AST_INT);
+  astIntDay.intVal = DateTime.now().day;
+  astVarDay.variableValue = astIntDay;
 
-  var astList = initAST(ASTType.AST_LIST);
-  astList.listChildren = initDynamicList(0);
+  dynamicListAppend(astObj.objectChildren, astVarDay);
 
-  for (String hex in hexS) {
-    dynamicListAppend(astList.listChildren, hex);
-  }
+  // ADD DAYS TO DATE OBJECT
+  var astVarWeekDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarWeekDay.variableName = 'weekday';
+  astVarWeekDay.variableType = initAST(ASTType.AST_TYPE);
+  astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  return astList;
-}
+  var astIntWeekDay = initAST(ASTType.AST_INT);
+  astIntWeekDay.intVal = DateTime.now().weekday;
+  astIntWeekDay.variableValue = astIntWeekDay;
 
-AST funcToDec(Runtime runtime, AST self, DynamicList args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
-  var str = (args.items[0] as AST).stringValue;
+  dynamicListAppend(astObj.objectChildren, astVarWeekDay);
 
-  var astList = initAST(ASTType.AST_LIST);
-  astList.listChildren = initDynamicList(0);
-
-  var decimals = str.codeUnits;
-  for (int decimal in decimals) {
-    dynamicListAppend(astList.listChildren, decimal);
-  }
-
-  return astList;
+  return astObj;
 }
 
 AST funcTime(Runtime runtime, AST self, DynamicList args) {
@@ -195,16 +197,159 @@ AST funcTime(Runtime runtime, AST self, DynamicList args) {
   astObj.variableType = initAST(ASTType.AST_TYPE);
   astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
 
-  var astVar = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVar.variableName = 'seconds';
-  astVar.variableType = initAST(ASTType.AST_TYPE);
-  astVar.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  // ADD HOURS TO TIME OBJECT
+  var astVarHour = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarHour.variableName = 'hour';
+  astVarHour.variableType = initAST(ASTType.AST_TYPE);
+  astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astInt = initAST(ASTType.AST_INT);
-  astInt.intVal = DateTime.now().second;
-  astVar.variableValue = astInt;
+  var astIntHour = initAST(ASTType.AST_INT);
+  astIntHour.intVal = DateTime.now().hour;
+  astVarHour.variableValue = astIntHour;
 
-  dynamicListAppend(astObj.objectChildren, astVar);
+  dynamicListAppend(astObj.objectChildren, astVarHour);
+
+  // ADD MINUTES TO TIME OBJECT
+  var astVarMinute = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMinute.variableName = 'minute';
+  astVarMinute.variableType = initAST(ASTType.AST_TYPE);
+  astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntMinute = initAST(ASTType.AST_INT);
+  astIntMinute.intVal = DateTime.now().minute;
+  astVarHour.variableValue = astIntMinute;
+
+  dynamicListAppend(astObj.objectChildren, astVarMinute);
+
+  // ADD SECONDS TO TIME OBJECT
+  var astVarSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarSeconds.variableName = 'second';
+  astVarSeconds.variableType = initAST(ASTType.AST_TYPE);
+  astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntSeconds = initAST(ASTType.AST_INT);
+  astIntSeconds.intVal = DateTime.now().second;
+  astVarSeconds.variableValue = astIntSeconds;
+
+  dynamicListAppend(astObj.objectChildren, astVarSeconds);
+
+  // ADD MILLISECONDS TO TIME OBJECT
+  var astVarMilliSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMilliSeconds.variableName = 'milliSecond';
+  astVarMilliSeconds.variableType = initAST(ASTType.AST_TYPE);
+  astVarMilliSeconds.variableType.typeValue =
+      initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntMilliSeconds = initAST(ASTType.AST_INT);
+  astIntMilliSeconds.intVal = DateTime.now().millisecond;
+  astVarMilliSeconds.variableValue = astIntMilliSeconds;
+
+  dynamicListAppend(astObj.objectChildren, astVarMilliSeconds);
+
+  return astObj;
+}
+
+AST funcDateTime(Runtime runtime, AST self, DynamicList args) {
+  var astObj = initAST(ASTType.AST_OBJECT);
+  astObj.variableType = initAST(ASTType.AST_TYPE);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+
+  // ADD YEAR TO DATETIME OBJECT
+  var astVarYear = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarYear.variableName = 'year';
+  astVarYear.variableType = initAST(ASTType.AST_TYPE);
+  astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntYear = initAST(ASTType.AST_INT);
+  astIntYear.intVal = DateTime.now().year;
+  astVarYear.variableValue = astIntYear;
+
+  dynamicListAppend(astObj.objectChildren, astVarYear);
+
+  // ADD MONTH TO DATETIME OBJECT
+  var astVarMonth = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMonth.variableName = 'month';
+  astVarMonth.variableType = initAST(ASTType.AST_TYPE);
+  astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntMonth = initAST(ASTType.AST_INT);
+  astIntMonth.intVal = DateTime.now().month;
+  astVarMonth.variableValue = astIntMonth;
+
+  dynamicListAppend(astObj.objectChildren, astVarMonth);
+
+  // ADD DAYS TO DATETIME OBJECT
+  var astVarDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarDay.variableName = 'day';
+  astVarDay.variableType = initAST(ASTType.AST_TYPE);
+  astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntDay = initAST(ASTType.AST_INT);
+  astIntDay.intVal = DateTime.now().day;
+  astVarDay.variableValue = astIntDay;
+
+  dynamicListAppend(astObj.objectChildren, astVarDay);
+
+  // ADD WEEKDAYS TO DATETIME OBJECT
+  var astVarWeekDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarWeekDay.variableName = 'weekday';
+  astVarWeekDay.variableType = initAST(ASTType.AST_TYPE);
+  astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntWeekDay = initAST(ASTType.AST_INT);
+  astIntWeekDay.intVal = DateTime.now().weekday;
+  astIntWeekDay.variableValue = astIntWeekDay;
+
+  dynamicListAppend(astObj.objectChildren, astVarWeekDay);
+
+  // ADD HOURS TO DATETIME OBJECT
+  var astVarHour = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarHour.variableName = 'hour';
+  astVarHour.variableType = initAST(ASTType.AST_TYPE);
+  astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntHour = initAST(ASTType.AST_INT);
+  astIntHour.intVal = DateTime.now().hour;
+  astVarHour.variableValue = astIntHour;
+
+  dynamicListAppend(astObj.objectChildren, astVarHour);
+
+  // ADD MINUTES TO DATETIME OBJECT
+  var astVarMinute = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMinute.variableName = 'minute';
+  astVarMinute.variableType = initAST(ASTType.AST_TYPE);
+  astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntMinute = initAST(ASTType.AST_INT);
+  astIntMinute.intVal = DateTime.now().minute;
+  astVarMinute.variableValue = astIntMinute;
+
+  dynamicListAppend(astObj.objectChildren, astVarMinute);
+
+  // ADD SECONDS TO DATETIME OBJECT
+  var astVarSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarSeconds.variableName = 'second';
+  astVarSeconds.variableType = initAST(ASTType.AST_TYPE);
+  astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntSeconds = initAST(ASTType.AST_INT);
+  astIntSeconds.intVal = DateTime.now().second;
+  astVarSeconds.variableValue = astIntSeconds;
+
+  dynamicListAppend(astObj.objectChildren, astVarSeconds);
+
+  // ADD MILLISECONDS TO DATETIME OBJECT
+  var astVarMilliSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
+  astVarMilliSeconds.variableName = 'milliSecond';
+  astVarMilliSeconds.variableType = initAST(ASTType.AST_TYPE);
+  astVarMilliSeconds.variableType.typeValue =
+      initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+
+  var astIntMilliSeconds = initAST(ASTType.AST_INT);
+  astIntMilliSeconds.intVal = DateTime.now().millisecond;
+  astVarMilliSeconds.variableValue = astIntMilliSeconds;
+
+  dynamicListAppend(astObj.objectChildren, astVarMilliSeconds);
 
   return astObj;
 }
