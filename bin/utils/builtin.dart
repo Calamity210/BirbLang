@@ -27,6 +27,8 @@ void initBuiltins(Runtime runtime) {
 AST funcScrem(Runtime runtime, AST self, List args) {
   for (int i = 0; i < args.length; i++) {
     AST astArg = args[i];
+    if (astArg.type == ASTType.AST_BINARYOP)
+      astArg = visitBinaryOp(initRuntime(), astArg);
     var str = astToString(astArg);
 
     if (str == null) {

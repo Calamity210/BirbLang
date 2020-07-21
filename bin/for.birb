@@ -1,7 +1,5 @@
 Map foo  = {
-"key": "foo",
-"value": 3
+"key": 3 + 4
 };
 
-int b = foo["key"];
-screm(b);
+screm(foo["key"]);

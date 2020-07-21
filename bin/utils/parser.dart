@@ -457,9 +457,7 @@ AST parseMap(Parser parser, Scope scope) {
             'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
         exit(1);
       }
-      String value = parser.curToken.value;
       ast.map[key] = parseExpression(parser, scope);
-
     } else {
       print(
           'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');

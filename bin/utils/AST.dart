@@ -457,7 +457,7 @@ String astToString(AST ast) {
     case ASTType.AST_LIST_ACCESS:
       return astListAccessToString(ast);
     case ASTType.AST_BINARYOP:
-      return astBinopToString(ast);
+      return astToString(visitBinaryOp(initRuntime(), ast));
     case ASTType.AST_NOOP:
       return '';
     case ASTType.AST_BREAK:
