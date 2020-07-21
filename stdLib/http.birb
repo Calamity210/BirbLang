@@ -1,0 +1,11 @@
+class HttpResponse {
+    String body;
+    List bodyBytes;
+
+    HttpResponse(nest.body, )
+}
+
+HttpResponse get(String url) {
+    class res = _HTTPGET(url);
+
+}

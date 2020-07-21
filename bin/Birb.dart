@@ -13,8 +13,7 @@ void main(List<String> arguments) {
   Lexer lexer;
   Parser parser;
   AST node;
-
-  if (arguments.length < 2) {
+  if (arguments.isEmpty) {
     isInteractive = true;
     print('<<<<< Birb Shell Initiated >>>>>');
 
@@ -28,7 +27,7 @@ void main(List<String> arguments) {
         lexer = initLexer(input);
         parser = initParser(lexer);
         node = parse(parser);
-        runtimeVisit(runtime, node);
+        visit(runtime, node);
         isInteractive = false;
       }
 
@@ -44,8 +43,8 @@ void main(List<String> arguments) {
     return;
   }
 
-  lexer = initLexer(File(arguments[1]).readAsStringSync());
+  lexer = initLexer(File(arguments[0]).readAsStringSync());
   parser = initParser(lexer);
   node = parse(parser);
-  runtimeVisit(runtime, node);
+  visit(runtime, node);
 }

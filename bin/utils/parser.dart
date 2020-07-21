@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'AST.dart';
 import 'data_type.dart';
-import 'dynamic_list.dart';
 import 'lexer.dart';
 import 'scope.dart';
 import 'token.dart';
@@ -48,7 +47,7 @@ void parserSyntaxError(Parser parser) {
 
 void parserUnexpectedToken(Parser parser, TokenType type) {
   print(
-      '[Line ${parser.lexer.lineNum}] Unexpected token type `${parser.curToken.value}`, was expecting `$type`');
+      '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
   exit(1);
 }
 
@@ -68,6 +67,7 @@ bool isDataType(String tokenValue) {
       tokenValue == 'class' ||
       tokenValue == 'enum' ||
       tokenValue == 'List' ||
+      tokenValue == 'Map' ||
       tokenValue == 'source');
 }
 
@@ -77,7 +77,7 @@ AST parseOneStatementCompound(Parser parser, Scope scope) {
 
   var statement = parseStatement(parser, scope);
   eat(parser, TokenType.TOKEN_SEMI);
-  dynamicListAppend(compound.compoundValue, statement);
+  compound.compoundValue.add(statement);
 
   return compound;
 }
@@ -189,7 +189,7 @@ AST parseStatements(Parser parser, Scope scope) {
 
   var statement = parseStatement(parser, scope);
 
-  dynamicListAppend(compound.compoundValue, statement);
+  compound.compoundValue.add(statement);
 
   while (parser.curToken.type == TokenType.TOKEN_SEMI ||
       statement.type != ASTType.AST_NOOP) {
@@ -199,7 +199,7 @@ AST parseStatements(Parser parser, Scope scope) {
 
     statement = parseStatement(parser, scope);
 
-    dynamicListAppend(compound.compoundValue, statement);
+    compound.compoundValue.add(statement);
   }
 
   return compound;
@@ -237,6 +237,9 @@ AST parseType(Parser parser, Scope scope) {
       break;
     case 'List':
       type.type = DATATYPE.DATA_TYPE_LIST;
+      break;
+    case 'Map':
+      type.type = DATATYPE.DATA_TYPE_MAP;
       break;
     case 'source':
       type.type = DATATYPE.DATA_TYPE_SOURCE;
@@ -311,6 +314,17 @@ AST parseVariable(Parser parser, Scope scope) {
   ast.scope = scope;
   ast.variableName = parser.prevToken.value;
 
+  if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
+    var astAssign =
+        initASTWithLine(ASTType.AST_VARIABLE_ASSIGNMENT, parser.lexer.lineNum);
+
+    astAssign.variableAssignmentLeft = ast;
+    astAssign.variableValue = parseExpression(parser, scope);
+    astAssign.scope = scope;
+
+    return astAssign;
+  }
+
   if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
     eat(parser, TokenType.TOKEN_EQUAL);
     var astAssign =
@@ -343,9 +357,13 @@ AST parseVariable(Parser parser, Scope scope) {
 }
 
 AST parseObject(Parser parser, Scope scope) {
-  var ast = initASTWithLine(ASTType.AST_OBJECT, parser.lexer.lineNum);
+  if (parser.prevToken.type == TokenType.TOKEN_EQUAL)
+    return parseMap(parser, scope);
+
+  AST ast = initASTWithLine(ASTType.AST_OBJECT, parser.lexer.lineNum);
+
   ast.scope = scope;
-  ast.objectChildren = initDynamicList(0);
+  ast.objectChildren = [];
 
   var newScope = initScope(false);
 
@@ -359,16 +377,16 @@ AST parseObject(Parser parser, Scope scope) {
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
-      dynamicListAppend(ast.objectChildren,
-          asObjectChild(parseFuncDef(parser, newScope), ast));
+      ast.objectChildren
+          .add(asObjectChild(parseFuncDef(parser, newScope), ast));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI) {
       eat(parser, TokenType.TOKEN_SEMI);
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
-        dynamicListAppend(ast.objectChildren,
-            asObjectChild(parseFuncDef(parser, newScope), ast));
+        ast.objectChildren
+            .add(asObjectChild(parseFuncDef(parser, newScope), ast));
       }
     }
   }
@@ -381,7 +399,7 @@ AST parseObject(Parser parser, Scope scope) {
 AST parseEnum(Parser parser, Scope scope) {
   var ast = initASTWithLine(ASTType.AST_ENUM, parser.lexer.lineNum);
   ast.scope = scope;
-  ast.enumChildren = initDynamicList(0);
+  ast.enumChildren = [];
 
   var newScope = initScope(false);
 
@@ -396,7 +414,7 @@ AST parseEnum(Parser parser, Scope scope) {
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
       eat(parser, TokenType.TOKEN_ID);
-      dynamicListAppend(ast.enumChildren, parseVariable(parser, newScope));
+      ast.enumChildren.add(parseVariable(parser, newScope));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
@@ -404,7 +422,7 @@ AST parseEnum(Parser parser, Scope scope) {
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
         eat(parser, TokenType.TOKEN_ID);
-        dynamicListAppend(ast.enumChildren, parseVariable(parser, newScope));
+        ast.enumChildren.add(parseVariable(parser, newScope));
       }
     }
   }
@@ -414,19 +432,80 @@ AST parseEnum(Parser parser, Scope scope) {
   return ast;
 }
 
-AST parseList(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_LBRACKET);
-  var ast = initASTWithLine(ASTType.AST_LIST, parser.lexer.lineNum);
-  ast.scope = scope;
-  ast.listChildren = initDynamicList(0);
+AST parseMap(Parser parser, Scope scope) {
+  eat(parser, TokenType.TOKEN_LBRACE);
 
-  if (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
-    dynamicListAppend(ast.listChildren, parseExpression(parser, scope));
+  var ast = initASTWithLine(ASTType.AST_MAP, parser.lexer.lineNum);
+  ast.scope = scope;
+  ast.map = {};
+
+  if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
+    if (parser.curToken.type == TokenType.TOKEN_STRING_VALUE) {
+      String key = parser.curToken.value;
+      eat(parser, TokenType.TOKEN_STRING_VALUE);
+
+      if (parser.curToken.type == TokenType.TOKEN_COLON)
+        eat(parser, TokenType.TOKEN_COLON);
+      else {
+        print(
+            'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
+        exit(1);
+      }
+
+      if (parser.curToken.type == TokenType.TOKEN_COMMA) {
+        print(
+            'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
+        exit(1);
+      }
+      String value = parser.curToken.value;
+      ast.map[key] = parseExpression(parser, scope);
+
+    } else {
+      print(
+          'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');
+      exit(1);
+    }
   }
 
   while (parser.curToken.type == TokenType.TOKEN_COMMA) {
     eat(parser, TokenType.TOKEN_COMMA);
-    dynamicListAppend(ast.listChildren, parseExpression(parser, scope));
+
+    String key = parser.curToken.value;
+    eat(parser, TokenType.TOKEN_STRING_VALUE);
+
+    if (parser.curToken.type == TokenType.TOKEN_COLON)
+      eat(parser, TokenType.TOKEN_COLON);
+    else {
+      print(
+          'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
+      exit(1);
+    }
+
+    if (parser.curToken.type == TokenType.TOKEN_COMMA) {
+      print(
+          'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
+      exit(1);
+    }
+    ast.map[key] = parseExpression(parser, scope);
+  }
+
+  eat(parser, TokenType.TOKEN_RBRACE);
+  return ast;
+}
+
+AST parseList(Parser parser, Scope scope) {
+  eat(parser, TokenType.TOKEN_LBRACKET);
+  var ast = initASTWithLine(ASTType.AST_LIST, parser.lexer.lineNum);
+  ast.scope = scope;
+  ast.listChildren = [];
+
+  if (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
+    ast.listChildren.add(parseExpression(parser, scope));
+  }
+
+  while (parser.curToken.type == TokenType.TOKEN_COMMA) {
+    eat(parser, TokenType.TOKEN_COMMA);
+    ast.listChildren.add(parseExpression(parser, scope));
   }
 
   eat(parser, TokenType.TOKEN_RBRACKET);
@@ -434,7 +513,7 @@ AST parseList(Parser parser, Scope scope) {
   return ast;
 }
 
-AST parseFactor(Parser parser, Scope scope) {
+AST parseFactor(Parser parser, Scope scope, bool isMap) {
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
       parser.curToken.type == TokenType.TOKEN_SUB) {
     var unOpOperator = copyToken(parser.curToken);
@@ -468,7 +547,7 @@ AST parseFactor(Parser parser, Scope scope) {
       var ast =
           initASTWithLine(ASTType.AST_ATTRIBUTE_ACCESS, parser.lexer.lineNum);
       ast.binaryOpLeft = a;
-      ast.binaryOpRight = parseFactor(parser, scope);
+      ast.binaryOpRight = parseFactor(parser, scope, false);
 
       a = ast;
     }
@@ -526,7 +605,7 @@ AST parseTerm(Parser parser, Scope scope) {
     return parseFuncDef(parser, scope);
   }
 
-  var node = parseFactor(parser, scope);
+  var node = parseFactor(parser, scope, false);
   AST astBinaryOp;
 
   if (parser.curToken.type == TokenType.TOKEN_LPARAN)
@@ -545,7 +624,7 @@ AST parseTerm(Parser parser, Scope scope) {
 
     astBinaryOp.binaryOpLeft = node;
     astBinaryOp.binaryOperator = binaryOpOperator;
-    astBinaryOp.binaryOpRight = parseFactor(parser, scope);
+    astBinaryOp.binaryOpRight = parseFactor(parser, scope, false);
 
     node = astBinaryOp;
   }
@@ -652,7 +731,7 @@ AST parseIf(Parser parser, Scope scope) {
         compound.scope = scope;
         var statement = parseStatement(parser, scope);
         eat(parser, TokenType.TOKEN_SEMI);
-        dynamicListAppend(compound.compoundValue, statement);
+        compound.compoundValue.add(statement);
 
         ast.elseBody = compound;
         ast.elseBody.scope = scope;
@@ -778,7 +857,7 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
       astExpr.scope = initScope(false);
     }
 
-    dynamicListAppend(ast.funcCallArgs, astExpr);
+    ast.funcCallArgs.add(astExpr);
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
       eat(parser, TokenType.TOKEN_COMMA);
@@ -788,7 +867,7 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
         astExpr.scope = initScope(false);
       }
 
-      dynamicListAppend(ast.funcCallArgs, astExpr);
+      ast.funcCallArgs.add(astExpr);
     }
   }
 
@@ -825,20 +904,49 @@ AST parseFuncDef(Parser parser, Scope scope) {
 
     ast.funcName = funcName;
     ast.funcDefType = astType;
-    ast.funcDefArgs = initDynamicList(0);
+    ast.funcDefArgs = [];
 
     eat(parser, TokenType.TOKEN_LPARAN);
 
     if (parser.curToken.type != TokenType.TOKEN_RPARAN) {
-      dynamicListAppend(ast.funcDefArgs, parseExpression(parser, scope));
+      ast.funcDefArgs.add(parseExpression(parser, scope));
 
       while (parser.curToken.type == TokenType.TOKEN_COMMA) {
         eat(parser, TokenType.TOKEN_COMMA);
-        dynamicListAppend(ast.funcDefArgs, parseExpression(parser, scope));
+        ast.funcDefArgs.add(parseExpression(parser, scope));
       }
     }
 
     eat(parser, TokenType.TOKEN_RPARAN);
+
+    if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
+      AST childDef;
+
+      if (isDataType(parser.curToken.value)) {
+        childDef = parseFuncDef(parser, scope);
+      } else {
+        eat(parser, TokenType.TOKEN_ID);
+        childDef = parseVariable(parser, scope);
+      }
+
+      childDef.scope = newScope;
+      ast.compChildren.add(childDef);
+
+      while (parser.curToken.type == TokenType.TOKEN_COMMA) {
+        eat(parser, TokenType.TOKEN_COMMA);
+
+        if (isDataType(parser.curToken.value)) {
+          childDef = parseFuncDef(parser, scope);
+        } else {
+          eat(parser, TokenType.TOKEN_ID);
+          childDef = parseVariable(parser, scope);
+        }
+
+        childDef.scope = newScope;
+        ast.compChildren.add(childDef);
+      }
+      return ast;
+    }
 
     if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
       eat(parser, TokenType.TOKEN_EQUAL);
@@ -853,7 +961,7 @@ AST parseFuncDef(Parser parser, Scope scope) {
       }
 
       childDef.scope = newScope;
-      dynamicListAppend(ast.compChildren, childDef);
+      ast.compChildren.add(childDef);
 
       while (parser.curToken.type == TokenType.TOKEN_COMMA) {
         eat(parser, TokenType.TOKEN_COMMA);
@@ -866,7 +974,7 @@ AST parseFuncDef(Parser parser, Scope scope) {
         }
 
         childDef.scope = newScope;
-        dynamicListAppend(ast.compChildren, childDef);
+        ast.compChildren.add(childDef);
       }
       return ast;
     }
@@ -887,6 +995,47 @@ AST parseFuncDef(Parser parser, Scope scope) {
       astVarDef.variableValue = parseEnum(parser, scope);
       astVarDef.variableName = parser.curToken.value;
       eat(parser, TokenType.TOKEN_ID);
+    }
+
+    if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
+      astVarDef.variableValue = parseExpression(parser, scope);
+
+      switch (astVarDef.variableValue.type) {
+        case ASTType.AST_OBJECT:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_OBJECT)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_ENUM:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_STRING:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_INT:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_DOUBLE:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_BOOL:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_LIST:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_COMPOUND:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
+            parserTypeError(parser);
+          break;
+        default:
+          break;
+      }
     }
 
     if (parser.curToken.type == TokenType.TOKEN_EQUAL) {

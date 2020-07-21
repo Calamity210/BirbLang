@@ -1,10 +1,9 @@
 import 'data_type.dart';
-import 'dynamic_list.dart';
 import 'runtime.dart';
 import 'scope.dart';
 import 'token.dart';
 
-typedef AstFPtr = AST Function(Runtime runtime, AST self,  DynamicList args);
+typedef AstFPtr = AST Function(Runtime runtime, AST self, List args);
 
 enum ASTType {
   AST_OBJECT,
@@ -19,6 +18,7 @@ enum ASTType {
   AST_STRING,
   AST_DOUBLE,
   AST_LIST,
+  AST_MAP,
   AST_BOOL,
   AST_INT,
   AST_ANY,
@@ -88,20 +88,21 @@ class AST {
   AST forChangeStatement;
   AST forBody;
 
-  DynamicList compoundValue;
+  List compoundValue;
 
-  DynamicList funcCallArgs;
+  List funcCallArgs;
 
-  DynamicList funcDefinitions;
-  DynamicList funcDefArgs;
+  List funcDefinitions;
+  List funcDefArgs;
 
   AST funcDefBody;
   AST funcDefType;
 
-  DynamicList objectChildren;
-  DynamicList enumChildren;
-  DynamicList listChildren;
-  DynamicList compChildren;
+  List objectChildren;
+  List enumChildren;
+  List listChildren;
+  Map map;
+  List compChildren;
 
   dynamic objectValue;
 
@@ -137,18 +138,13 @@ class AST {
 AST initAST(ASTType type) {
   var ast = AST();
   ast.type = type;
-  ast.compoundValue =
-      ast.type == ASTType.AST_COMPOUND ? initDynamicList(0) : null;
-  ast.funcCallArgs =
-      ast.type == ASTType.AST_FUNC_CALL ? initDynamicList(0) : null;
-  ast.funcDefArgs =
-      ast.type == ASTType.AST_FUNC_DEFINITION ? initDynamicList(0) : null;
-  ast.objectChildren =
-      ast.type == ASTType.AST_OBJECT ? initDynamicList(0) : null;
-  ast.enumChildren = ast.type == ASTType.AST_ENUM ? initDynamicList(0) : null;
-  ast.listChildren = ast.type == ASTType.AST_LIST ? initDynamicList(0) : null;
-  ast.compChildren =
-      ast.type == ASTType.AST_FUNC_DEFINITION ? initDynamicList(0) : null;
+  ast.compoundValue = ast.type == ASTType.AST_COMPOUND ? [] : null;
+  ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
+  ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
+  ast.objectChildren = ast.type == ASTType.AST_OBJECT ? [] : null;
+  ast.enumChildren = ast.type == ASTType.AST_ENUM ? [] : null;
+  ast.listChildren = ast.type == ASTType.AST_LIST ? [] : null;
+  ast.compChildren = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
 
   return ast;
 }
@@ -222,11 +218,11 @@ AST astCopy(AST ast) {
 AST astCopyObject(AST ast) {
   var a = initAST(ast.type);
   a.scope = ast.scope;
-  a.objectChildren = initDynamicList(0);
+  a.objectChildren = [];
 
-  for (var i = 0; i < ast.objectChildren.size; i++) {
-    var child_copy = astCopy(ast);
-    dynamicListAppend(a.objectChildren, child_copy);
+  for (int i = 0; i < ast.objectChildren.length; i++) {
+    var childCopy = astCopy(ast);
+    a.objectChildren.add(childCopy);
   }
 
   return a;
@@ -263,11 +259,11 @@ AST astCopyFunctionDefinition(AST ast) {
   a.scope = ast.scope;
   a.funcName = ast.funcName;
   a.funcDefBody = astCopy(ast.funcDefBody);
-  a.funcDefArgs = initDynamicList(0);
+  a.funcDefArgs = [];
 
-  for (var i = 0; i < ast.funcDefArgs.size; i++) {
-    var item = astCopy(ast.funcDefArgs.items[i]);
-    dynamicListAppend(a.funcDefArgs, item);
+  for (int i = 0; i < ast.funcDefArgs.length; i++) {
+    var item = astCopy(ast.funcDefArgs[i]);
+    a.funcDefArgs.add(item);
   }
 
   return a;
@@ -292,11 +288,11 @@ AST astCopyDouble(AST ast) {
 AST astCopyList(AST ast) {
   var a = initAST(ast.type);
   a.scope = ast.scope;
-  a.listChildren = initDynamicList(0);
+  a.listChildren = [];
 
-  for (var i = 0; i < ast.listChildren.size; i++) {
-    var item = astCopy(ast.listChildren.items[i]);
-    dynamicListAppend(a.listChildren, item);
+  for (int i = 0; i < ast.listChildren.length; i++) {
+    var item = astCopy(ast.listChildren[i]);
+    a.listChildren.add(item);
   }
 
   return a;
@@ -321,11 +317,11 @@ AST astCopyInt(AST ast) {
 AST astCopyCompound(AST ast) {
   var a = initAST(ast.type);
   a.scope = ast.scope;
-  a.compoundValue = initDynamicList(0);
+  a.compoundValue = [];
 
-  for (var i = 0; i < ast.compoundValue.size; i++) {
-    var item = astCopy(ast.compoundValue.items[i]);
-    dynamicListAppend(a.compoundValue, item);
+  for (int i = 0; i < ast.compoundValue.length; i++) {
+    var item = astCopy(ast.compoundValue[i]);
+    a.compoundValue.add(item);
   }
 
   return a;
@@ -380,11 +376,11 @@ AST astCopyVariableModifier(AST ast) {
 AST astCopyFunctionCall(AST ast) {
   var a = initAST(ast.type);
   a.funcCallExpression = astCopy(ast.funcCallExpression);
-  a.funcCallArgs = initDynamicList(0);
+  a.funcCallArgs = [];
 
-  for (var i = 0; i < ast.funcCallArgs.size; i++) {
-    var item = astCopy(ast.funcCallArgs.items[i]);
-    dynamicListAppend(a.funcCallArgs, item);
+  for (int i = 0; i < ast.funcCallArgs.length; i++) {
+    var item = astCopy(ast.funcCallArgs[i]);
+    a.funcCallArgs.add(item);
   }
 
   return a;
@@ -481,13 +477,13 @@ String astObjectToString(AST ast) {
 }
 
 String astFunctionDefinitionToString(AST ast) {
-  return '${ast.funcName} (${ast.funcDefArgs.size})';
+  return '${ast.funcName} (${ast.funcDefArgs.length})';
 }
 
 String astFunctionCallToString(AST ast) {
   var expressionStr = astToString(ast.funcCallExpression);
 
-  return '$expressionStr (${ast.funcCallArgs.size})';
+  return '$expressionStr (${ast.funcCallArgs.length})';
 }
 
 String astNullToString(AST ast) {
@@ -515,7 +511,7 @@ String astTypeToString(AST ast) {
 }
 
 String astAttributeAccessToString(AST ast) {
- return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
+  return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
 }
 
 String astListAccessToString(AST ast) {

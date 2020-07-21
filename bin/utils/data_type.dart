@@ -7,6 +7,7 @@ enum DATATYPE {
   DATA_TYPE_OBJECT,
   DATA_TYPE_ENUM,
   DATA_TYPE_LIST,
+  DATA_TYPE_MAP,
   DATA_TYPE_SOURCE
 }
 
@@ -45,7 +46,7 @@ DataType dataTypeCopy(DataType src) {
 bool dataTypeHasModifier(DataType dataType, int modifier) {
   if (dataType == null) return false;
 
-  for (var i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++) {
     if (dataType.modifiers[i] == modifier) return true;
   }
 

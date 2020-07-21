@@ -3,15 +3,15 @@ import 'dynamic_list.dart';
 
 class Scope {
   AST owner;
-  DynamicList variableDefinitions;
-  DynamicList functionDefinitions;
+  List variableDefinitions;
+  List functionDefinitions;
   bool global;
 }
 
 Scope initScope(bool global) {
   var scope = Scope();
-  scope.variableDefinitions = initDynamicList(0);
-  scope.functionDefinitions = initDynamicList(0);
+  scope.variableDefinitions = [];
+  scope.functionDefinitions = [];
   scope.global = global;
 
   return scope;
