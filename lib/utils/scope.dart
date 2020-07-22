@@ -1,5 +1,4 @@
 import 'AST.dart';
-import 'dynamic_list.dart';
 
 class Scope {
   AST owner;

@@ -3,11 +3,12 @@ import 'runtime.dart';
 import 'scope.dart';
 import 'token.dart';
 
-typedef AstFPtr = AST Function(Runtime runtime, AST self, List args);
-typedef FutAstFPtr = Future<AST> Function(Runtime runtime, AST self, List args);
+typedef AstFuncPointer = AST Function(Runtime runtime, AST self, List args);
+typedef AstFutureFuncPointer = Future<AST> Function(
+    Runtime runtime, AST self, List args);
 
 enum ASTType {
-  AST_OBJECT,
+  AST_CLASS,
   AST_ENUM,
   AST_VARIABLE,
   AST_VARIABLE_DEFINITION,
@@ -56,7 +57,7 @@ class AST {
 // AST_BOOL
   bool boolValue = false;
 
-  bool isObjectChild = false;
+  bool isClassChild = false;
 
   // AST_DOUBLE
   double doubleValue = 0.0;
@@ -99,13 +100,13 @@ class AST {
   AST funcDefBody;
   AST funcDefType;
 
-  List objectChildren;
+  List classChildren;
   List enumChildren;
   List listChildren;
   Map<String, dynamic> map;
   List compChildren;
 
-  dynamic objectValue;
+  dynamic classValue;
 
   // AST_IF
   AST ifExpression;
@@ -133,17 +134,18 @@ class AST {
 
   Scope scope;
 
-  AstFPtr fptr;
-  FutAstFPtr futureptr;
+  AstFuncPointer fptr;
+  AstFutureFuncPointer futureptr;
 }
 
+/// Initializes the Abstract Syntax tree with default values
 AST initAST(ASTType type) {
   var ast = AST();
   ast.type = type;
   ast.compoundValue = ast.type == ASTType.AST_COMPOUND ? [] : null;
   ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
   ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
-  ast.objectChildren = ast.type == ASTType.AST_OBJECT ? [] : null;
+  ast.classChildren = ast.type == ASTType.AST_CLASS ? [] : null;
   ast.enumChildren = ast.type == ASTType.AST_ENUM ? [] : null;
   ast.listChildren = ast.type == ASTType.AST_LIST ? [] : null;
   ast.compChildren = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
@@ -163,274 +165,10 @@ AST astRScope(AST ast, Scope scope) {
   return ast;
 }
 
-AST astCopy(AST ast) {
-  if (ast == null) {
-    return null;
-  }
-
-  switch (ast.type) {
-    case ASTType.AST_OBJECT:
-      return astRScope(astCopyObject(ast), ast.scope);
-    case ASTType.AST_VARIABLE:
-      return astRScope(astCopyVariable(ast), ast.scope);
-    case ASTType.AST_VARIABLE_DEFINITION:
-      return astRScope(astCopyVariableDefinition(ast), ast.scope);
-    case ASTType.AST_VARIABLE_ASSIGNMENT:
-      return astRScope(astCopyVariableAssignment(ast), ast.scope);
-    case ASTType.AST_VARIABLE_MODIFIER:
-      return astRScope(astCopyVariableModifier(ast), ast.scope);
-    case ASTType.AST_FUNC_DEFINITION:
-      return astRScope(astCopyFunctionDefinition(ast), ast.scope);
-    case ASTType.AST_FUNC_CALL:
-      return astRScope(astCopyFunctionCall(ast), ast.scope);
-    case ASTType.AST_NULL:
-      return astRScope(astCopyNull(ast), ast.scope);
-    case ASTType.AST_STRING:
-      return astRScope(astCopyString(ast), ast.scope);
-    case ASTType.AST_DOUBLE:
-      return astRScope(astCopyDouble(ast), ast.scope);
-    case ASTType.AST_LIST:
-      return astRScope(astCopyList(ast), ast.scope);
-    case ASTType.AST_BOOL:
-      return astRScope(astCopyBool(ast), ast.scope);
-    case ASTType.AST_INT:
-      return astRScope(astCopyInt(ast), ast.scope);
-    case ASTType.AST_COMPOUND:
-      return astRScope(astCopyCompound(ast), ast.scope);
-    case ASTType.AST_TYPE:
-      return astRScope(astCopyType(ast), ast.scope);
-    case ASTType.AST_BINARYOP:
-      return astRScope(astCopyBinop(ast), ast.scope);
-    case ASTType.AST_NOOP:
-      return ast;
-    case ASTType.AST_BREAK:
-      return ast;
-    case ASTType.AST_RETURN:
-      return astRScope(astCopyReturn(ast), ast.scope);
-    case ASTType.AST_IF:
-      return astRScope(astCopyIf(ast), ast.scope);
-    case ASTType.AST_WHILE:
-      return astRScope(astCopyWhile(ast), ast.scope);
-    default:
-      print('AST type ${ast.type} cannot be copied');
-      return null;
-  }
-}
-
-AST astCopyObject(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.objectChildren = [];
-
-  for (int i = 0; i < ast.objectChildren.length; i++) {
-    var childCopy = astCopy(ast);
-    a.objectChildren.add(childCopy);
-  }
-
-  return a;
-}
-
-AST astCopyVariable(AST ast) {
-  AST type;
-
-  if (ast.variableType != null) {
-    type = astCopy(ast.variableType);
-  }
-
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.variableType = type;
-  a.variableValue = astCopy(ast.variableValue);
-  a.variableName = ast.variableName;
-
-  return a;
-}
-
-AST astCopyVariableDefinition(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.variableValue = astCopy(ast.variableValue);
-  a.variableType = astCopy(ast.variableType);
-  a.variableName = ast.variableName;
-
-  return a;
-}
-
-AST astCopyFunctionDefinition(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.funcName = ast.funcName;
-  a.funcDefBody = astCopy(ast.funcDefBody);
-  a.funcDefArgs = [];
-
-  for (int i = 0; i < ast.funcDefArgs.length; i++) {
-    var item = astCopy(ast.funcDefArgs[i]);
-    a.funcDefArgs.add(item);
-  }
-
-  return a;
-}
-
-AST astCopyString(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.stringValue = ast.stringValue;
-
-  return a;
-}
-
-AST astCopyDouble(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.doubleValue = ast.doubleValue;
-
-  return a;
-}
-
-AST astCopyList(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.listChildren = [];
-
-  for (int i = 0; i < ast.listChildren.length; i++) {
-    var item = astCopy(ast.listChildren[i]);
-    a.listChildren.add(item);
-  }
-
-  return a;
-}
-
-AST astCopyBool(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.boolValue = ast.boolValue;
-
-  return a;
-}
-
-AST astCopyInt(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.intVal = ast.intVal;
-
-  return a;
-}
-
-AST astCopyCompound(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.compoundValue = [];
-
-  for (int i = 0; i < ast.compoundValue.length; i++) {
-    var item = astCopy(ast.compoundValue[i]);
-    a.compoundValue.add(item);
-  }
-
-  return a;
-}
-
-AST astCopyType(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.typeValue = dataTypeCopy(ast.typeValue);
-
-  return a;
-}
-
-AST astCopyAttributeAccess(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-  a.binaryOpLeft = astCopy(ast.binaryOpLeft);
-  a.binaryOpRight = astCopy(ast.binaryOpRight);
-  a.binaryOperator = ast.binaryOperator;
-
-  return a;
-}
-
-AST astCopyReturn(AST ast) {
-  var a = initAST(ast.type);
-  a.scope = ast.scope;
-
-  if (ast.returnValue != null) {
-    a.returnValue = astCopy(ast.returnValue);
-  }
-
-  return a;
-}
-
-AST astCopyVariableAssignment(AST ast) {
-  var a = initAST(ast.type);
-  a.variableAssignmentLeft = astCopy(ast.variableAssignmentLeft);
-  a.variableValue = astCopy(ast.variableValue);
-
-  return a;
-}
-
-AST astCopyVariableModifier(AST ast) {
-  var a = initAST(ast.type);
-  a.binaryOpLeft = astCopy(ast.binaryOpLeft);
-  a.binaryOpRight = astCopy(ast.binaryOpRight);
-  a.binaryOperator = ast.binaryOperator;
-
-  return a;
-}
-
-AST astCopyFunctionCall(AST ast) {
-  var a = initAST(ast.type);
-  a.funcCallExpression = astCopy(ast.funcCallExpression);
-  a.funcCallArgs = [];
-
-  for (int i = 0; i < ast.funcCallArgs.length; i++) {
-    var item = astCopy(ast.funcCallArgs[i]);
-    a.funcCallArgs.add(item);
-  }
-
-  return a;
-}
-
-AST astCopyNull(AST ast) {
-  var a = initAST(ast.type);
-
-  return a;
-}
-
-AST astCopyListAccess(AST ast) {
-  var a = initAST(ast.type);
-  a.listAccessPointer = astCopy(ast.listAccessPointer);
-
-  return a;
-}
-
-AST astCopyBinop(AST ast) {
-  var a = initAST(ast.type);
-  a.binaryOpLeft = astCopy(ast.binaryOpLeft);
-  a.binaryOpRight = astCopy(ast.binaryOpRight);
-  a.binaryOperator = ast.binaryOperator;
-
-  return a;
-}
-
-AST astCopyIf(AST ast) {
-  var a = initAST(ast.type);
-  a.ifExpression = astCopy(ast.ifExpression);
-  a.ifBody = astCopy(ast.ifBody);
-  a.ifElse = ast.ifElse;
-
-  return a;
-}
-
-AST astCopyWhile(AST ast) {
-  var a = initAST(ast.type);
-  a.whileExpression = astCopy(ast.whileExpression);
-  a.whileBody = astCopy(ast.whileBody);
-
-  return a;
-}
-
 String astToString(AST ast) {
   switch (ast.type) {
-    case ASTType.AST_OBJECT:
-      return astObjectToString(ast);
+    case ASTType.AST_CLASS:
+      return astClassToString(ast);
     case ASTType.AST_VARIABLE:
       return ast.variableName;
     case ASTType.AST_FUNC_DEFINITION:
@@ -478,7 +216,7 @@ String astToString(AST ast) {
   }
 }
 
-String astObjectToString(AST ast) {
+String astClassToString(AST ast) {
   return '{ class }';
 }
 

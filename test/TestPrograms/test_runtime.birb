@@ -1,0 +1,28 @@
+class Birb {
+  String favouriteGreeting = 'Henlo';
+  String name = 'Birb';
+  int age = 10;
+  List favouriteFood = ['Seeb', 'Seeb', 'Seeb'];
+  Map goodBadMap = {
+        'good': ['Seeb'],
+        'bad': 'rest',
+        'goodCount': 1,
+        'badCount': 'ERROR'
+  };
+}
+
+
+List favouriteFood = Birb.favouriteFood;
+Map goodBadMap = Birb.goodBadMap;
+
+   class foo = new Birb;
+  void printDetails() {
+    screm(foo.favouriteGreeting + " am " + foo.name);
+    screm("I am " + foo.age + " years old");
+    screm("I like " + favouriteFood[0]);
+
+    // IDK, first thing that came to mind
+    screm('There is only ' + goodBadMap['goodCount'] + " item in my good list");
+  }
+
+printDetails();

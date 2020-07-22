@@ -6,24 +6,35 @@ import 'package:Birb/utils/lexer.dart';
 import 'package:Birb/utils/parser.dart';
 import 'package:Birb/utils/runtime.dart';
 
-bool isInteractive = false;
-
 void main(List<String> arguments) {
-  Runtime runtime = initRuntime();
-  Lexer lexer;
-  Parser parser;
-  AST node;
-  if (arguments.isEmpty) {
-    isInteractive = true;
-    print('<<<<< Birb Shell Initiated >>>>>');
+  /// If no file path is specified the birb shell will
+  /// start up allowing developers to write programs directly from their terminal
+  bool isInteractive = false;
 
+  /// Runtime visitor
+  Runtime runtime = initRuntime();
+
+  Lexer lexer;
+
+  Parser parser;
+
+  AST node;
+
+  // No file path is specified, Initiate the birb shell
+  if (arguments.isEmpty) {
     int lineNum = 0;
     String input = '';
+    isInteractive = true;
+
+    print('<<<<< Birb Shell Initiated >>>>>');
+
     while (isInteractive) {
       lineNum++;
       stdout.write('$lineNum: ');
       var str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
-      if (str == 'runBirb') {
+
+      // Compile program
+      if (str == 'runBirb()') {
         lexer = initLexer(input);
         parser = initParser(lexer);
         node = parse(parser);
@@ -31,17 +42,19 @@ void main(List<String> arguments) {
         isInteractive = false;
       }
 
-      if (str == 'quit();') {
+      // Exit shell
+      if (str == 'quit()') {
         isInteractive = false;
         break;
       }
-
       input += str + '\n';
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
     return;
   }
+
+  // File path was given
 
   lexer = initLexer(File(arguments[0]).readAsStringSync());
   parser = initParser(lexer);

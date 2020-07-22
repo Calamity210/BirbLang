@@ -1,0 +1,7 @@
+String henlo = "Henlo birb";
+
+void print(String msg) {
+    screm(msg);
+}
+
+print(henlo);

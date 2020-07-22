@@ -7,3 +7,9 @@ build/
 
 # Directory created by dartdoc
 doc/api/
+
+# Intellij stuff
+.idea/
+
+# Executable
+birb

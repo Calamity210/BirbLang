@@ -12,14 +12,18 @@
       <w>fname</w>
       <w>fopen</w>
       <w>fptr</w>
+      <w>henlo</w>
       <w>lbrace</w>
       <w>lbracket</w>
       <w>lparan</w>
+      <w>lparen</w>
       <w>mapo</w>
       <w>rbrace</w>
       <w>rbracket</w>
       <w>rparan</w>
+      <w>rparen</w>
       <w>screm</w>
+      <w>seeb</w>
       <w>stdoutbuffer</w>
       <w>ternaryop</w>
       <w>unaryop</w>

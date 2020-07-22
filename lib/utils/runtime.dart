@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'AST.dart';
-import 'standards.dart';
 import 'data_type.dart';
 import 'scope.dart';
+import 'standards.dart';
 import 'token.dart';
 
 class Runtime {
@@ -28,9 +28,7 @@ void multipleVariableDefinitionsError(int lineNum, String variableName) {
 }
 
 AST listAddFPtr(Runtime runtime, AST self, List args) {
-  for (int i = 0; i < args.length; i++) {
-    self.listChildren.add(args[i]);
-  }
+  self.listChildren.addAll(args);
 
   return self;
 }
@@ -154,7 +152,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
   return await visit(runtime, fdef.funcDefBody);
 }
 
-AST registerGlobalFunction(Runtime runtime, String fname, AstFPtr fptr) {
+AST registerGlobalFunction(Runtime runtime, String fname, AstFuncPointer fptr) {
   var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
   fdef.funcName = fname;
   fdef.fptr = fptr;
@@ -163,7 +161,7 @@ AST registerGlobalFunction(Runtime runtime, String fname, AstFPtr fptr) {
 }
 
 AST registerGlobalFutureFunction(
-    Runtime runtime, String fname, FutAstFPtr fptr) {
+    Runtime runtime, String fname, AstFutureFuncPointer fptr) {
   var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
   fdef.funcName = fname;
   fdef.futureptr = fptr;
@@ -220,7 +218,7 @@ Future<AST> visit(Runtime runtime, AST node) async {
   }
 
   switch (node.type) {
-    case ASTType.AST_OBJECT:
+    case ASTType.AST_CLASS:
       return node;
     case ASTType.AST_ENUM:
       return node;
@@ -243,9 +241,15 @@ Future<AST> visit(Runtime runtime, AST node) async {
     case ASTType.AST_DOUBLE:
       return node;
     case ASTType.AST_LIST:
-      return node;
+      {
+        node.funcDefinitions = runtime.listMethods;
+        return node;
+      }
     case ASTType.AST_MAP:
-      return node;
+      {
+        node.funcDefinitions = runtime.mapMethods;
+        return node;
+      }
     case ASTType.AST_BOOL:
       return node;
     case ASTType.AST_INT:
@@ -332,9 +336,9 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
   var localScope = node.scope;
   var globalScope = runtime.scope;
 
-  if (node.objectChildren != null && node.objectChildren.isNotEmpty) {
-    for (int i = 0; i < node.objectChildren.length; i++) {
-      AST objectVarDef = node.objectChildren[i];
+  if (node.classChildren != null && node.classChildren.isNotEmpty) {
+    for (int i = 0; i < node.classChildren.length; i++) {
+      AST objectVarDef = node.classChildren[i];
 
       if (objectVarDef.type != ASTType.AST_VARIABLE_DEFINITION) {
         continue;
@@ -392,7 +396,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
     }
   }
 
-  if (!node.isObjectChild && globalScope != null) {
+  if (!node.isClassChild && globalScope != null) {
     var varDef = await getVarDefByName(runtime, globalScope, node.variableName);
 
     if (varDef != null) {
@@ -462,9 +466,9 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
   var localScope = node.scope;
   var globalScope = runtime.scope;
 
-  if (node.objectChildren != null && node.objectChildren.isNotEmpty) {
-    for (int i = 0; i < node.objectChildren.length; i++) {
-      AST objectVarDef = node.objectChildren[i];
+  if (node.classChildren != null && node.classChildren.isNotEmpty) {
+    for (int i = 0; i < node.classChildren.length; i++) {
+      AST objectVarDef = node.classChildren[i];
 
       if (objectVarDef.type != ASTType.AST_VARIABLE_DEFINITION) {
         continue;
@@ -525,9 +529,9 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
   for (int i = 0; i < varScope.variableDefinitions.length; i++) {
     AST astVarDef = varScope.variableDefinitions[i];
 
-    if (node.objectChildren != null) {
-      for (int i = 0; i < node.objectChildren.length; i++) {
-        AST objectVarDef = node.objectChildren[i];
+    if (node.classChildren != null) {
+      for (int i = 0; i < node.classChildren.length; i++) {
+        AST objectVarDef = node.classChildren[i];
 
         if (objectVarDef.type != ASTType.AST_VARIABLE_DEFINITION) continue;
 
@@ -798,8 +802,8 @@ Future<AST> visitCompound(Runtime runtime, AST node) async {
 }
 
 Future<AST> visitAttAccess(Runtime runtime, AST node) async {
-  if (node.objectChildren != null)
-    node.binaryOpLeft.objectChildren = node.objectChildren;
+  if (node.classChildren != null)
+    node.binaryOpLeft.classChildren = node.classChildren;
 
   var left = await visit(runtime, node.binaryOpLeft);
 
@@ -863,15 +867,15 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         return astList;
       }
     }
-  } else if (left.type == ASTType.AST_OBJECT) {
+  } else if (left.type == ASTType.AST_CLASS) {
     if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
         node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
         node.binaryOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
         node.binaryOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
-      node.binaryOpRight.objectChildren = left.objectChildren;
+      node.binaryOpRight.classChildren = left.classChildren;
       node.binaryOpRight.scope = left.scope;
-      node.binaryOpRight.isObjectChild = true;
-      node.objectChildren = left.objectChildren;
+      node.binaryOpRight.isClassChild = true;
+      node.classChildren = left.classChildren;
       node.scope = left.scope;
     }
   } else if (left.type == ASTType.AST_ENUM) {
@@ -908,9 +912,9 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         }
       }
 
-      if (left.objectChildren != null) {
-        for (int i = 0; i < left.objectChildren.length; i++) {
-          AST objChild = left.objectChildren[i];
+      if (left.classChildren != null) {
+        for (int i = 0; i < left.classChildren.length; i++) {
+          AST objChild = left.classChildren[i];
 
           if (objChild.type == ASTType.AST_FUNC_DEFINITION) if (objChild
                   .funcName ==
@@ -971,9 +975,9 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
     if (right.type == ASTType.AST_BINARYOP) right = await visit(runtime, right);
 
-    if (left.type == ASTType.AST_OBJECT) {
-      for (int i = 0; i < left.objectChildren.length; i++) {
-        var child = await visit(runtime, left.objectChildren[i] as AST);
+    if (left.type == ASTType.AST_CLASS) {
+      for (int i = 0; i < left.classChildren.length; i++) {
+        var child = await visit(runtime, left.classChildren[i] as AST);
 
         if (child.type == ASTType.AST_VARIABLE_DEFINITION &&
             child.type == ASTType.AST_VARIABLE_ASSIGNMENT) {
@@ -1350,19 +1354,19 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
           return retVal;
         }
-        if (left.type == ASTType.AST_OBJECT &&
-            right.type == ASTType.AST_OBJECT) {
+        if (left.type == ASTType.AST_CLASS &&
+            right.type == ASTType.AST_CLASS) {
           retVal = initAST(ASTType.AST_BOOL);
 
-          retVal.boolValue = left.objectChildren == right.objectChildren;
+          retVal.boolValue = left.classChildren == right.classChildren;
 
           return retVal;
         }
 
-        if (left.type == ASTType.AST_OBJECT && right.type == ASTType.AST_NULL) {
+        if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_NULL) {
           retVal = initAST(ASTType.AST_BOOL);
 
-          retVal.boolValue = left.objectChildren.isEmpty;
+          retVal.boolValue = left.classChildren.isEmpty;
 
           return retVal;
         }
@@ -1437,19 +1441,19 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
           return retVal;
         }
-        if (left.type == ASTType.AST_OBJECT &&
-            right.type == ASTType.AST_OBJECT) {
+        if (left.type == ASTType.AST_CLASS &&
+            right.type == ASTType.AST_CLASS) {
           retVal = initAST(ASTType.AST_BOOL);
 
-          retVal.boolValue = left.objectChildren != right.objectChildren;
+          retVal.boolValue = left.classChildren != right.classChildren;
 
           return retVal;
         }
 
-        if (left.type == ASTType.AST_OBJECT && right.type == ASTType.AST_NULL) {
+        if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_NULL) {
           retVal = initAST(ASTType.AST_BOOL);
 
-          retVal.boolValue = left.objectChildren.isNotEmpty;
+          retVal.boolValue = left.classChildren.isNotEmpty;
 
           return retVal;
         }
@@ -1563,7 +1567,7 @@ Future<AST> visitFor(Runtime runtime, AST node) async {
 }
 
 Future<AST> visitNew(Runtime runtime, AST node) async {
-  return astCopy(await visit(runtime, node.newValue));
+  return await visit(runtime, node.newValue);
 }
 
 Future<AST> visitIterate(Runtime runtime, AST node) async {

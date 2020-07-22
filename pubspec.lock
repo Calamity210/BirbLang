@@ -309,6 +309,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.11"
+  test_process:
+    dependency: "direct main"
+    description:
+      name: test_process
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.5"
   typed_data:
     dependency: transitive
     description:

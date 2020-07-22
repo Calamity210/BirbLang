@@ -1,4 +1,0 @@
-Map map = {}
-class res = GET("https://pub.dev/packages?q=auth", map);
-
-screm(res.body);

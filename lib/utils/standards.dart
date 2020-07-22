@@ -80,7 +80,7 @@ AST funcExit(Runtime runtime, AST self, List args) {
 }
 
 AST objFileFuncRead(Runtime runtime, AST self, List args) {
-  File f = self.objectValue;
+  File f = self.classValue;
   var astString = initAST(ASTType.AST_STRING);
 
   astString.stringValue = f.readAsStringSync();
@@ -117,10 +117,10 @@ AST funcFileOpen(Runtime runtime, AST self, List args) {
   AST astObj;
 
   f.open(mode: mode).then((value) {
-    astObj = initAST(ASTType.AST_OBJECT);
+    astObj = initAST(ASTType.AST_CLASS);
     astObj.variableType = initAST(ASTType.AST_TYPE);
-    astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
-    astObj.objectValue = value;
+    astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+    astObj.classValue = value;
 
     var fDefRead = initAST(ASTType.AST_FUNC_DEFINITION);
     fDefRead.funcName = 'read';
@@ -133,13 +133,13 @@ AST funcFileOpen(Runtime runtime, AST self, List args) {
 }
 
 AST funcFileWrite(Runtime runtime, AST self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_OBJECT]);
+  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_CLASS]);
 
   var retAST = initAST(ASTType.AST_INT);
   retAST.intVal = 1;
 
   var line = (args[0] as AST).stringValue;
-  File f = (args[1] as AST).objectValue;
+  File f = (args[1] as AST).classValue;
 
   f.writeAsStringSync(line);
 
@@ -150,9 +150,9 @@ AST funcFileWrite(Runtime runtime, AST self, List args) {
  * DATE AND TIME
  */
 AST funcDate(Runtime runtime, AST self, List args) {
-  var astObj = initAST(ASTType.AST_OBJECT);
+  var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD YEAR TO DATE OBJECT
   var astVarYear = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -164,7 +164,7 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astIntYear.intVal = DateTime.now().year;
   astVarYear.variableValue = astIntYear;
 
-  astObj.objectChildren.add(astVarYear);
+  astObj.classChildren.add(astVarYear);
 
   // ADD MONTH TO DATE OBJECT
   var astVarMonth = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -176,7 +176,7 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astIntMonth.intVal = DateTime.now().month;
   astVarMonth.variableValue = astIntMonth;
 
-  astObj.objectChildren.add(astVarMonth);
+  astObj.classChildren.add(astVarMonth);
 
   // ADD DAYS TO DATE OBJECT
   var astVarDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -188,7 +188,7 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astIntDay.intVal = DateTime.now().day;
   astVarDay.variableValue = astIntDay;
 
-  astObj.objectChildren.add(astVarDay);
+  astObj.classChildren.add(astVarDay);
 
   // ADD DAYS TO DATE OBJECT
   var astVarWeekDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -200,15 +200,15 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astIntWeekDay.intVal = DateTime.now().weekday;
   astIntWeekDay.variableValue = astIntWeekDay;
 
-  astObj.objectChildren.add(astVarWeekDay);
+  astObj.classChildren.add(astVarWeekDay);
 
   return astObj;
 }
 
 AST funcTime(Runtime runtime, AST self, List args) {
-  var astObj = initAST(ASTType.AST_OBJECT);
+  var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD HOURS TO TIME OBJECT
   var astVarHour = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -220,7 +220,7 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astIntHour.intVal = DateTime.now().hour;
   astVarHour.variableValue = astIntHour;
 
-  astObj.objectChildren.add(astVarHour);
+  astObj.classChildren.add(astVarHour);
 
   // ADD MINUTES TO TIME OBJECT
   var astVarMinute = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -232,7 +232,7 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astIntMinute.intVal = DateTime.now().minute;
   astVarHour.variableValue = astIntMinute;
 
-  astObj.objectChildren.add(astVarMinute);
+  astObj.classChildren.add(astVarMinute);
 
   // ADD SECONDS TO TIME OBJECT
   var astVarSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -244,7 +244,7 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astIntSeconds.intVal = DateTime.now().second;
   astVarSeconds.variableValue = astIntSeconds;
 
-  astObj.objectChildren.add(astVarSeconds);
+  astObj.classChildren.add(astVarSeconds);
 
   // ADD MILLISECONDS TO TIME OBJECT
   var astVarMilliSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -257,15 +257,15 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astIntMilliSeconds.intVal = DateTime.now().millisecond;
   astVarMilliSeconds.variableValue = astIntMilliSeconds;
 
-  astObj.objectChildren.add(astVarMilliSeconds);
+  astObj.classChildren.add(astVarMilliSeconds);
 
   return astObj;
 }
 
 AST funcDateTime(Runtime runtime, AST self, List args) {
-  var astObj = initAST(ASTType.AST_OBJECT);
+  var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD YEAR TO DATETIME OBJECT
   var astVarYear = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -277,7 +277,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntYear.intVal = DateTime.now().year;
   astVarYear.variableValue = astIntYear;
 
-  astObj.objectChildren.add(astVarYear);
+  astObj.classChildren.add(astVarYear);
 
   // ADD MONTH TO DATETIME OBJECT
   var astVarMonth = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -289,7 +289,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntMonth.intVal = DateTime.now().month;
   astVarMonth.variableValue = astIntMonth;
 
-  astObj.objectChildren.add(astVarMonth);
+  astObj.classChildren.add(astVarMonth);
 
   // ADD DAYS TO DATETIME OBJECT
   var astVarDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -301,7 +301,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntDay.intVal = DateTime.now().day;
   astVarDay.variableValue = astIntDay;
 
-  astObj.objectChildren.add(astVarDay);
+  astObj.classChildren.add(astVarDay);
 
   // ADD WEEKDAYS TO DATETIME OBJECT
   var astVarWeekDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -313,7 +313,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntWeekDay.intVal = DateTime.now().weekday;
   astIntWeekDay.variableValue = astIntWeekDay;
 
-  astObj.objectChildren.add(astVarWeekDay);
+  astObj.classChildren.add(astVarWeekDay);
 
   // ADD HOURS TO DATETIME OBJECT
   var astVarHour = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -325,7 +325,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntHour.intVal = DateTime.now().hour;
   astVarHour.variableValue = astIntHour;
 
-  astObj.objectChildren.add(astVarHour);
+  astObj.classChildren.add(astVarHour);
 
   // ADD MINUTES TO DATETIME OBJECT
   var astVarMinute = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -337,7 +337,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntMinute.intVal = DateTime.now().minute;
   astVarMinute.variableValue = astIntMinute;
 
-  astObj.objectChildren.add(astVarMinute);
+  astObj.classChildren.add(astVarMinute);
 
   // ADD SECONDS TO DATETIME OBJECT
   var astVarSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -349,7 +349,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntSeconds.intVal = DateTime.now().second;
   astVarSeconds.variableValue = astIntSeconds;
 
-  astObj.objectChildren.add(astVarSeconds);
+  astObj.classChildren.add(astVarSeconds);
 
   // ADD MILLISECONDS TO DATETIME OBJECT
   var astVarMilliSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -362,7 +362,7 @@ AST funcDateTime(Runtime runtime, AST self, List args) {
   astIntMilliSeconds.intVal = DateTime.now().millisecond;
   astVarMilliSeconds.variableValue = astIntMilliSeconds;
 
-  astObj.objectChildren.add(astVarMilliSeconds);
+  astObj.classChildren.add(astVarMilliSeconds);
 
   return astObj;
 }
@@ -382,9 +382,9 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
 
   Response response = await get(url);
 
-  var astObj = initAST(ASTType.AST_OBJECT);
+  var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // BODY
   var ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -396,7 +396,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.stringValue = response.body;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // BODY BYTES
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -408,7 +408,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.listChildren = response.bodyBytes;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // STATUS CODE
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -420,7 +420,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.intVal = response.statusCode;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // CONTENT LENGTH
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -432,7 +432,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.intVal = response.contentLength;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // REASON PHRASE
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -444,7 +444,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.stringValue = response.reasonPhrase;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // HEADERS
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -456,7 +456,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   astVal.map = response.headers;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   return astObj;
 }
@@ -482,9 +482,9 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
 
   Response response = await post(url, headers: head, body: bodyList ?? bodyMap);
 
-  var astObj = initAST(ASTType.AST_OBJECT);
+  var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_OBJECT);
+  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // BODY
   var ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -496,7 +496,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.stringValue = response.body;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // BODY BYTES
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -508,7 +508,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.listChildren = response.bodyBytes;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // STATUS CODE
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -520,7 +520,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.intVal = response.statusCode;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // CONTENT LENGTH
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -532,7 +532,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.intVal = response.contentLength;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // REASON PHRASE
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -544,7 +544,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.stringValue = response.reasonPhrase;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   // HEADERS
   ast = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -556,7 +556,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astVal.map = response.headers;
   ast.variableValue = astVal;
 
-  astObj.objectChildren.add(ast);
+  astObj.classChildren.add(ast);
 
   return astObj;
 }

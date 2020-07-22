@@ -27,6 +27,7 @@ class Parser {
   DataType dataType;
 }
 
+/// Initializes and returns a parser with a lexer
 Parser initParser(Lexer lexer) {
   var parser = Parser();
   parser.lexer = lexer;
@@ -35,29 +36,33 @@ Parser initParser(Lexer lexer) {
   return parser;
 }
 
+/// Throws an error and exits
 void parserTypeError(Parser parser) {
   print('[Line ${parser.lexer.lineNum}] Invalid type');
   exit(1);
 }
 
+/// Throws an error and exits
 void parserSyntaxError(Parser parser) {
   print('[Line ${parser.lexer.lineNum}] Syntax error');
   exit(1);
 }
 
+/// Throws an error and exits
 void parserUnexpectedToken(Parser parser, TokenType type) {
   print(
       '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
   exit(1);
 }
 
-AST asObjectChild(AST ast, AST object) {
-  ast.isObjectChild = true;
+/// Sets the ast to be a child of a class
+AST asClassChild(AST ast, AST object) {
+  ast.isClassChild = true;
   ast.parent = object;
-
   return ast;
 }
 
+/// Check if the token is a DataType
 bool isDataType(String tokenValue) {
   return (tokenValue == 'void' ||
       tokenValue == 'int' ||
@@ -134,7 +139,7 @@ AST parseStatement(Parser parser, Scope scope) {
 
         var a = parseVariable(parser, scope);
 
-        while (parser.curToken.type == TokenType.TOKEN_LPARAN) {
+        while (parser.curToken.type == TokenType.TOKEN_LPAREN) {
           a = parseFuncCall(parser, scope, a);
         }
 
@@ -230,7 +235,7 @@ AST parseType(Parser parser, Scope scope) {
       type.type = DATATYPE.DATA_TYPE_BOOL;
       break;
     case 'class':
-      type.type = DATATYPE.DATA_TYPE_OBJECT;
+      type.type = DATATYPE.DATA_TYPE_CLASS;
       break;
     case 'enum':
       type.type = DATATYPE.DATA_TYPE_ENUM;
@@ -356,14 +361,14 @@ AST parseVariable(Parser parser, Scope scope) {
   return ast;
 }
 
-AST parseObject(Parser parser, Scope scope) {
+AST parseClass(Parser parser, Scope scope) {
   if (parser.prevToken.type != TokenType.TOKEN_ID)
     return parseMap(parser, scope);
 
-  AST ast = initASTWithLine(ASTType.AST_OBJECT, parser.lexer.lineNum);
+  AST ast = initASTWithLine(ASTType.AST_CLASS, parser.lexer.lineNum);
 
   ast.scope = scope;
-  ast.objectChildren = [];
+  ast.classChildren = [];
 
   var newScope = initScope(false);
 
@@ -377,16 +382,16 @@ AST parseObject(Parser parser, Scope scope) {
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
-      ast.objectChildren
-          .add(asObjectChild(parseFuncDef(parser, newScope), ast));
+      ast.classChildren
+          .add(asClassChild(parseFuncDef(parser, newScope), ast));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI) {
       eat(parser, TokenType.TOKEN_SEMI);
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
-        ast.objectChildren
-            .add(asObjectChild(parseFuncDef(parser, newScope), ast));
+        ast.classChildren
+            .add(asClassChild(parseFuncDef(parser, newScope), ast));
       }
     }
   }
@@ -562,17 +567,17 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
       a = astListAccess;
     }
 
-    while (parser.curToken.type == TokenType.TOKEN_LPARAN)
+    while (parser.curToken.type == TokenType.TOKEN_LPAREN)
       a = parseFuncCall(parser, scope, a);
 
     if (a != null) return a;
   }
 
   /* */
-  if (parser.curToken.type == TokenType.TOKEN_LPARAN) {
-    eat(parser, TokenType.TOKEN_LPARAN);
+  if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
+    eat(parser, TokenType.TOKEN_LPAREN);
     var astExpression = parseExpression(parser, scope);
-    eat(parser, TokenType.TOKEN_RPARAN);
+    eat(parser, TokenType.TOKEN_RPAREN);
 
     return astExpression;
   }
@@ -586,7 +591,7 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
     case TokenType.TOKEN_STRING_VALUE:
       return parseString(parser, scope);
     case TokenType.TOKEN_LBRACE:
-      return parseObject(parser, scope);
+      return parseClass(parser, scope);
     case TokenType.TOKEN_LBRACKET:
       return parseList(parser, scope);
     default:
@@ -606,7 +611,7 @@ AST parseTerm(Parser parser, Scope scope) {
   var node = parseFactor(parser, scope, false);
   AST astBinaryOp;
 
-  if (parser.curToken.type == TokenType.TOKEN_LPARAN)
+  if (parser.curToken.type == TokenType.TOKEN_LPAREN)
     node = parseFuncCall(parser, scope, node);
 
   while (parser.curToken.type == TokenType.TOKEN_DIV ||
@@ -695,11 +700,11 @@ AST parseReturn(Parser parser, Scope scope) {
 AST parseIf(Parser parser, Scope scope) {
   var ast = initASTWithLine(ASTType.AST_IF, parser.lexer.lineNum);
   eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPARAN);
+  eat(parser, TokenType.TOKEN_LPAREN);
 
   ast.ifExpression = parseExpression(parser, scope);
 
-  eat(parser, TokenType.TOKEN_RPARAN);
+  eat(parser, TokenType.TOKEN_RPAREN);
 
   ast.scope = scope;
 
@@ -794,10 +799,10 @@ AST parseAssert(Parser parser, Scope scope) {
 
 AST parseWhile(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPARAN);
+  eat(parser, TokenType.TOKEN_LPAREN);
   var ast = initASTWithLine(ASTType.AST_WHILE, parser.lexer.lineNum);
   ast.whileExpression = parseExpression(parser, scope);
-  eat(parser, TokenType.TOKEN_RPARAN);
+  eat(parser, TokenType.TOKEN_RPAREN);
 
   if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
     eat(parser, TokenType.TOKEN_LBRACE);
@@ -816,7 +821,7 @@ AST parseFor(Parser parser, Scope scope) {
   var ast = initAST(ASTType.AST_FOR);
 
   eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPARAN);
+  eat(parser, TokenType.TOKEN_LPAREN);
 
   ast.forInitStatement = parseStatement(parser, scope);
   eat(parser, TokenType.TOKEN_SEMI);
@@ -826,7 +831,7 @@ AST parseFor(Parser parser, Scope scope) {
 
   ast.forChangeStatement = parseStatement(parser, scope);
 
-  eat(parser, TokenType.TOKEN_RPARAN);
+  eat(parser, TokenType.TOKEN_RPAREN);
 
   if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
     eat(parser, TokenType.TOKEN_LBRACE);
@@ -844,11 +849,11 @@ AST parseFor(Parser parser, Scope scope) {
 AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   var ast = initASTWithLine(ASTType.AST_FUNC_CALL, parser.lexer.lineNum);
   ast.funcCallExpression = expr;
-  eat(parser, TokenType.TOKEN_LPARAN);
+  eat(parser, TokenType.TOKEN_LPAREN);
 
   ast.scope = scope;
 
-  if (parser.curToken.type != TokenType.TOKEN_RPARAN) {
+  if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
     var astExpr = parseExpression(parser, scope);
 
     if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
@@ -869,7 +874,7 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
     }
   }
 
-  eat(parser, TokenType.TOKEN_RPARAN);
+  eat(parser, TokenType.TOKEN_RPAREN);
 
   return ast;
 }
@@ -894,7 +899,7 @@ AST parseFuncDef(Parser parser, Scope scope) {
     isEnum = true;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_LPARAN) {
+  if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     var ast =
         initASTWithLine(ASTType.AST_FUNC_DEFINITION, parser.lexer.lineNum);
     var newScope = initScope(false);
@@ -904,9 +909,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
     ast.funcDefType = astType;
     ast.funcDefArgs = [];
 
-    eat(parser, TokenType.TOKEN_LPARAN);
+    eat(parser, TokenType.TOKEN_LPAREN);
 
-    if (parser.curToken.type != TokenType.TOKEN_RPARAN) {
+    if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
       ast.funcDefArgs.add(parseExpression(parser, scope));
 
       while (parser.curToken.type == TokenType.TOKEN_COMMA) {
@@ -915,7 +920,7 @@ AST parseFuncDef(Parser parser, Scope scope) {
       }
     }
 
-    eat(parser, TokenType.TOKEN_RPARAN);
+    eat(parser, TokenType.TOKEN_RPAREN);
 
     if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
       AST childDef;
@@ -999,8 +1004,8 @@ AST parseFuncDef(Parser parser, Scope scope) {
       astVarDef.variableValue = parseExpression(parser, scope);
 
       switch (astVarDef.variableValue.type) {
-        case ASTType.AST_OBJECT:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_OBJECT)
+        case ASTType.AST_CLASS:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
             parserTypeError(parser);
           break;
         case ASTType.AST_ENUM:
@@ -1046,8 +1051,8 @@ AST parseFuncDef(Parser parser, Scope scope) {
       astVarDef.variableValue = parseExpression(parser, scope);
 
       switch (astVarDef.variableValue.type) {
-        case ASTType.AST_OBJECT:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_OBJECT)
+        case ASTType.AST_CLASS:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
             parserTypeError(parser);
           break;
         case ASTType.AST_ENUM:
@@ -1086,5 +1091,3 @@ AST parseFuncDef(Parser parser, Scope scope) {
     return astVarDef;
   }
 }
-
-
