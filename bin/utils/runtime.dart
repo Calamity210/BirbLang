@@ -162,7 +162,8 @@ AST runtimeRegisterGlobalFunction(Runtime runtime, String fname, AstFPtr fptr) {
   return fdef;
 }
 
-AST runtimeRegisterGlobalFutureFunction(Runtime runtime, String fname, FutAstFPtr fptr) {
+AST runtimeRegisterGlobalFutureFunction(
+    Runtime runtime, String fname, FutAstFPtr fptr) {
   var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
   fdef.funcName = fname;
   fdef.futureptr = fptr;
@@ -220,9 +221,9 @@ Future<AST> visit(Runtime runtime, AST node) async {
 
   switch (node.type) {
     case ASTType.AST_OBJECT:
-      return await visitObject(runtime, node);
+      return node;
     case ASTType.AST_ENUM:
-      return await visitEnum(runtime, node);
+      return node;
     case ASTType.AST_VARIABLE:
       return await visitVariable(runtime, node);
     case ASTType.AST_VARIABLE_DEFINITION:
@@ -236,35 +237,35 @@ Future<AST> visit(Runtime runtime, AST node) async {
     case ASTType.AST_FUNC_CALL:
       return await visitFuncCall(runtime, node);
     case ASTType.AST_NULL:
-      return await visitNull(runtime, node);
+      return node;
     case ASTType.AST_STRING:
-      return await visitString(runtime, node);
+      return node;
     case ASTType.AST_DOUBLE:
-      return await visitDouble(runtime, node);
+      return node;
     case ASTType.AST_LIST:
-      return await visitList(runtime, node);
+      return node;
     case ASTType.AST_MAP:
-      return await visitMap(runtime, node);
+      return node;
     case ASTType.AST_BOOL:
-      return await visitBool(runtime, node);
+      return node;
     case ASTType.AST_INT:
-      return await visitInt(runtime, node);
+      return node;
     case ASTType.AST_COMPOUND:
       return await visitCompound(runtime, node);
     case ASTType.AST_TYPE:
-      return await visitType(runtime, node);
+      return node;
     case ASTType.AST_BINARYOP:
       return await visitBinaryOp(runtime, node);
     case ASTType.AST_UNARYOP:
       return await visitUnaryOp(runtime, node);
     case ASTType.AST_NOOP:
-      return await visitNoop(runtime, node);
+      return node;
     case ASTType.AST_BREAK:
-      return await visitBreak(runtime, node);
+      return node;
     case ASTType.AST_RETURN:
-      return await visitReturn(runtime, node);
+      return node;
     case ASTType.AST_CONTINUE:
-      return await visitContinue(runtime, node);
+      return node;
     case ASTType.AST_TERNARY:
       return await visitTernary(runtime, node);
     case ASTType.AST_IF:
@@ -304,7 +305,8 @@ bool boolEval(AST node) {
   }
 }
 
-Future<AST> getVarDefByName(Runtime runtime, Scope scope, String varName) async {
+Future<AST> getVarDefByName(
+    Runtime runtime, Scope scope, String varName) async {
   if (scope.owner != null) {
     if (varName == 'nest') {
       if (scope.owner.parent != null) {
@@ -429,7 +431,8 @@ Future<AST> visitVarDef(Runtime runtime, AST node) async {
   }
 
   if (node.scope != null) {
-    var varDefLocal = await getVarDefByName(runtime, node.scope, node.variableName);
+    var varDefLocal =
+        await getVarDefByName(runtime, node.scope, node.variableName);
 
     if (varDefLocal != null) {
       multipleVariableDefinitionsError(node.lineNum, node.variableName);
@@ -623,7 +626,8 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
 
   var visitedExpr = await visit(runtime, node.funcCallExpression);
 
-  if (visitedExpr.type == ASTType.AST_FUNC_DEFINITION) funcDef = await visitedExpr;
+  if (visitedExpr.type == ASTType.AST_FUNC_DEFINITION)
+    funcDef = await visitedExpr;
 
   if (funcDef == null) return null;
 
@@ -645,7 +649,8 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       await visitedFptrArgs.add(visited);
     }
 
-    var ret = await visit(runtime, await funcDef.futureptr(runtime, funcDef, await visitedFptrArgs));
+    var ret = await visit(runtime,
+        await funcDef.futureptr(runtime, funcDef, await visitedFptrArgs));
 
     return ret;
   }
@@ -668,7 +673,8 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       await visitedFptrArgs.add(visited);
     }
 
-    var ret = await visit(runtime, funcDef.fptr(runtime, funcDef, await visitedFptrArgs));
+    var ret = await visit(
+        runtime, funcDef.fptr(runtime, funcDef, await visitedFptrArgs));
 
     return ret;
   }
@@ -743,7 +749,8 @@ Future<AST> visitFuncCall(Runtime runtime, AST node) async {
     if (localScopeFuncDef != null) return localScopeFuncDef;
   }
 
-  var globalScopeFuncDef = await runtimeFuncLookup(runtime, runtime.scope, node);
+  var globalScopeFuncDef =
+      await runtimeFuncLookup(runtime, runtime.scope, node);
   if (globalScopeFuncDef != null) return globalScopeFuncDef;
 
   print('Error: [Line ${node.lineNum}] Undefined method `?`');
@@ -751,44 +758,6 @@ Future<AST> visitFuncCall(Runtime runtime, AST node) async {
 
   // To silence the analyzer
   return null;
-}
-
-Future<AST> visitNull(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitString(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitDouble(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitObject(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitEnum(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitList(Runtime runtime, AST node) async {
-  node.funcDefinitions = runtime.listMethods;
-  return node;
-}
-
-Future<AST> visitMap(Runtime runtime, AST node) async {
-  node.funcDefinitions = runtime.mapMethods;
-  return node;
-}
-
-Future<AST> visitBool(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitInt(Runtime runtime, AST node) async {
-  return node;
 }
 
 Future<AST> visitCompound(Runtime runtime, AST node) async {
@@ -825,10 +794,6 @@ Future<AST> visitCompound(Runtime runtime, AST node) async {
   }
 
   collectAndSweepGarbage(runtime, oldDefList, scope);
-  return node;
-}
-
-Future<AST> visitType(Runtime runtime, AST node) async {
   return node;
 }
 
@@ -936,7 +901,8 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
                 await visitedFptrArgs.add(visited);
               }
 
-              return await visit(runtime, fDef.fptr(runtime, left, await visitedFptrArgs));
+              return await visit(
+                  runtime, fDef.fptr(runtime, left, await visitedFptrArgs));
             }
           }
         }
@@ -967,7 +933,6 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
   AST ast = await visit(runtime, node.listAccessPointer);
 
   if (ast.type == ASTType.AST_STRING) {
-
     var key = ast.stringValue;
     if (left.type != ASTType.AST_MAP) {
       print('Error: [Line ${node.lineNum}] Expected a Map');
@@ -978,7 +943,6 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
       return left.map[key];
     else
       return null;
-
   } else {
     var index = ast.intVal;
     if (left.type == ASTType.AST_LIST) if (left.listChildren.isNotEmpty &&
@@ -1546,22 +1510,6 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
   }
 
   return returnValue;
-}
-
-Future<AST> visitNoop(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitBreak(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitContinue(Runtime runtime, AST node) async {
-  return node;
-}
-
-Future<AST> visitReturn(Runtime runtime, AST node) async {
-  return node;
 }
 
 Future<AST> visitIf(Runtime runtime, AST node) async {
