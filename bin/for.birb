@@ -1,5 +1,0 @@
-Map foo  = {
-"key": 3 + 4
-};
-
-screm(foo["key"]);
