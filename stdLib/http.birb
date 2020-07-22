@@ -1,11 +1,4 @@
-class HttpResponse {
-    String body;
-    List bodyBytes;
+Map map = {}
+class res = GET("https://pub.dev/packages?q=auth", map);
 
-    HttpResponse(nest.body, )
-}
-
-HttpResponse get(String url) {
-    class res = _HTTPGET(url);
-
-}
+screm(res.body);

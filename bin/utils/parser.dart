@@ -1086,3 +1086,5 @@ AST parseFuncDef(Parser parser, Scope scope) {
     return astVarDef;
   }
 }
+
+

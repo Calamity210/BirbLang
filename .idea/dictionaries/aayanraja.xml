@@ -7,6 +7,7 @@
       <w>birb</w>
       <w>builtins</w>
       <w>defs</w>
+      <w>fcall</w>
       <w>fdef</w>
       <w>fname</w>
       <w>fopen</w>

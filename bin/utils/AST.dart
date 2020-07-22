@@ -4,6 +4,7 @@ import 'scope.dart';
 import 'token.dart';
 
 typedef AstFPtr = AST Function(Runtime runtime, AST self, List args);
+typedef FutAstFPtr = Future<AST> Function(Runtime runtime, AST self, List args);
 
 enum ASTType {
   AST_OBJECT,
@@ -101,7 +102,7 @@ class AST {
   List objectChildren;
   List enumChildren;
   List listChildren;
-  Map map;
+  Map<String, dynamic> map;
   List compChildren;
 
   dynamic objectValue;
@@ -133,6 +134,7 @@ class AST {
   Scope scope;
 
   AstFPtr fptr;
+  FutAstFPtr futureptr;
 }
 
 AST initAST(ASTType type) {
@@ -457,7 +459,11 @@ String astToString(AST ast) {
     case ASTType.AST_LIST_ACCESS:
       return astListAccessToString(ast);
     case ASTType.AST_BINARYOP:
-      return astToString(visitBinaryOp(initRuntime(), ast));
+      {
+        AST visitedBiOp;
+        visitBinaryOp(initRuntime(), ast).then((value) => visitedBiOp = value);
+        return astToString(visitedBiOp);
+      }
     case ASTType.AST_NOOP:
       return '';
     case ASTType.AST_BREAK:
