@@ -9,8 +9,8 @@ Minimal Birb programming language
 $ dart2native lib/Birb.dart
 ```
 I personally like to run:
-```
-dart2native lib/Birb.dart -o birb
+```shell
+$ dart2native lib/Birb.dart -o birb
 ```
 so the output isn't in a `.exe` format.
 
