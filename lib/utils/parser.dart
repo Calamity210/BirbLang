@@ -73,7 +73,7 @@ bool isDataType(String tokenValue) {
       tokenValue == 'enum' ||
       tokenValue == 'List' ||
       tokenValue == 'Map' ||
-      tokenValue == 'source');
+      tokenValue == 'Source');
 }
 
 AST parseOneStatementCompound(Parser parser, Scope scope) {
@@ -246,7 +246,7 @@ AST parseType(Parser parser, Scope scope) {
     case 'Map':
       type.type = DATATYPE.DATA_TYPE_MAP;
       break;
-    case 'source':
+    case 'Source':
       type.type = DATATYPE.DATA_TYPE_SOURCE;
       break;
   }

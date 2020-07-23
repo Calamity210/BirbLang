@@ -13,20 +13,20 @@ AST INITIALIZED_NOOP;
 
 void initStandards(Runtime runtime) async {
   registerGlobalVariable(runtime, 'birbVer', '0.0.1');
-  registerGlobalFunction(runtime, 'include', funcInclude);
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'openFile', funcFileOpen);
   registerGlobalFunction(runtime, 'writeFile', funcFileWrite);
   registerGlobalFunction(runtime, 'input', funcInput);
-  registerGlobalFunction(runtime, 'DateTime', funcDateTime);
   registerGlobalFunction(runtime, 'Date', funcDate);
   registerGlobalFunction(runtime, 'Time', funcTime);
+
+  registerGlobalFutureFunction(runtime, 'import', funcInclude);
   registerGlobalFutureFunction(runtime, 'GET', funcGet);
   registerGlobalFutureFunction(runtime, 'POST', funcPost);
 }
 
-AST funcInclude(Runtime runtime, AST self, List args) {
+Future<AST> funcInclude(Runtime runtime, AST self, List args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   AST astStr = args[0];
@@ -35,8 +35,10 @@ AST funcInclude(Runtime runtime, AST self, List args) {
   var lexer = initLexer(File(filename).readAsStringSync());
   var parser = initParser(lexer);
   var node = parse(parser);
+  var runtime = initRuntime();
+  var ast = await visit(runtime, node);
 
-  return node;
+  return ast;
 }
 
 /// STDOUT
@@ -262,111 +264,6 @@ AST funcTime(Runtime runtime, AST self, List args) {
   return astObj;
 }
 
-AST funcDateTime(Runtime runtime, AST self, List args) {
-  var astObj = initAST(ASTType.AST_CLASS);
-  astObj.variableType = initAST(ASTType.AST_TYPE);
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
-
-  // ADD YEAR TO DATETIME OBJECT
-  var astVarYear = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarYear.variableName = 'year';
-  astVarYear.variableType = initAST(ASTType.AST_TYPE);
-  astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntYear = initAST(ASTType.AST_INT);
-  astIntYear.intVal = DateTime.now().year;
-  astVarYear.variableValue = astIntYear;
-
-  astObj.classChildren.add(astVarYear);
-
-  // ADD MONTH TO DATETIME OBJECT
-  var astVarMonth = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarMonth.variableName = 'month';
-  astVarMonth.variableType = initAST(ASTType.AST_TYPE);
-  astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntMonth = initAST(ASTType.AST_INT);
-  astIntMonth.intVal = DateTime.now().month;
-  astVarMonth.variableValue = astIntMonth;
-
-  astObj.classChildren.add(astVarMonth);
-
-  // ADD DAYS TO DATETIME OBJECT
-  var astVarDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarDay.variableName = 'day';
-  astVarDay.variableType = initAST(ASTType.AST_TYPE);
-  astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntDay = initAST(ASTType.AST_INT);
-  astIntDay.intVal = DateTime.now().day;
-  astVarDay.variableValue = astIntDay;
-
-  astObj.classChildren.add(astVarDay);
-
-  // ADD WEEKDAYS TO DATETIME OBJECT
-  var astVarWeekDay = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarWeekDay.variableName = 'weekday';
-  astVarWeekDay.variableType = initAST(ASTType.AST_TYPE);
-  astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntWeekDay = initAST(ASTType.AST_INT);
-  astIntWeekDay.intVal = DateTime.now().weekday;
-  astIntWeekDay.variableValue = astIntWeekDay;
-
-  astObj.classChildren.add(astVarWeekDay);
-
-  // ADD HOURS TO DATETIME OBJECT
-  var astVarHour = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarHour.variableName = 'hour';
-  astVarHour.variableType = initAST(ASTType.AST_TYPE);
-  astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntHour = initAST(ASTType.AST_INT);
-  astIntHour.intVal = DateTime.now().hour;
-  astVarHour.variableValue = astIntHour;
-
-  astObj.classChildren.add(astVarHour);
-
-  // ADD MINUTES TO DATETIME OBJECT
-  var astVarMinute = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarMinute.variableName = 'minute';
-  astVarMinute.variableType = initAST(ASTType.AST_TYPE);
-  astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntMinute = initAST(ASTType.AST_INT);
-  astIntMinute.intVal = DateTime.now().minute;
-  astVarMinute.variableValue = astIntMinute;
-
-  astObj.classChildren.add(astVarMinute);
-
-  // ADD SECONDS TO DATETIME OBJECT
-  var astVarSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarSeconds.variableName = 'second';
-  astVarSeconds.variableType = initAST(ASTType.AST_TYPE);
-  astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntSeconds = initAST(ASTType.AST_INT);
-  astIntSeconds.intVal = DateTime.now().second;
-  astVarSeconds.variableValue = astIntSeconds;
-
-  astObj.classChildren.add(astVarSeconds);
-
-  // ADD MILLISECONDS TO DATETIME OBJECT
-  var astVarMilliSeconds = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  astVarMilliSeconds.variableName = 'milliSecond';
-  astVarMilliSeconds.variableType = initAST(ASTType.AST_TYPE);
-  astVarMilliSeconds.variableType.typeValue =
-      initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntMilliSeconds = initAST(ASTType.AST_INT);
-  astIntMilliSeconds.intVal = DateTime.now().millisecond;
-  astVarMilliSeconds.variableValue = astIntMilliSeconds;
-
-  astObj.classChildren.add(astVarMilliSeconds);
-
-  return astObj;
-}
-
 /**
  * HTTP
  */
@@ -467,7 +364,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
 
   String url = (args[0] as AST).stringValue;
   Map headers = (args[1] as AST).map;
-  AST body = args[3];
+  AST body = args[2];
 
   List bodyList;
   Map bodyMap;
