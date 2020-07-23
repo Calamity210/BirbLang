@@ -65,6 +65,7 @@ AST asClassChild(AST ast, AST object) {
 /// Check if the token is a DataType
 bool isDataType(String tokenValue) {
   return (tokenValue == 'void' ||
+      tokenValue == 'var' ||
       tokenValue == 'int' ||
       tokenValue == 'String' ||
       tokenValue == 'double' ||
@@ -225,6 +226,9 @@ AST parseType(Parser parser, Scope scope) {
     case 'String':
       type.type = DATATYPE.DATA_TYPE_STRING;
       break;
+    case 'var':
+      type.type = DATATYPE.DATA_TYPE_VAR;
+      break;
     case 'int':
       type.type = DATATYPE.DATA_TYPE_INT;
       break;
@@ -382,8 +386,7 @@ AST parseClass(Parser parser, Scope scope) {
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
-      ast.classChildren
-          .add(asClassChild(parseFuncDef(parser, newScope), ast));
+      ast.classChildren.add(asClassChild(parseFuncDef(parser, newScope), ast));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI) {
@@ -899,6 +902,7 @@ AST parseFuncDef(Parser parser, Scope scope) {
     isEnum = true;
   }
 
+  // Function Definition, otherwise Variable definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     var ast =
         initASTWithLine(ASTType.AST_FUNC_DEFINITION, parser.lexer.lineNum);
@@ -995,6 +999,14 @@ AST parseFuncDef(Parser parser, Scope scope) {
     astVarDef.variableType = astType;
 
     if (isEnum) {
+      var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
+      astType.scope = scope;
+
+      var type = initDataType();
+      type.type = DATATYPE.DATA_TYPE_ENUM;
+      astType.typeValue = type;
+
+      astVarDef.variableType = astType;
       astVarDef.variableValue = parseEnum(parser, scope);
       astVarDef.variableName = parser.curToken.value;
       eat(parser, TokenType.TOKEN_ID);
@@ -1013,23 +1025,51 @@ AST parseFuncDef(Parser parser, Scope scope) {
             parserTypeError(parser);
           break;
         case ASTType.AST_STRING:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
             parserTypeError(parser);
           break;
         case ASTType.AST_INT:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
             parserTypeError(parser);
           break;
         case ASTType.AST_DOUBLE:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
             parserTypeError(parser);
           break;
         case ASTType.AST_BOOL:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
             parserTypeError(parser);
           break;
         case ASTType.AST_LIST:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_MAP:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
+            astVarDef.variableType = astType;
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
             parserTypeError(parser);
           break;
         case ASTType.AST_COMPOUND:
@@ -1060,23 +1100,51 @@ AST parseFuncDef(Parser parser, Scope scope) {
             parserTypeError(parser);
           break;
         case ASTType.AST_STRING:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
             parserTypeError(parser);
           break;
         case ASTType.AST_INT:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
             parserTypeError(parser);
           break;
         case ASTType.AST_DOUBLE:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
             parserTypeError(parser);
           break;
         case ASTType.AST_BOOL:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
             parserTypeError(parser);
           break;
         case ASTType.AST_LIST:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
+            astVarDef.variableType = astType;
+          }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
+            parserTypeError(parser);
+          break;
+        case ASTType.AST_MAP:
+          if(astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
+            astVarDef.variableType = astType;
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
             parserTypeError(parser);
           break;
         case ASTType.AST_COMPOUND:

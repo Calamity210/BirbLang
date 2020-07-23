@@ -1,0 +1,10 @@
+String henlo = "
+Henlo Birb
+";
+
+henlo.trim(); // "Henlo Birb"
+
+henlo.toUpperCase(); // "HENLO BIRB"
+
+// "HENLO"
+screm(henlo.substring(0, 5));

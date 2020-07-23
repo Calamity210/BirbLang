@@ -1,0 +1,14 @@
+class Birb {
+    String name = "Birb";
+    int age = 10;
+    double mood = 0.5;
+    bool isMale = true;
+    List favFood = ["Seeb"];
+    Map family = {
+        "father": "Birbo",
+        "mother": "Birby"
+    };
+}
+
+var i = 10;
+screm(i);

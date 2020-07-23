@@ -1,0 +1,11 @@
+class date = Date();
+int year = date.year;
+
+if (year == 2020)
+screm("2020");
+
+for (int i = 0; i < 9; i += 1)
+screm(i);
+
+while(year != 2030)
+year += 1;

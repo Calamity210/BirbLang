@@ -366,11 +366,6 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   Map bodyEarly = (args[1] as AST).map;
   Map head = (args[2] as AST).map;
 
-//  if (body.type == ASTType.AST_LIST)
-//    bodyList = body.listChildren;
-//  else
-//    bodyMap = body.map;
-
   Map<String, String> body = {};
   bodyEarly.forEach((key, value) => body[key] = (value as AST).stringValue);
 

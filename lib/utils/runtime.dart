@@ -822,7 +822,7 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
     if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
       return visitStringProperties(node, left);
     } else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
-      return visitStringProperties(node, left);
+      return visitStringMethods(node, left);
     }
   } else if (left.type == ASTType.AST_CLASS) {
     if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
@@ -1761,7 +1761,7 @@ Future<AST> visitStringProperties(AST node, AST left) async {
 }
 
 Future<AST> visitStringMethods(AST node, AST left) async {
-  switch (node.binaryOpRight.funcName) {
+  switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'codeUnitAt':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
@@ -1855,7 +1855,7 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST width = node.binaryOpRight.funcCallArgs[0];
         AST padding = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue.padLeft(width.intVal, padding.stringValue);
+        left.stringValue = left.stringValue.padLeft(width.intVal, padding.stringValue);
 
         return left;
       }
@@ -1867,7 +1867,7 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST width = node.binaryOpRight.funcCallArgs[0];
         AST padding = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue.padRight(width.intVal, padding.stringValue);
+        left.stringValue = left.stringValue.padRight(width.intVal, padding.stringValue);
 
         return left;
       }
@@ -1879,7 +1879,7 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST replace = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue.replaceAll(pattern.stringValue, replace.stringValue);
+        left.stringValue = left.stringValue.replaceAll(pattern.stringValue, replace.stringValue);
 
         return left;
       }
@@ -1892,7 +1892,7 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST replace = node.binaryOpRight.funcCallArgs[1];
         AST index = node.binaryOpRight.funcCallArgs[2];
 
-        left.stringValue.replaceFirst(
+        left.stringValue = left.stringValue.replaceFirst(
             pattern.stringValue, replace.stringValue, index.intVal);
 
         return left;
@@ -1958,34 +1958,34 @@ Future<AST> visitStringMethods(AST node, AST left) async {
 
     case 'toLowerCase':
       {
-        left.stringValue.toLowerCase();
+        left.stringValue = left.stringValue.toLowerCase();
 
         return left;
       }
 
     case 'toUpperCase':
       {
-        left.stringValue.toUpperCase();
+        left.stringValue = left.stringValue.toUpperCase();
 
         return left;
       }
 
     case 'trim':
       {
-        left.stringValue.trim();
+        left.stringValue = left.stringValue.trim();
 
         return left;
       }
 
     case 'trimLeft':
       {
-        left.stringValue.trimLeft();
+        left.stringValue = left.stringValue.trimLeft();
         return left;
       }
 
     case 'trimRight':
       {
-        left.stringValue.trimRight();
+        left.stringValue = left.stringValue.trimRight();
         return left;
       }
 
