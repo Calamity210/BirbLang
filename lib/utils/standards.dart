@@ -360,24 +360,24 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
 
 Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   runtimeExpectArgs(
-      args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_ANY]);
+      args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
 
   String url = (args[0] as AST).stringValue;
-  Map headers = (args[1] as AST).map;
-  AST body = args[2];
+  Map bodyEarly = (args[1] as AST).map;
+  Map head = (args[2] as AST).map;
 
-  List bodyList;
-  Map bodyMap;
+//  if (body.type == ASTType.AST_LIST)
+//    bodyList = body.listChildren;
+//  else
+//    bodyMap = body.map;
 
-  if (body.type == ASTType.AST_LIST)
-    bodyList = body.listChildren;
-  else
-    bodyMap = body.map;
+  Map<String, String> body = {};
+  bodyEarly.forEach((key, value) => body[key] = (value as AST).stringValue);
 
-  Map<String, String> head;
-  headers.map((key, value) => head[key] = value);
+  Map<String, String> headers = {};
+  head.forEach((key, value) => headers[key] = (value as AST).stringValue);
 
-  Response response = await post(url, headers: head, body: bodyList ?? bodyMap);
+  Response response = await post(url, body: body, headers: headers);
 
   var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
