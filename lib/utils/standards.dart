@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -20,6 +21,8 @@ void initStandards(Runtime runtime) async {
   registerGlobalFunction(runtime, 'input', funcInput);
   registerGlobalFunction(runtime, 'Date', funcDate);
   registerGlobalFunction(runtime, 'Time', funcTime);
+  registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
+  registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
 
   registerGlobalFutureFunction(runtime, 'import', funcInclude);
   registerGlobalFutureFunction(runtime, 'GET', funcGet);
@@ -451,4 +454,50 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   astObj.classChildren.add(ast);
 
   return astObj;
+}
+
+AST funcDecodeJson(Runtime runtime, AST self, List args) {
+  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+
+  String jsonString = (args[0] as AST).stringValue;
+
+  AST jsonAST = initAST(ASTType.AST_MAP)
+    ..map = jsonDecode(jsonString) as Map<String, dynamic>;
+
+  return jsonAST;
+}
+
+AST funcEncodeJson(Runtime runtime, AST self, List args) {
+  runtimeExpectArgs(args, [ASTType.AST_MAP]);
+
+  Map map = (args[0] as AST).map;
+
+  Map jsonMap = {};
+
+  map.forEach((key, value) {
+    AST val = value;
+    switch (val.type) {
+      case ASTType.AST_STRING:
+        jsonMap[key] = val.stringValue;
+        break;
+      case ASTType.AST_INT:
+        jsonMap[key] = val.intVal;
+        break;
+      case ASTType.AST_DOUBLE:
+        jsonMap[key] = val.doubleValue;
+        break;
+      case ASTType.AST_LIST:
+        jsonMap[key] = val.listChildren;
+        break;
+      case ASTType.AST_MAP:
+        jsonMap[key] = val.map;
+        break;
+    }
+    return;
+  });
+
+  AST jsonAST = initAST(ASTType.AST_STRING)
+    ..stringValue = jsonEncode(jsonMap);
+
+  return jsonAST;
 }

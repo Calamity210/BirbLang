@@ -900,9 +900,14 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
       exit(1);
     }
 
-    if (left.map.containsKey(key))
+    if (left.map.containsKey(key)) {
+      if (left.map[key] is String) {
+        AST mapValAST = initAST(ASTType.AST_STRING)
+          ..stringValue = left.map[key];
+        return mapValAST;
+      }
       return left.map[key];
-    else
+    } else
       return null;
   } else {
     var index = ast.intVal;
@@ -1855,7 +1860,8 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST width = node.binaryOpRight.funcCallArgs[0];
         AST padding = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue = left.stringValue.padLeft(width.intVal, padding.stringValue);
+        left.stringValue =
+            left.stringValue.padLeft(width.intVal, padding.stringValue);
 
         return left;
       }
@@ -1867,7 +1873,8 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST width = node.binaryOpRight.funcCallArgs[0];
         AST padding = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue = left.stringValue.padRight(width.intVal, padding.stringValue);
+        left.stringValue =
+            left.stringValue.padRight(width.intVal, padding.stringValue);
 
         return left;
       }
@@ -1879,7 +1886,8 @@ Future<AST> visitStringMethods(AST node, AST left) async {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST replace = node.binaryOpRight.funcCallArgs[1];
 
-        left.stringValue = left.stringValue.replaceAll(pattern.stringValue, replace.stringValue);
+        left.stringValue = left.stringValue
+            .replaceAll(pattern.stringValue, replace.stringValue);
 
         return left;
       }

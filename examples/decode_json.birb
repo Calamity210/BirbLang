@@ -1,0 +1,8 @@
+String json = '
+{
+"content": "foo"
+}
+';
+Map map = decodeJson(json);
+
+screm(map["content"]);

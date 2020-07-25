@@ -38,6 +38,7 @@ void main(List<String> arguments) {
         lexer = initLexer(input);
         parser = initParser(lexer);
         node = parse(parser);
+
         visit(runtime, node);
         isInteractive = false;
       }

@@ -1,0 +1,7 @@
+Map map = {
+"content": "foo"
+};
+
+String str = encodeJson(map);
+
+screm(str);

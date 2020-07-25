@@ -1,5 +1,5 @@
-void print(int a) {
-screm(a);
+void print(int a, int b) {
+screm(a+b);
 }
 
-print(1);
+print(1,2);

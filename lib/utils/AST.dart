@@ -51,6 +51,7 @@ class AST {
 
   int lineNum = 0;
 
+
 // AST_INT
   int intVal = 0;
 
@@ -179,8 +180,7 @@ String astToString(AST ast) {
       return astNullToString(ast);
     case ASTType.AST_STRING:
       {
-        var str = ast.stringValue;
-        return str;
+        return ast.stringValue;
       }
     case ASTType.AST_DOUBLE:
       return astDoubleToString(ast);
