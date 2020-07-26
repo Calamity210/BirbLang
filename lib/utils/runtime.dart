@@ -912,9 +912,26 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
   } else {
     var index = ast.intVal;
     if (left.type == ASTType.AST_LIST) if (left.listChildren.isNotEmpty &&
-        index < left.listChildren.length)
+        index < left.listChildren.length) {
+      if (left.listChildren[index] is Map) {
+        var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
+        AST mapAst = initAST(ASTType.AST_MAP)
+          ..typeValue = type
+          ..scope = left.scope
+          ..map = left.listChildren[index];
+
+        return mapAst;
+      } else if (left.listChildren[index] is String) {
+        var type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+        AST stringAst = initAST(ASTType.AST_STRING)
+          ..typeValue = type
+          ..scope = left.scope
+          ..stringValue = left.listChildren[index];
+
+        return stringAst;
+      }
       return left.listChildren[index];
-    else {
+    } else {
       print(
           'Error: Invalid list index: Valid range is: ${left.listChildren.isNotEmpty ? left.listChildren.length - 1 : 0}');
 

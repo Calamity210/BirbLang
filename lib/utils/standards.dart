@@ -166,7 +166,9 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntYear = initAST(ASTType.AST_INT);
-  astIntYear.intVal = DateTime.now().year;
+  astIntYear.intVal = DateTime
+      .now()
+      .year;
   astVarYear.variableValue = astIntYear;
 
   astObj.classChildren.add(astVarYear);
@@ -178,7 +180,9 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntMonth = initAST(ASTType.AST_INT);
-  astIntMonth.intVal = DateTime.now().month;
+  astIntMonth.intVal = DateTime
+      .now()
+      .month;
   astVarMonth.variableValue = astIntMonth;
 
   astObj.classChildren.add(astVarMonth);
@@ -190,7 +194,9 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntDay = initAST(ASTType.AST_INT);
-  astIntDay.intVal = DateTime.now().day;
+  astIntDay.intVal = DateTime
+      .now()
+      .day;
   astVarDay.variableValue = astIntDay;
 
   astObj.classChildren.add(astVarDay);
@@ -202,7 +208,9 @@ AST funcDate(Runtime runtime, AST self, List args) {
   astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntWeekDay = initAST(ASTType.AST_INT);
-  astIntWeekDay.intVal = DateTime.now().weekday;
+  astIntWeekDay.intVal = DateTime
+      .now()
+      .weekday;
   astIntWeekDay.variableValue = astIntWeekDay;
 
   astObj.classChildren.add(astVarWeekDay);
@@ -222,7 +230,9 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntHour = initAST(ASTType.AST_INT);
-  astIntHour.intVal = DateTime.now().hour;
+  astIntHour.intVal = DateTime
+      .now()
+      .hour;
   astVarHour.variableValue = astIntHour;
 
   astObj.classChildren.add(astVarHour);
@@ -234,7 +244,9 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntMinute = initAST(ASTType.AST_INT);
-  astIntMinute.intVal = DateTime.now().minute;
+  astIntMinute.intVal = DateTime
+      .now()
+      .minute;
   astVarHour.variableValue = astIntMinute;
 
   astObj.classChildren.add(astVarMinute);
@@ -246,7 +258,9 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntSeconds = initAST(ASTType.AST_INT);
-  astIntSeconds.intVal = DateTime.now().second;
+  astIntSeconds.intVal = DateTime
+      .now()
+      .second;
   astVarSeconds.variableValue = astIntSeconds;
 
   astObj.classChildren.add(astVarSeconds);
@@ -259,7 +273,9 @@ AST funcTime(Runtime runtime, AST self, List args) {
       initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
   var astIntMilliSeconds = initAST(ASTType.AST_INT);
-  astIntMilliSeconds.intVal = DateTime.now().millisecond;
+  astIntMilliSeconds.intVal = DateTime
+      .now()
+      .millisecond;
   astVarMilliSeconds.variableValue = astIntMilliSeconds;
 
   astObj.classChildren.add(astVarMilliSeconds);
@@ -272,15 +288,33 @@ AST funcTime(Runtime runtime, AST self, List args) {
  */
 
 Future<AST> funcGet(Runtime runtime, AST self, List args) async {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_MAP]);
+  if (args.length == 3)
+    runtimeExpectArgs(args,
+        [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_FUNC_DEFINITION]);
+  else
+    runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_MAP]);
 
   String url = (args[0] as AST).stringValue;
   Map headers = (args[1] as AST).map;
+  AST funcDef;
+  AST funCall;
 
-  Map<String, String> head;
-  headers.map((key, value) => head[key] = value);
+  if (args.length == 3) {
+    funcDef = args[2];
+    AST funcCalExpr = initAST(ASTType.AST_VARIABLE);
+    funcCalExpr.variableName = funcDef.funcName;
 
-  Response response = await get(url);
+    funCall = initAST(ASTType.AST_FUNC_CALL);
+    funCall.funcName = funcDef.funcName;
+    funCall.type = ASTType.AST_FUNC_CALL;
+    funCall.funcCallExpression = funcCalExpr;
+  }
+
+  Map<String, String> head = {};
+  headers.forEach((key, value) => head[key] = (value as AST).stringValue);
+
+  Response response = await get(url, headers: head);
+  if (args.length == 3) await visitFuncCall(runtime, funCall);
 
   var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
@@ -362,12 +396,34 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
 }
 
 Future<AST> funcPost(Runtime runtime, AST self, List args) async {
-  runtimeExpectArgs(
-      args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
+  if (args.length == 4)
+    runtimeExpectArgs(args, [
+      ASTType.AST_STRING,
+      ASTType.AST_MAP,
+      ASTType.AST_MAP,
+      ASTType.AST_FUNC_DEFINITION
+    ]);
+  else
+    runtimeExpectArgs(
+        args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
 
   String url = (args[0] as AST).stringValue;
   Map bodyEarly = (args[1] as AST).map;
   Map head = (args[2] as AST).map;
+
+  AST funcDef;
+  AST funCall;
+
+  if (args.length == 4) {
+    funcDef = args[3];
+    AST funcCalExpr = initAST(ASTType.AST_VARIABLE);
+    funcCalExpr.variableName = funcDef.funcName;
+
+    funCall = initAST(ASTType.AST_FUNC_CALL);
+    funCall.funcName = funcDef.funcName;
+    funCall.type = ASTType.AST_FUNC_CALL;
+    funCall.funcCallExpression = funcCalExpr;
+  }
 
   Map<String, String> body = {};
   bodyEarly.forEach((key, value) => body[key] = (value as AST).stringValue);
@@ -376,6 +432,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   head.forEach((key, value) => headers[key] = (value as AST).stringValue);
 
   Response response = await post(url, body: body, headers: headers);
+  if (args.length == 4) await visitCompound(runtime, funCall);
 
   var astObj = initAST(ASTType.AST_CLASS);
   astObj.variableType = initAST(ASTType.AST_TYPE);
@@ -461,8 +518,15 @@ AST funcDecodeJson(Runtime runtime, AST self, List args) {
 
   String jsonString = (args[0] as AST).stringValue;
 
-  AST jsonAST = initAST(ASTType.AST_MAP)
-    ..map = jsonDecode(jsonString) as Map<String, dynamic>;
+  var decoded = jsonDecode(jsonString);
+  AST jsonAST;
+  if (decoded is List)
+    jsonAST = initAST(ASTType.AST_LIST)
+      ..listChildren = decoded;
+
+  else
+    jsonAST = initAST(ASTType.AST_MAP)
+      ..map = jsonDecode(jsonString) as Map<String, dynamic>;
 
   return jsonAST;
 }
