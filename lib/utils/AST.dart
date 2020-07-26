@@ -17,6 +17,7 @@ enum ASTType {
   AST_FUNC_DEFINITION,
   AST_FUNC_CALL,
   AST_NULL,
+  AST_FUTURE,
   AST_STRING,
   AST_DOUBLE,
   AST_LIST,
@@ -51,11 +52,10 @@ class AST {
 
   int lineNum = 0;
 
-
-// AST_INT
+  // AST_INT
   int intVal = 0;
 
-// AST_BOOL
+  // AST_BOOL
   bool boolValue = false;
 
   bool isClassChild = false;
@@ -97,6 +97,7 @@ class AST {
 
   List funcDefinitions;
   List funcDefArgs;
+  bool isFuture = false;
 
   AST funcDefBody;
   AST funcDefType;

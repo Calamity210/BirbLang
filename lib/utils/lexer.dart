@@ -39,14 +39,16 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '+') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
       var type = TokenType.TOKEN_PLUS;
 
       advance(lexer);
 
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_PLUS_EQUAL;
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
       }
@@ -55,14 +57,16 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '-') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
       var type = TokenType.TOKEN_SUB;
 
       advance(lexer);
 
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_SUB_EQUAL;
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
       }
@@ -71,14 +75,16 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '*') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
       var type = TokenType.TOKEN_MUL;
 
       advance(lexer);
 
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_MUL_EQUAL;
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
       }
@@ -87,12 +93,14 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '&') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
 
       advance(lexer);
 
       if (lexer.currentChar == '&') {
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
 
@@ -101,12 +109,14 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '|') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
 
       advance(lexer);
 
       if (lexer.currentChar == '|') {
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
 
@@ -115,14 +125,16 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '=') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
       var type = TokenType.TOKEN_EQUAL;
 
       advance(lexer);
 
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_EQUALITY;
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
       }
@@ -131,14 +143,16 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '!') {
-      var value = lexer.currentChar;;
+      var value = lexer.currentChar;
+      ;
       var type = TokenType.TOKEN_NOT;
 
       advance(lexer);
 
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_NOT_EQUAL;
-        value += lexer.currentChar;;
+        value += lexer.currentChar;
+        ;
 
         advance(lexer);
       }
@@ -224,7 +238,8 @@ void advance(Lexer lexer) {
 
 /// Advances while returning a Token
 Token advanceWithToken(Lexer lexer, TokenType type) {
-  var value = lexer.currentChar;;
+  var value = lexer.currentChar;
+  ;
   advance(lexer);
   var token = initToken(type, value);
 
@@ -334,17 +349,20 @@ Token collectNumber(Lexer lexer) {
   var value = '';
 
   while (isNumeric(lexer.currentChar)) {
-    value += lexer.currentChar;;
+    value += lexer.currentChar;
+    ;
     advance(lexer);
   }
 
   if (lexer.currentChar == '.') {
     type = TokenType.TOKEN_DOUBLE_VALUE;
-    value += lexer.currentChar;;
+    value += lexer.currentChar;
+    ;
     advance(lexer);
 
     while (isNumeric(lexer.currentChar)) {
-      value += lexer.currentChar;;
+      value += lexer.currentChar;
+      ;
       advance(lexer);
     }
   }

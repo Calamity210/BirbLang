@@ -1,5 +1,8 @@
-void print(int a, int b) {
-screm(a+b);
+void print(int a) {
+screm(a);
 }
 
-print(1,2);
+void foo() {
+    screm("foo");
+}
+print(1).then(foo());

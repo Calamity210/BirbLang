@@ -805,88 +805,99 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
   if (node.classChildren != null)
     node.binaryOpLeft.classChildren = node.classChildren;
 
-  var left = await visit(runtime, node.binaryOpLeft);
+  if (node.binaryOpRight != null &&
+      node.binaryOpLeft.type == ASTType.AST_FUNC_CALL &&
+      node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+    return visit(runtime, node.binaryOpLeft).then((value) async {
+      return await visit(runtime, node.binaryOpRight.funcCallArgs[0]);
+    });
+  } else {
+    var left = await visit(runtime, node.binaryOpLeft);
 
-  if (left.type == ASTType.AST_LIST) {
-    if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-      if (node.binaryOpRight.variableName == 'length') {
-        var intAST = initAST(ASTType.AST_INT);
+    if (left.type == ASTType.AST_LIST) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
+        if (node.binaryOpRight.variableName == 'length') {
+          var intAST = initAST(ASTType.AST_INT);
 
-        intAST.intVal = left.listChildren.length;
+          intAST.intVal = left.listChildren.length;
 
-        return intAST;
+          return intAST;
+        }
       }
     }
-  }
-  if (left.type == ASTType.AST_STRING) {
-    if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-      return visitStringProperties(node, left);
-    } else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
-      return visitStringMethods(node, left);
+    if (left.type == ASTType.AST_STRING) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
+        return visitStringProperties(node, left);
+      } else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+        return visitStringMethods(node, left);
+      }
+    } else if (left.type == ASTType.AST_CLASS) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
+          node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
+          node.binaryOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
+          node.binaryOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
+        node.binaryOpRight.classChildren = left.classChildren;
+        node.binaryOpRight.scope = left.scope;
+        node.binaryOpRight.isClassChild = true;
+        node.classChildren = left.classChildren;
+        node.scope = left.scope;
+      }
+    } else if (left.type == ASTType.AST_ENUM) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
+        node.binaryOpRight.enumChildren = left.enumChildren;
+        node.binaryOpRight.scope = left.scope;
+        node.enumChildren = left.enumChildren;
+        node.scope = left.scope;
+      }
     }
-  } else if (left.type == ASTType.AST_CLASS) {
-    if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
-        node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
-        node.binaryOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
-        node.binaryOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
-      node.binaryOpRight.classChildren = left.classChildren;
-      node.binaryOpRight.scope = left.scope;
-      node.binaryOpRight.isClassChild = true;
-      node.classChildren = left.classChildren;
-      node.scope = left.scope;
-    }
-  } else if (left.type == ASTType.AST_ENUM) {
-    if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-      node.binaryOpRight.enumChildren = left.enumChildren;
-      node.binaryOpRight.scope = left.scope;
-      node.enumChildren = left.enumChildren;
-      node.scope = left.scope;
-    }
-  }
 
-  if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
-    if (node.binaryOpRight.funcCallExpression.type == ASTType.AST_VARIABLE) {
-      var funcCallName = node.binaryOpRight.funcCallExpression.variableName;
+    if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+      if (node.binaryOpRight.funcCallExpression.type == ASTType.AST_VARIABLE) {
+        var funcCallName = node.binaryOpRight.funcCallExpression.variableName;
 
-      if (left.funcDefinitions != null) {
-        for (int i = 0; i < left.funcDefinitions.length; i++) {
-          AST fDef = left.funcDefinitions[i];
+        if (left.funcDefinitions != null) {
+          for (int i = 0; i < left.funcDefinitions.length; i++) {
+            AST fDef = left.funcDefinitions[i];
 
-          if (fDef.funcName == funcCallName) {
-            if (fDef.fptr != null) {
-              var visitedFptrArgs = [];
+            if (fDef.funcName == funcCallName) {
+              if (fDef.fptr != null) {
+                var visitedFptrArgs = [];
 
-              for (int j = 0; j < node.binaryOpRight.funcCallArgs.length; j++) {
-                AST astArg = node.binaryOpRight.funcCallArgs[j];
-                var visited = await visit(runtime, astArg);
-                await visitedFptrArgs.add(visited);
+                for (int j = 0;
+                    j < node.binaryOpRight.funcCallArgs.length;
+                    j++) {
+                  AST astArg = node.binaryOpRight.funcCallArgs[j];
+                  var visited = await visit(runtime, astArg);
+                  await visitedFptrArgs.add(visited);
+                }
+
+                return await visit(
+                    runtime, fDef.fptr(runtime, left, await visitedFptrArgs));
               }
-
-              return await visit(
-                  runtime, fDef.fptr(runtime, left, await visitedFptrArgs));
             }
           }
         }
-      }
 
-      if (left.classChildren != null) {
-        for (int i = 0; i < left.classChildren.length; i++) {
-          AST objChild = left.classChildren[i];
+        if (left.classChildren != null) {
+          for (int i = 0; i < left.classChildren.length; i++) {
+            AST objChild = left.classChildren[i];
 
-          if (objChild.type == ASTType.AST_FUNC_DEFINITION) if (objChild
-                  .funcName ==
-              funcCallName)
-            return await runtimeFuncCall(runtime, node.binaryOpRight, objChild);
+            if (objChild.type == ASTType.AST_FUNC_DEFINITION) if (objChild
+                    .funcName ==
+                funcCallName)
+              return await runtimeFuncCall(
+                  runtime, node.binaryOpRight, objChild);
+          }
         }
       }
     }
+
+    node.scope = getScope(runtime, left);
+
+    var newAST = await visit(runtime, node.binaryOpRight);
+
+    return await visit(runtime, newAST);
   }
-
-  node.scope = getScope(runtime, left);
-
-  var newAST = await visit(runtime, node.binaryOpRight);
-
-  return await visit(runtime, newAST);
 }
 
 Future<AST> visitListAccess(Runtime runtime, AST node) async {
