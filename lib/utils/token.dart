@@ -1,5 +1,4 @@
 enum TokenType {
-  TOKEN_FUTURE_VALUE,
   TOKEN_STRING_VALUE,
   TOKEN_VAR_VALUE,
   TOKEN_INT_VALUE,
@@ -21,13 +20,18 @@ enum TokenType {
   TOKEN_SEMI,
   TOKEN_COMMA,
   TOKEN_PLUS,
+  TOKEN_PLUS_PLUS,
   TOKEN_PLUS_EQUAL,
   TOKEN_SUB,
+  TOKEN_SUB_SUB,
   TOKEN_SUB_EQUAL,
   TOKEN_MUL,
+  TOKEN_MUL_MUL,
   TOKEN_MUL_EQUAL,
   TOKEN_DIV,
+  TOKEN_DIV_EQUAL,
   TOKEN_MOD,
+  TOKEN_MOD_EQUAL,
   TOKEN_DOT,
   TOKEN_LESS_THAN,
   TOKEN_GREATER_THAN,
@@ -50,6 +54,3 @@ Token initToken(TokenType type, String value) {
   return token;
 }
 
-Token copyToken(Token token) {
-  return initToken(token.type, token.value);
-}

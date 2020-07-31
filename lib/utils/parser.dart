@@ -29,9 +29,8 @@ class Parser {
 
 /// Initializes and returns a parser with a lexer
 Parser initParser(Lexer lexer) {
-  var parser = Parser()
-    ..lexer = lexer;
-    parser.curToken = getNextToken(parser.lexer);
+  var parser = Parser()..lexer = lexer;
+  parser.curToken = getNextToken(parser.lexer);
 
   return parser;
 }
@@ -175,6 +174,22 @@ AST parseStatement(Parser parser, Scope scope) {
     case TokenType.TOKEN_DOUBLE_VALUE:
     case TokenType.TOKEN_INT_VALUE:
       return parseExpression(parser, scope);
+    case TokenType.TOKEN_PLUS_PLUS:
+    case TokenType.TOKEN_SUB_SUB:
+    case TokenType.TOKEN_MUL_MUL:
+      {
+        Token operator = parser.curToken;
+        eat(parser, operator.type);
+
+        AST astVarMod =
+            initASTWithLine(ASTType.AST_VARIABLE_MODIFIER, parser.lexer.lineNum)
+              ..binaryOpRight = parseStatement(parser, scope)
+              ..binaryOperator = operator
+              ..scope = scope;
+
+        return astVarMod;
+      }
+      break;
     case TokenType.TOKEN_ANON_ID:
       {
         print(
@@ -223,12 +238,6 @@ AST parseType(Parser parser, Scope scope) {
   switch (tokenValue) {
     case 'void':
       type.type = DATATYPE.DATA_TYPE_VOID;
-      break;
-    case 'Future':
-      astType.isFuture = true;
-      eat(parser, TokenType.TOKEN_LESS_THAN);
-      type.type = parseType(parser, scope).typeValue.type;
-      eat(parser, TokenType.TOKEN_GREATER_THAN);
       break;
     case 'String':
       type.type = DATATYPE.DATA_TYPE_STRING;
@@ -349,22 +358,37 @@ AST parseVariable(Parser parser, Scope scope) {
 
     return astAssign;
   }
-
-  if (parser.curToken.type == TokenType.TOKEN_PLUS_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_MUL_EQUAL) {
-    var operator = copyToken(parser.curToken);
+  if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_MUL_MUL) {
+    Token operator = parser.curToken;
 
     eat(parser, operator.type);
 
-    var astVariableModifier =
+    AST astVarMod =
+        initASTWithLine(ASTType.AST_VARIABLE_MODIFIER, parser.lexer.lineNum)
+          ..binaryOpLeft = ast
+          ..binaryOperator = operator
+          ..scope = scope;
+
+    return astVarMod;
+  } else if (parser.curToken.type == TokenType.TOKEN_PLUS_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
+    Token operator = parser.curToken;
+
+    eat(parser, operator.type);
+
+    AST astVarMod =
         initASTWithLine(ASTType.AST_VARIABLE_MODIFIER, parser.lexer.lineNum)
           ..binaryOpLeft = ast
           ..binaryOpRight = parseExpression(parser, scope)
           ..binaryOperator = operator
           ..scope = scope;
 
-    return astVariableModifier;
+    return astVarMod;
   }
 
   return ast;
@@ -520,14 +544,15 @@ AST parseList(Parser parser, Scope scope) {
   }
 
   eat(parser, TokenType.TOKEN_RBRACKET);
-
   return ast;
 }
 
 AST parseFactor(Parser parser, Scope scope, bool isMap) {
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB) {
-    var unOpOperator = copyToken(parser.curToken);
+      parser.curToken.type == TokenType.TOKEN_SUB ||
+      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
+    var unOpOperator = parser.curToken;
     eat(parser, unOpOperator.type);
 
     var ast = initASTWithLine(ASTType.AST_UNARYOP, parser.lexer.lineNum);
@@ -548,8 +573,43 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseNew(parser, scope);
   }
 
+  if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_MUL_MUL) {
+    eat(parser, parser.curToken.type);
+
+    var a = parseVariable(parser, scope).binaryOpRight;
+
+    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+      eat(parser, TokenType.TOKEN_DOT);
+      var ast =
+          initASTWithLine(ASTType.AST_ATTRIBUTE_ACCESS, parser.lexer.lineNum);
+      ast.binaryOpLeft = a;
+      ast.binaryOpRight = parseFactor(parser, scope, false);
+
+      a = ast;
+    }
+
+    while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
+      var astListAccess =
+          initASTWithLine(ASTType.AST_LIST_ACCESS, parser.lexer.lineNum);
+      astListAccess.binaryOpLeft = a;
+
+      eat(parser, TokenType.TOKEN_LBRACKET);
+      astListAccess.listAccessPointer = parseExpression(parser, scope);
+      eat(parser, TokenType.TOKEN_RBRACKET);
+
+      a = astListAccess;
+    }
+
+    while (parser.curToken.type == TokenType.TOKEN_LPAREN)
+      a = parseFuncCall(parser, scope, a);
+
+    if (a != null) return a;
+  }
+
   if (parser.curToken.type == TokenType.TOKEN_ID) {
-    eat(parser, TokenType.TOKEN_ID);
+    eat(parser, parser.curToken.type);
 
     var a = parseVariable(parser, scope);
 
@@ -628,7 +688,7 @@ AST parseTerm(Parser parser, Scope scope) {
       parser.curToken.type == TokenType.TOKEN_GREATER_THAN ||
       parser.curToken.type == TokenType.TOKEN_EQUALITY ||
       parser.curToken.type == TokenType.TOKEN_NOT_EQUAL) {
-    var binaryOpOperator = copyToken(parser.curToken);
+    var binaryOpOperator = parser.curToken;
     eat(parser, binaryOpOperator.type);
 
     astBinaryOp = initASTWithLine(ASTType.AST_BINARYOP, parser.lexer.lineNum);
@@ -647,22 +707,39 @@ AST parseExpression(Parser parser, Scope scope) {
   AST astBinaryOp;
 
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB) {
-    var binaryOp = copyToken(parser.curToken);
-    eat(parser, binaryOp.type);
+      parser.curToken.type == TokenType.TOKEN_SUB ||
+      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
+    if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+        parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
+      var binaryOp = parser.curToken;
+      eat(parser, binaryOp.type);
 
-    astBinaryOp = initASTWithLine(ASTType.AST_BINARYOP, parser.lexer.lineNum);
-    astBinaryOp.scope = scope;
+      astBinaryOp = initASTWithLine(ASTType.AST_BINARYOP, parser.lexer.lineNum);
+      astBinaryOp.scope = scope;
 
-    astBinaryOp.binaryOpLeft = node;
-    astBinaryOp.binaryOperator = binaryOp;
-    astBinaryOp.binaryOpRight = parseTerm(parser, scope);
+      astBinaryOp.binaryOpLeft = node;
+      astBinaryOp.binaryOperator = binaryOp;
+      astBinaryOp.binaryOpRight = parseTerm(parser, scope);
 
-    node = astBinaryOp;
+      node = astBinaryOp;
+    } else {
+      var binaryOp = parser.curToken;
+      eat(parser, binaryOp.type);
+
+      astBinaryOp = initASTWithLine(ASTType.AST_BINARYOP, parser.lexer.lineNum);
+      astBinaryOp.scope = scope;
+
+      astBinaryOp.binaryOpLeft = node;
+      astBinaryOp.binaryOperator = binaryOp;
+      astBinaryOp.binaryOpRight = parseTerm(parser, scope);
+
+      node = astBinaryOp;
+    }
   }
 
   while (parser.curToken.type == TokenType.TOKEN_AND) {
-    var binaryOp = copyToken(parser.curToken);
+    var binaryOp = parser.curToken;
     eat(parser, binaryOp.type);
 
     astBinaryOp = initASTWithLine(ASTType.AST_BINARYOP, parser.lexer.lineNum);
@@ -910,7 +987,6 @@ AST parseFuncDef(Parser parser, Scope scope) {
   // Function Definition?, otherwise Variable definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     var ast = initASTWithLine(ASTType.AST_FUNC_DEFINITION, parser.lexer.lineNum)
-      ..isFuture = astType.isFuture
       ..funcName = funcName
       ..funcDefType = astType
       ..funcDefArgs = [];

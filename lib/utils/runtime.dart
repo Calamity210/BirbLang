@@ -527,27 +527,100 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
       }
     }
 
+    if (left == null) {
+      switch (node.binaryOperator.type) {
+        case TokenType.TOKEN_PLUS_PLUS:
+          {
+            AST variable = await visitVariable(runtime, node.binaryOpRight);
+            if (variable.type == ASTType.AST_INT)
+              return variable..intVal += 1;
+            else
+              return variable..doubleValue += 1;
+          }
+          break;
+
+        case TokenType.TOKEN_SUB_SUB:
+          {
+            AST variable = await visitVariable(runtime, node.binaryOpRight);
+            if (variable.type == ASTType.AST_INT)
+              return variable..intVal -= 1;
+            else
+              return variable..doubleValue -= 1;
+          }
+          break;
+        case TokenType.TOKEN_MUL_MUL:
+          {
+            AST variable = await visitVariable(runtime, node.binaryOpRight);
+            if (variable.type == ASTType.AST_INT)
+              return variable..intVal *= variable.intVal;
+            else
+              return variable..doubleValue *= variable.doubleValue;
+          }
+          break;
+        default:
+          print('Error: [Line ${node.lineNum}] No left value provided');
+          exit(1);
+          break;
+      }
+    }
     if (astVarDef.variableName == left.variableName) {
       value = await visit(runtime, node.binaryOpRight);
 
       switch (node.binaryOperator.type) {
+        case TokenType.TOKEN_PLUS_PLUS:
+          {
+            AST variable = await visitVariable(runtime, left);
+            if (variable.typeValue.type ==
+                DATATYPE.DATA_TYPE_INT) {
+              return variable..intVal += 1;;
+            } else if (variable.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_DOUBLE) {
+              return variable..doubleValue += 1;;
+            }
+          }
+          break;
+        case TokenType.TOKEN_SUB_SUB:
+          {
+            AST variable = await visitVariable(runtime, left);
+
+            if (variable.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_INT) {
+              return variable..intVal -= 1;
+            } else if (variable.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_DOUBLE) {
+              return variable..doubleValue -= 1;
+            }
+          }
+          break;
+        case TokenType.TOKEN_MUL_MUL:
+          {
+            AST variable = await visitVariable(runtime, left);
+            if (variable.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_INT) {
+              return variable..intVal *= variable.intVal;;
+            } else if (variable.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_DOUBLE) {
+              return variable..doubleValue *= variable.intVal;;
+            }
+          }
+          break;
         case TokenType.TOKEN_PLUS_EQUAL:
           {
             if (astVarDef.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_INT) {
               astVarDef.variableValue.intVal +=
                   value.intVal ?? value.doubleValue.toInt();
+
               astVarDef.variableValue.doubleValue +=
                   astVarDef.variableValue.intVal;
-              return astVarDef.variableValue;
             } else if (astVarDef.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
               astVarDef.variableValue.doubleValue +=
                   value.doubleValue ?? value.intVal;
               astVarDef.variableValue.intVal +=
                   astVarDef.variableValue.doubleValue.toInt();
-              return astVarDef.variableValue;
             }
+            return astVarDef.variableValue;
           }
           break;
 
@@ -586,6 +659,27 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
                   value.doubleValue ?? value.intVal;
               astVarDef.variableValue.intVal *=
                   astVarDef.variableValue.doubleValue.toInt();
+              return astVarDef.variableValue;
+            }
+          }
+          break;
+        case TokenType.TOKEN_DIV_EQUAL:
+          {
+            if (astVarDef.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_DOUBLE) {
+              astVarDef.variableValue.doubleValue /=
+                  value.doubleValue ?? value.intVal;
+              return astVarDef.variableValue;
+            }
+          }
+          break;
+
+        case TokenType.TOKEN_MOD_EQUAL:
+          {
+            if (astVarDef.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_DOUBLE) {
+              astVarDef.variableValue.intVal %=
+                  value.doubleValue ?? value.intVal;
               return astVarDef.variableValue;
             }
           }
@@ -1477,6 +1571,35 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
           returnValue = initAST(ASTType.AST_DOUBLE);
           returnValue.doubleValue = right.doubleValue.abs();
         }
+      }
+      break;
+
+    case TokenType.TOKEN_PLUS_PLUS:
+      {
+        AST variable = await visitVariable(runtime, node.unaryOpRight);
+        if (variable.type == ASTType.AST_INT)
+          return variable..intVal += 1;
+        else
+          return variable..doubleValue += 1;
+      }
+      break;
+
+    case TokenType.TOKEN_SUB_SUB:
+      {
+        AST variable = await visitVariable(runtime, node.unaryOpRight);
+        if (variable.type == ASTType.AST_INT)
+          return variable..intVal -= 1;
+        else
+          return variable..doubleValue -= 1;
+      }
+      break;
+    case TokenType.TOKEN_MUL_MUL:
+      {
+        AST variable = await visitVariable(runtime, node.unaryOpRight);
+        if (variable.type == ASTType.AST_INT)
+          return variable..intVal *= variable.intVal;
+        else
+          return variable..doubleValue *= variable.doubleValue;
       }
       break;
 
