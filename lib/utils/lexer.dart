@@ -13,10 +13,10 @@ class Lexer {
 /// Takes in a string of content(programs),
 /// Initializes and returns a new lexer
 Lexer initLexer(String contents) {
-  var lexer = Lexer();
-  lexer.contents = contents.trim();
-  lexer.currentIndex = 0;
-  lexer.lineNum = 1;
+  var lexer = Lexer()
+    ..contents = contents.trim()
+    ..currentIndex = 0
+    ..lineNum = 1;
   lexer.currentChar = lexer.contents[lexer.currentIndex];
 
   return lexer;
@@ -40,7 +40,6 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '+') {
       var value = lexer.currentChar;
-      ;
       var type = TokenType.TOKEN_PLUS;
 
       advance(lexer);
@@ -48,7 +47,6 @@ Token getNextToken(Lexer lexer) {
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_PLUS_EQUAL;
         value += lexer.currentChar;
-        ;
 
         advance(lexer);
       }
@@ -58,7 +56,6 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '-') {
       var value = lexer.currentChar;
-      ;
       var type = TokenType.TOKEN_SUB;
 
       advance(lexer);
@@ -66,7 +63,6 @@ Token getNextToken(Lexer lexer) {
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_SUB_EQUAL;
         value += lexer.currentChar;
-        ;
 
         advance(lexer);
       }
@@ -76,7 +72,6 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '*') {
       var value = lexer.currentChar;
-      ;
       var type = TokenType.TOKEN_MUL;
 
       advance(lexer);
@@ -84,7 +79,6 @@ Token getNextToken(Lexer lexer) {
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_MUL_EQUAL;
         value += lexer.currentChar;
-        ;
 
         advance(lexer);
       }
@@ -94,13 +88,12 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '&') {
       var value = lexer.currentChar;
-      ;
 
       advance(lexer);
 
       if (lexer.currentChar == '&') {
         value += lexer.currentChar;
-        ;
+       
 
         advance(lexer);
 
@@ -110,13 +103,11 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '|') {
       var value = lexer.currentChar;
-      ;
 
       advance(lexer);
 
       if (lexer.currentChar == '|') {
         value += lexer.currentChar;
-        ;
 
         advance(lexer);
 
@@ -126,7 +117,7 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '=') {
       var value = lexer.currentChar;
-      ;
+     
       var type = TokenType.TOKEN_EQUAL;
 
       advance(lexer);
@@ -134,7 +125,7 @@ Token getNextToken(Lexer lexer) {
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_EQUALITY;
         value += lexer.currentChar;
-        ;
+       
 
         advance(lexer);
       }
@@ -144,7 +135,7 @@ Token getNextToken(Lexer lexer) {
 
     if (lexer.currentChar == '!') {
       var value = lexer.currentChar;
-      ;
+     
       var type = TokenType.TOKEN_NOT;
 
       advance(lexer);
@@ -152,7 +143,7 @@ Token getNextToken(Lexer lexer) {
       if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_NOT_EQUAL;
         value += lexer.currentChar;
-        ;
+       
 
         advance(lexer);
       }
@@ -239,7 +230,7 @@ void advance(Lexer lexer) {
 /// Advances while returning a Token
 Token advanceWithToken(Lexer lexer, TokenType type) {
   var value = lexer.currentChar;
-  ;
+ 
   advance(lexer);
   var token = initToken(type, value);
 
@@ -350,19 +341,19 @@ Token collectNumber(Lexer lexer) {
 
   while (isNumeric(lexer.currentChar)) {
     value += lexer.currentChar;
-    ;
+   
     advance(lexer);
   }
 
   if (lexer.currentChar == '.') {
     type = TokenType.TOKEN_DOUBLE_VALUE;
     value += lexer.currentChar;
-    ;
+   
     advance(lexer);
 
     while (isNumeric(lexer.currentChar)) {
       value += lexer.currentChar;
-      ;
+     
       advance(lexer);
     }
   }

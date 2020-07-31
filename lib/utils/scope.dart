@@ -8,11 +8,10 @@ class Scope {
 }
 
 Scope initScope(bool global) {
-  var scope = Scope();
-  scope.variableDefinitions = [];
-  scope.functionDefinitions = [];
-  scope.global = global;
+  var scope = Scope()
+    ..variableDefinitions = []
+    ..functionDefinitions = []
+    ..global = global;
 
   return scope;
 }
-

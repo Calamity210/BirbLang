@@ -29,9 +29,9 @@ class Parser {
 
 /// Initializes and returns a parser with a lexer
 Parser initParser(Lexer lexer) {
-  var parser = Parser();
-  parser.lexer = lexer;
-  parser.curToken = getNextToken(parser.lexer);
+  var parser = Parser()
+    ..lexer = lexer;
+    parser.curToken = getNextToken(parser.lexer);
 
   return parser;
 }

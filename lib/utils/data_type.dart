@@ -19,11 +19,11 @@ class DataType {
 }
 
 DataType initDataType() {
-  var dataType = DataType();
-  dataType.type = DATATYPE.DATA_TYPE_VOID;
-  dataType.modifiers[0] = 0;
-  dataType.modifiers[1] = 0;
-  dataType.modifiers[2] = 0;
+  var dataType = DataType()
+    ..type = DATATYPE.DATA_TYPE_VOID
+    ..modifiers[0] = 0
+    ..modifiers[1] = 0
+    ..modifiers[2] = 0;
 
   return dataType;
 }

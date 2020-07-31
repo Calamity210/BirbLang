@@ -14,12 +14,41 @@ class Runtime {
   String stdoutBuffer;
 }
 
-Scope getScope(Runtime runtime, AST node) {
-  if (node.scope == null) {
-    return runtime.scope;
-  }
+Runtime initRuntime() {
+  var runtime = Runtime()
+    ..scope = initScope(true)
+    ..listMethods = []
+    ..mapMethods = [];
 
-  return node.scope;
+  INITIALIZED_NOOP = initAST(ASTType.AST_NOOP);
+
+  initStandards(runtime);
+
+  var LIST_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
+  LIST_ADD_FUNCTION_DEFINITION.fptr = listAddFPtr;
+  runtime.listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
+
+  var LIST_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
+  LIST_REMOVE_FUNCTION_DEFINITION.fptr = listRemoveFptr;
+  runtime.listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
+
+  var MAP_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
+  MAP_ADD_FUNCTION_DEFINITION.fptr = mapAddFPtr;
+  runtime.mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
+
+  var MAP_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
+  MAP_REMOVE_FUNCTION_DEFINITION.fptr = mapAddFPtr;
+  runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
+
+  return runtime;
+}
+
+Scope getScope(Runtime runtime, AST node) {
+  return node.scope ?? runtime.scope;
 }
 
 void multipleVariableDefinitionsError(int lineNum, String variableName) {
@@ -52,7 +81,6 @@ AST mapAddFPtr(Runtime runtime, AST self, List args) {
   runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_ANY]);
 
   self.map[args[0]] = args[1];
-
   return self;
 }
 
@@ -67,7 +95,6 @@ AST mapRemoveFptr(Runtime runtime, AST self, List args) {
   }
 
   self.map.remove(astString.stringValue);
-
   return self;
 }
 
@@ -85,19 +112,14 @@ void collectAndSweepGarbage(Runtime runtime, List old_def_list, Scope scope) {
     for (int j = 0; j < old_def_list.length; j++) {
       AST oldDef = old_def_list[j];
 
-      if (oldDef == newDef) {
-        exists = true;
-      }
+      if (oldDef == newDef) exists = true;
     }
 
-    if (!exists) {
-      garbage.add(newDef);
-    }
+    if (!exists) garbage.add(newDef);
   }
 
-  for (int i = 0; i < garbage.length; i++) {
+  for (int i = 0; i < garbage.length; i++)
     scope.variableDefinitions.remove(garbage[i]);
-  }
 }
 
 Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
@@ -105,7 +127,6 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
     print(
       'Error: [Line ${fcall.lineNum}] ${fdef.funcName} Expected ${fdef.funcDefArgs.length} arguments but found ${fcall.funcCallArgs.length} arguments\n',
     );
-
     exit(1);
   }
 
@@ -137,13 +158,10 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
       var vdef = await getVarDefByName(
           runtime, getScope(runtime, astArg), astArg.variableName);
 
-      if (vdef != null) {
-        newVariableDef.variableValue = vdef.variableValue;
-      }
+      if (vdef != null) newVariableDef.variableValue = vdef.variableValue;
     }
 
     newVariableDef.variableValue ??= await visit(runtime, astArg);
-
     newVariableDef.variableName = argName;
 
     funcDefBodyScope.variableDefinitions.add(newVariableDef);
@@ -162,54 +180,21 @@ AST registerGlobalFunction(Runtime runtime, String fname, AstFuncPointer fptr) {
 
 AST registerGlobalFutureFunction(
     Runtime runtime, String fname, AstFutureFuncPointer fptr) {
-  var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
-  fdef.funcName = fname;
-  fdef.futureptr = fptr;
+  var fdef = initAST(ASTType.AST_FUNC_DEFINITION)
+    ..funcName = fname
+    ..futureptr = fptr;
   runtime.scope.functionDefinitions.add(fdef);
   return fdef;
 }
 
 AST registerGlobalVariable(Runtime runtime, String vname, String vval) {
-  var vdef = initAST(ASTType.AST_VARIABLE_DEFINITION);
-  vdef.variableName = vname;
-  vdef.variableType = initAST(ASTType.AST_STRING);
-  vdef.variableValue = initAST(ASTType.AST_STRING);
-  vdef.variableValue.stringValue = vval;
+  var vdef = initAST(ASTType.AST_VARIABLE_DEFINITION)
+    ..variableName = vname
+    ..variableType = initAST(ASTType.AST_STRING)
+    ..variableValue = initAST(ASTType.AST_STRING)
+    ..variableValue.stringValue = vval;
   runtime.scope.variableDefinitions.add(vdef);
   return vdef;
-}
-
-Runtime initRuntime() {
-  var runtime = Runtime();
-  runtime.scope = initScope(true);
-  runtime.listMethods = [];
-  runtime.mapMethods = [];
-
-  INITIALIZED_NOOP = initAST(ASTType.AST_NOOP);
-
-  initStandards(runtime);
-
-  var LIST_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
-  LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  LIST_ADD_FUNCTION_DEFINITION.fptr = listAddFPtr;
-  runtime.listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
-
-  var LIST_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
-  LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  LIST_REMOVE_FUNCTION_DEFINITION.fptr = listRemoveFptr;
-  runtime.listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
-
-  var MAP_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
-  MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  MAP_ADD_FUNCTION_DEFINITION.fptr = mapAddFPtr;
-  runtime.mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
-
-  var MAP_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
-  MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  MAP_REMOVE_FUNCTION_DEFINITION.fptr = mapAddFPtr;
-  runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
-
-  return runtime;
 }
 
 Future<AST> visit(Runtime runtime, AST node) async {

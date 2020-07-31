@@ -142,8 +142,7 @@ class AST {
 
 /// Initializes the Abstract Syntax tree with default values
 AST initAST(ASTType type) {
-  var ast = AST();
-  ast.type = type;
+  var ast = AST()..type = type;
   ast.compoundValue = ast.type == ASTType.AST_COMPOUND ? [] : null;
   ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
   ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
