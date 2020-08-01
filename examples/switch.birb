@@ -1,0 +1,9 @@
+var foo = 16;
+switch (foo) {
+    case 15: {
+        screm(15);
+    }
+    default: {
+        screm("default");
+    }
+}

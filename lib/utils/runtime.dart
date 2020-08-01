@@ -259,6 +259,8 @@ Future<AST> visit(Runtime runtime, AST node) async {
       return await visitTernary(runtime, node);
     case ASTType.AST_IF:
       return await visitIf(runtime, node);
+    case ASTType.AST_SWITCH:
+      return await visitSwitch(runtime, node);
     case ASTType.AST_WHILE:
       return await visitWhile(runtime, node);
     case ASTType.AST_FOR:
@@ -570,12 +572,13 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
         case TokenType.TOKEN_PLUS_PLUS:
           {
             AST variable = await visitVariable(runtime, left);
-            if (variable.typeValue.type ==
-                DATATYPE.DATA_TYPE_INT) {
-              return variable..intVal += 1;;
+            if (variable.typeValue.type == DATATYPE.DATA_TYPE_INT) {
+              return variable..intVal += 1;
+              ;
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
-              return variable..doubleValue += 1;;
+              return variable..doubleValue += 1;
+              ;
             }
           }
           break;
@@ -597,10 +600,12 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
             AST variable = await visitVariable(runtime, left);
             if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_INT) {
-              return variable..intVal *= variable.intVal;;
+              return variable..intVal *= variable.intVal;
+              ;
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
-              return variable..doubleValue *= variable.intVal;;
+              return variable..doubleValue *= variable.intVal;
+              ;
             }
           }
           break;
@@ -1628,6 +1633,60 @@ Future<AST> visitIf(Runtime runtime, AST node) async {
   }
 
   return node;
+}
+
+Future<AST> visitSwitch(Runtime runtime, AST node) async {
+  if (node.switchExpression == null) {
+    print('Error: [Line ${node.lineNum}] If expression can\'t be empty');
+    exit(1);
+    return null;
+  }
+  AST caseAST = await visit(runtime, node.switchExpression);
+
+  switch (caseAST.type) {
+    case ASTType.AST_STRING:
+      Iterable<AST> testCase = node.switchCases.keys
+          .where((element) => element.stringValue == caseAST.stringValue);
+
+      if (testCase != null && testCase.isNotEmpty) {
+        return await visit(runtime, node.switchCases[testCase]);
+      }
+      return await visit(runtime, node.switchDefault);
+    case ASTType.AST_INT:
+      Iterable<AST> testCase = node.switchCases.keys
+          .where((element) => element.intVal == caseAST.intVal);
+
+      if (testCase != null && testCase.isNotEmpty) {
+        return await visit(runtime, node.switchCases[testCase]);
+      }
+      return await visit(runtime, node.switchDefault);
+    case ASTType.AST_DOUBLE:
+      Iterable<AST> testCase = node.switchCases.keys
+          .where((element) => element.doubleValue == caseAST.doubleValue);
+
+      if (testCase != null && testCase.isNotEmpty) {
+        return await visit(runtime, node.switchCases[testCase]);
+      }
+      return await visit(runtime, node.switchDefault);
+    case ASTType.AST_MAP:
+      Iterable<AST> testCase =
+          node.switchCases.keys.where((element) => element.map == caseAST.map);
+
+      if (testCase != null && testCase.isNotEmpty) {
+        return await visit(runtime, node.switchCases[testCase]);
+      }
+      return await visit(runtime, node.switchDefault);
+    case ASTType.AST_LIST:
+      Iterable<AST> testCase = node.switchCases.keys
+          .where((element) => element.listChildren == caseAST.listChildren);
+
+      if (testCase != null && testCase.isNotEmpty) {
+        return await visit(runtime, node.switchCases[testCase]);
+      }
+      return await visit(runtime, node.switchDefault);
+    default:
+      return await visit(runtime, node.switchDefault);
+  }
 }
 
 Future<AST> visitTernary(Runtime runtime, AST node) async {

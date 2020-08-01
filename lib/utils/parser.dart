@@ -10,6 +10,9 @@ const String WHILE = 'while';
 const String FOR = 'for';
 const String IF = 'if';
 const String ELSE = 'else';
+const String SWITCH = 'switch';
+const String CASE = 'case';
+const String DEFAULT = 'default';
 const String RETURN = 'return';
 const String BREAK = 'break';
 const String CONTINUE = 'continue';
@@ -117,6 +120,8 @@ AST parseStatement(Parser parser, Scope scope) {
             return parseFor(parser, scope);
           case IF:
             return parseIf(parser, scope);
+          case SWITCH:
+            return parseSwitch(parser, scope);
           case FALSE:
           case TRUE:
             return parseBool(parser, scope);
@@ -828,6 +833,56 @@ AST parseIf(Parser parser, Scope scope) {
   }
 
   return ast;
+}
+
+AST parseSwitch(Parser parser, Scope scope) {
+  AST switchAST = initASTWithLine(ASTType.AST_SWITCH, parser.lexer.lineNum)..switchCases = {};
+
+  eat(parser, TokenType.TOKEN_ID);
+  eat(parser, TokenType.TOKEN_LPAREN);
+
+  switchAST.switchExpression = parseExpression(parser, scope);
+
+  eat(parser, TokenType.TOKEN_RPAREN);
+  eat(parser, TokenType.TOKEN_LBRACE);
+  eat(parser, TokenType.TOKEN_ID);
+
+  AST caseAST = parseStatement(parser, scope);
+
+  eat(parser, TokenType.TOKEN_COLON);
+  eat(parser, TokenType.TOKEN_LBRACE);
+
+  AST caseFuncAST = parseStatements(parser, scope);
+
+  eat(parser, TokenType.TOKEN_RBRACE);
+
+  switchAST.switchCases[caseAST] = caseFuncAST;
+
+  while (parser.curToken.value == CASE) {
+    caseAST = parseStatement(parser, scope);
+
+    eat(parser, TokenType.TOKEN_COLON);
+    eat(parser, TokenType.TOKEN_LBRACE);
+
+    caseFuncAST = parseStatements(parser, scope);
+
+    eat(parser, TokenType.TOKEN_RBRACE);
+
+    switchAST.switchCases[caseAST] = caseFuncAST;
+  }
+
+  // Default case (REQUIRED)
+  eat(parser, TokenType.TOKEN_ID);
+  eat(parser, TokenType.TOKEN_COLON);
+  eat(parser, TokenType.TOKEN_LBRACE);
+
+  AST defaultFuncAST = parseStatements(parser, scope);
+
+  eat(parser, TokenType.TOKEN_RBRACE);
+
+  switchAST.switchDefault = defaultFuncAST;
+
+  return switchAST;
 }
 
 AST parseTernary(Parser parser, Scope scope, AST expr) {

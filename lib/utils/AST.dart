@@ -35,6 +35,7 @@ enum ASTType {
   AST_TERNARY,
   AST_IF,
   AST_ELSE,
+  AST_SWITCH,
   AST_WHILE,
   AST_FOR,
   AST_ATTRIBUTE_ACCESS,
@@ -49,10 +50,10 @@ class AST {
 
   AST funcCallExpression;
 
-  int lineNum = 0;
+  int lineNum;
 
   // AST_INT
-  int intVal = 0;
+  int intVal;
 
   // AST_BOOL
   bool boolValue = false;
@@ -60,7 +61,7 @@ class AST {
   bool isClassChild = false;
 
   // AST_DOUBLE
-  double doubleValue = 0.0;
+  double doubleValue;
 
   // AST_STRING
   String stringValue;
@@ -114,6 +115,11 @@ class AST {
   AST ifElse;
   AST elseBody;
 
+  // AST_SWITCH
+  AST switchExpression;
+  Map<AST, AST> switchCases;
+  AST switchDefault;
+
   // AST_TERNARYOP
   AST ternaryExpression;
   AST ternaryBody;
@@ -136,6 +142,7 @@ class AST {
 
   AstFuncPointer fptr;
   AstFutureFuncPointer futureptr;
+
 }
 
 /// Initializes the Abstract Syntax tree with default values
