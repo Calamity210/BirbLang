@@ -1649,7 +1649,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
           .where((element) => element.stringValue == caseAST.stringValue);
 
       if (testCase != null && testCase.isNotEmpty) {
-        return await visit(runtime, node.switchCases[testCase]);
+        return await visit(runtime, node.switchCases[testCase.first]);
       }
       return await visit(runtime, node.switchDefault);
     case ASTType.AST_INT:
@@ -1657,7 +1657,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
           .where((element) => element.intVal == caseAST.intVal);
 
       if (testCase != null && testCase.isNotEmpty) {
-        return await visit(runtime, node.switchCases[testCase]);
+        return await visit(runtime, node.switchCases[testCase.first]);
       }
       return await visit(runtime, node.switchDefault);
     case ASTType.AST_DOUBLE:
@@ -1665,7 +1665,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
           .where((element) => element.doubleValue == caseAST.doubleValue);
 
       if (testCase != null && testCase.isNotEmpty) {
-        return await visit(runtime, node.switchCases[testCase]);
+        return await visit(runtime, node.switchCases[testCase.first]);
       }
       return await visit(runtime, node.switchDefault);
     case ASTType.AST_MAP:
@@ -1673,7 +1673,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
           node.switchCases.keys.where((element) => element.map == caseAST.map);
 
       if (testCase != null && testCase.isNotEmpty) {
-        return await visit(runtime, node.switchCases[testCase]);
+        return await visit(runtime, node.switchCases[testCase.first]);
       }
       return await visit(runtime, node.switchDefault);
     case ASTType.AST_LIST:
@@ -1681,7 +1681,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
           .where((element) => element.listChildren == caseAST.listChildren);
 
       if (testCase != null && testCase.isNotEmpty) {
-        return await visit(runtime, node.switchCases[testCase]);
+        return await visit(runtime, node.switchCases[testCase.first]);
       }
       return await visit(runtime, node.switchDefault);
     default:

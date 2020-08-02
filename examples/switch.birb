@@ -1,4 +1,4 @@
-var foo = 16;
+var foo = 15;
 switch (foo) {
     case 15: {
         screm(15);
