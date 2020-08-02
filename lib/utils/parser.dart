@@ -859,6 +859,8 @@ AST parseSwitch(Parser parser, Scope scope) {
   switchAST.switchCases[caseAST] = caseFuncAST;
 
   while (parser.curToken.value == CASE) {
+    eat(parser, TokenType.TOKEN_ID);
+
     caseAST = parseStatement(parser, scope);
 
     eat(parser, TokenType.TOKEN_COLON);
