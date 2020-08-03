@@ -1,0 +1,5 @@
+class Foo {
+    Map i = {"content": 10};
+}
+
+screm(Foo.i["content"]);

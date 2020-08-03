@@ -1,0 +1,5 @@
+List list = {
+    10
+};
+
+screm(list[0]);

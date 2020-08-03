@@ -1,0 +1,5 @@
+Map map = {
+    "content": "This is a message"
+};
+
+screm(map["content"]);

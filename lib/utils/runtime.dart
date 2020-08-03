@@ -939,6 +939,12 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         node.binaryOpRight.isClassChild = true;
         node.classChildren = left.classChildren;
         node.scope = left.scope;
+      } else if (node.binaryOpRight.type == ASTType.AST_LIST_ACCESS) {
+        node.binaryOpRight.binaryOpLeft.classChildren = left.classChildren;
+        node.binaryOpRight.binaryOpLeft.scope = left.scope;
+        node.binaryOpRight.binaryOpLeft.isClassChild = true;
+        node.binaryOpRight.classChildren = left.classChildren;
+        node.binaryOpRight.scope = left.scope;
       }
     } else if (left.type == ASTType.AST_ENUM) {
       if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
