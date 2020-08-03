@@ -25,11 +25,11 @@ Lexer initLexer(String contents) {
 
 /// Grabs next token from the lexer
 Token getNextToken(Lexer lexer) {
-  while (
-      lexer.currentIndex < lexer.contents.length && lexer.currentChar != null) {
-    if (lexer.currentChar == ' ' ||
-        lexer.currentChar == '\n' ||
-        lexer.currentChar == '\r') skipWhitespace(lexer);
+  while (lexer.currentIndex < lexer.contents.length && lexer.currentChar != null) {
+
+    // Skip
+    if (lexer.currentChar == ' ' || lexer.currentChar == '\n' ||lexer.currentChar == '\r')
+      skipWhitespace(lexer);
 
     // Collect a num
     if (isNumeric(lexer.currentChar)) {

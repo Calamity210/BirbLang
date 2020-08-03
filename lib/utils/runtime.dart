@@ -226,15 +226,11 @@ Future<AST> visit(Runtime runtime, AST node) async {
     case ASTType.AST_DOUBLE:
       return node;
     case ASTType.AST_LIST:
-      {
-        node.funcDefinitions = runtime.listMethods;
-        return node;
-      }
+      node.funcDefinitions = runtime.listMethods;
+      return node;
     case ASTType.AST_MAP:
-      {
-        node.funcDefinitions = runtime.mapMethods;
-        return node;
-      }
+      node.funcDefinitions = runtime.mapMethods;
+      return node;
     case ASTType.AST_BOOL:
       return node;
     case ASTType.AST_INT:
@@ -269,8 +265,6 @@ Future<AST> visit(Runtime runtime, AST node) async {
       return await visitAttAccess(runtime, node);
     case ASTType.AST_LIST_ACCESS:
       return await visitListAccess(runtime, node);
-    case ASTType.AST_NEW:
-      return await visitNew(runtime, node);
     case ASTType.AST_ITERATE:
       return await visitIterate(runtime, node);
     case ASTType.AST_ASSERT:
@@ -587,11 +581,9 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
             AST variable = await visitVariable(runtime, left);
             if (variable.typeValue.type == DATATYPE.DATA_TYPE_INT) {
               return variable..intVal += 1;
-
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
               return variable..doubleValue += 1;
-
             }
           }
           break;
@@ -614,11 +606,9 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
             if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_INT) {
               return variable..intVal *= variable.intVal;
-
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
               return variable..doubleValue *= variable.intVal;
-
             }
           }
           break;
@@ -856,9 +846,6 @@ Future<AST> visitFuncCall(Runtime runtime, AST node) async {
 
   print('Error: [Line ${node.lineNum}] Undefined method `?`');
   exit(1);
-
-  // To silence the analyzer
-  return null;
 }
 
 Future<AST> visitCompound(Runtime runtime, AST node) async {
@@ -1740,10 +1727,6 @@ Future<AST> visitFor(Runtime runtime, AST node) async {
   return node;
 }
 
-Future<AST> visitNew(Runtime runtime, AST node) async {
-  return await visit(runtime, node.newValue);
-}
-
 Future<AST> visitIterate(Runtime runtime, AST node) async {
   var scope = getScope(runtime, node);
   var astIterable = await visit(runtime, node.iterateIterable);
@@ -1865,10 +1848,6 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
       exit(1);
     }
   }
-}
-
-void runtimeBufferStdout(Runtime runtime, String buffer) {
-  runtime.stdoutBuffer = buffer;
 }
 
 Future<AST> visitStringProperties(AST node, AST left) async {

@@ -10,7 +10,6 @@ const String FINAL = 'final';
 const String FOR = 'for';
 const String IF = 'if';
 const String ITERATE = 'iterate';
-const String NEW = 'new';
 const String NULL = 'null';
 const String RETURN = 'return';
 const String SWITCH = 'switch';

@@ -65,10 +65,17 @@ bool isDataType(String tokenValue) {
       tokenValue == 'Source');
 }
 
+/// Check if the current token is a variable modifier
 bool isModifier(String tokenValue) {
   return tokenValue == CONST || tokenValue == FINAL || tokenValue == STATIC;
 }
 
+/// Parses a single statement compound
+/// ie:
+/// ```dart
+///  if (. . .)
+///   screm("foo")
+/// ```
 AST parseOneStatementCompound(Parser parser, Scope scope) {
   var compound = initASTWithLine(ASTType.AST_COMPOUND, parser.lexer.lineNum);
   compound.scope = scope;
@@ -130,8 +137,6 @@ AST parseStatement(Parser parser, Scope scope) {
             return parseBreak(parser, scope);
           case CONTINUE:
             return parseContinue(parser, scope);
-          case NEW:
-            return parseNew(parser, scope);
           case ITERATE:
             return parseIterate(parser, scope);
           case ASSERT:
@@ -571,8 +576,6 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseBool(parser, scope);
     case NULL:
       return parseNull(parser, scope);
-    case NEW:
-      return parseNew(parser, scope);
   }
 
   if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
@@ -903,14 +906,6 @@ AST parseTernary(Parser parser, Scope scope, AST expr) {
   ternary.ternaryElseBody = parseTerm(parser, scope);
 
   return ternary;
-}
-
-AST parseNew(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  var ast = initASTWithLine(ASTType.AST_NEW, parser.lexer.lineNum);
-  ast.newValue = parseExpression(parser, scope);
-
-  return ast;
 }
 
 AST parseIterate(Parser parser, Scope scope) {

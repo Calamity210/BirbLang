@@ -40,7 +40,6 @@ enum ASTType {
   AST_FOR,
   AST_ATTRIBUTE_ACCESS,
   AST_LIST_ACCESS,
-  AST_NEW,
   AST_ITERATE,
   AST_ASSERT
 }
@@ -131,7 +130,6 @@ class AST {
   AST returnValue;
   AST listAccessPointer;
   AST savedFuncCall;
-  AST newValue;
   AST iterateIterable;
   AST iterateFunction;
 
@@ -160,117 +158,56 @@ AST initAST(ASTType type) {
 }
 
 AST initASTWithLine(ASTType type, int line) {
-  var node = initAST(type);
-  node.lineNum = line;
+  var node = initAST(type)..lineNum = line;
 
   return node;
-}
-
-AST astRScope(AST ast, Scope scope) {
-  ast.scope = scope;
-  return ast;
 }
 
 String astToString(AST ast) {
   switch (ast.type) {
     case ASTType.AST_CLASS:
-      return astClassToString(ast);
+      return '{ class }';
     case ASTType.AST_VARIABLE:
       return ast.variableName;
     case ASTType.AST_FUNC_DEFINITION:
-      return astFunctionDefinitionToString(ast);
+      return '${ast.funcName} (${ast.funcDefArgs.length})';
     case ASTType.AST_FUNC_CALL:
-      return astFunctionCallToString(ast);
+      String expressionStr = astToString(ast.funcCallExpression);
+      return '$expressionStr (${ast.funcCallArgs.length})';
     case ASTType.AST_NULL:
-      return astNullToString(ast);
+      return 'null';
     case ASTType.AST_STRING:
-      {
-        return ast.stringValue;
-      }
+      return ast.stringValue;
     case ASTType.AST_DOUBLE:
-      return astDoubleToString(ast);
+      return ast.doubleValue.toStringAsPrecision(6).padRight(12);
     case ASTType.AST_LIST:
-      return astListToString(ast);
+      return ast.listElements.toString();
+    case ASTType.AST_MAP:
+      return ast.map.toString();
     case ASTType.AST_BOOL:
-      return astBoolToString(ast);
+      return ast.boolValue.toString();
     case ASTType.AST_INT:
-      return astIntToString(ast);
+      return ast.intVal.toString();
     case ASTType.AST_TYPE:
-      return astTypeToString(ast);
+      return '< Type >';
     case ASTType.AST_ATTRIBUTE_ACCESS:
-      return astAttributeAccessToString(ast);
+      return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
     case ASTType.AST_LIST_ACCESS:
-      return astListAccessToString(ast);
+      return 'list[access]';
     case ASTType.AST_BINARYOP:
-      {
-        AST visitedBiOp;
-        visitBinaryOp(initRuntime(), ast).then((value) => visitedBiOp = value);
-        return astToString(visitedBiOp);
-      }
+      AST visitedBiOp;
+      visitBinaryOp(initRuntime(), ast).then((value) => visitedBiOp = value);
+      return astToString(visitedBiOp);
     case ASTType.AST_NOOP:
-      return '';
+      return '{{NO-OP}}';
     case ASTType.AST_BREAK:
-      return '';
+      return 'break';
     case ASTType.AST_RETURN:
       return astToString(ast.returnValue);
     case ASTType.AST_ENUM:
-      return astEnumToString(ast);
+      return ast.variableName;
     default:
       print('Could no convert ast of type ${ast.type} to String');
       return null;
   }
-}
-
-String astClassToString(AST ast) {
-  return '{ class }';
-}
-
-String astFunctionDefinitionToString(AST ast) {
-  return '${ast.funcName} (${ast.funcDefArgs.length})';
-}
-
-String astFunctionCallToString(AST ast) {
-  var expressionStr = astToString(ast.funcCallExpression);
-
-  return '$expressionStr (${ast.funcCallArgs.length})';
-}
-
-String astNullToString(AST ast) {
-  return 'null';
-}
-
-String astDoubleToString(AST ast) {
-  return ast.doubleValue.toStringAsPrecision(6).padRight(12);
-}
-
-String astListToString(AST ast) {
-  return '[ list ]';
-}
-
-String astBoolToString(AST ast) {
-  return ast.boolValue.toString();
-}
-
-String astIntToString(AST ast) {
-  return ast.intVal.toString();
-}
-
-String astTypeToString(AST ast) {
-  return '< type >';
-}
-
-String astAttributeAccessToString(AST ast) {
-  return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
-}
-
-String astListAccessToString(AST ast) {
-  return '[ listAccess ]';
-}
-
-String astBinopToString(AST ast) {
-  return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
-}
-
-String astEnumToString(AST ast) {
-  return ast.variableName;
 }

@@ -28,18 +28,7 @@ DataType initDataType() {
 }
 
 DataType initDataTypeAs(DATATYPE type) {
-  var dataType = initDataType();
-  dataType.type = type;
-
-  return dataType;
-}
-
-DataType dataTypeCopy(DataType src) {
-  var dataType = initDataType();
-  dataType.type = src.type;
-  dataType.modifiers[0] = src.modifiers[0];
-  dataType.modifiers[1] = src.modifiers[1];
-  dataType.modifiers[2] = src.modifiers[2];
+  var dataType = initDataType()..type = type;
 
   return dataType;
 }
