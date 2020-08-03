@@ -307,7 +307,6 @@ Future<AST> getVarDefByName(
       return scope.owner;
     }
   }
-
   for (int i = 0; i < scope.variableDefinitions.length; i++) {
     AST varDef = scope.variableDefinitions[i];
 
@@ -368,7 +367,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
         return varDef;
       }
 
-      var value = await visit(runtime, node);
+      var value = await visitVariable(runtime, node);
       value.typeValue = varDef.variableType.typeValue;
 
       return value;
@@ -588,11 +587,11 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
             AST variable = await visitVariable(runtime, left);
             if (variable.typeValue.type == DATATYPE.DATA_TYPE_INT) {
               return variable..intVal += 1;
-              ;
+
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
               return variable..doubleValue += 1;
-              ;
+
             }
           }
           break;
@@ -615,11 +614,11 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
             if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_INT) {
               return variable..intVal *= variable.intVal;
-              ;
+
             } else if (variable.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
               return variable..doubleValue *= variable.intVal;
-              ;
+
             }
           }
           break;

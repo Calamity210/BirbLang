@@ -18,6 +18,7 @@ Future<void> main(List<String> arguments) async {
 
   Parser parser;
 
+  /// Parsed program
   AST node;
 
   // No file path is specified, Initiate the birb shell
@@ -48,53 +49,16 @@ Future<void> main(List<String> arguments) async {
         isInteractive = false;
         break;
       }
-      input += str + '\n';
+
+      input += '$str\n';
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
     return;
   }
 
-  if (arguments.length == 2 && arguments[1] == '--timeAll') {
-    Stopwatch stopwatch = Stopwatch();
-    stopwatch.start();
-
-    lexer = initLexer(File(arguments[0]).readAsStringSync());
-    parser = initParser(lexer);
-    node = parse(parser);
-    await visit(runtime, node);
-
-    stopwatch.stop();
-    print('${stopwatch.elapsedMilliseconds}ms');
-  }
-  if (arguments.length == 2 && arguments[1] == '--time') {
-    Stopwatch visitSW = Stopwatch();
-    Stopwatch parseSW = Stopwatch();
-
-    lexer = initLexer(File(arguments[0]).readAsStringSync());
-    parser = initParser(lexer);
-
-    parseSW.start();
-    node = parse(parser);
-    parseSW.stop();
-
-    visitSW.start();
-    await visit(runtime, node);
-    visitSW.stop();
-    print('''
-==============MilliSeconds===============
-Parsing: ${parseSW.elapsedMilliseconds}ms
-Runtime: ${visitSW.elapsedMilliseconds}ms
-
-==============MicroSeconds===============
-Parsing: ${parseSW.elapsedMicroseconds}ms
-Runtime: ${visitSW.elapsedMicroseconds}ms
-    ''');
-  } else if (arguments.length == 1) {
-    lexer = initLexer(File(arguments[0]).readAsStringSync());
-    parser = initParser(lexer);
-    node = parse(parser);
-    await visit(runtime, node);
-  }
-
+  lexer = initLexer(File(arguments[0]).readAsStringSync());
+  parser = initParser(lexer);
+  node = parse(parser);
+  await visit(runtime, node);
 }
