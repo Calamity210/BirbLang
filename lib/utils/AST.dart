@@ -73,6 +73,7 @@ class AST {
   AST variableValue;
   AST variableType;
   AST variableAssignmentLeft;
+  bool isFinal = false;
 
   String funcName;
 
@@ -102,8 +103,8 @@ class AST {
   AST funcDefType;
 
   List classChildren;
-  List enumChildren;
-  List listChildren;
+  List enumElements;
+  List listElements;
   Map<String, dynamic> map;
   List compChildren;
 
@@ -142,7 +143,6 @@ class AST {
 
   AstFuncPointer fptr;
   AstFutureFuncPointer futureptr;
-
 }
 
 /// Initializes the Abstract Syntax tree with default values
@@ -152,8 +152,8 @@ AST initAST(ASTType type) {
   ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
   ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
   ast.classChildren = ast.type == ASTType.AST_CLASS ? [] : null;
-  ast.enumChildren = ast.type == ASTType.AST_ENUM ? [] : null;
-  ast.listChildren = ast.type == ASTType.AST_LIST ? [] : null;
+  ast.enumElements = ast.type == ASTType.AST_ENUM ? [] : null;
+  ast.listElements = ast.type == ASTType.AST_LIST ? [] : null;
   ast.compChildren = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
 
   return ast;

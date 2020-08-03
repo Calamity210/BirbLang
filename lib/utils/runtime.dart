@@ -57,7 +57,7 @@ void multipleVariableDefinitionsError(int lineNum, String variableName) {
 }
 
 AST listAddFPtr(Runtime runtime, AST self, List args) {
-  self.listChildren.addAll(args);
+  self.listElements.addAll(args);
 
   return self;
 }
@@ -67,12 +67,12 @@ AST listRemoveFptr(Runtime runtime, AST self, List args) {
 
   AST ast_int = args[0];
 
-  if (ast_int.intVal > self.listChildren.length) {
+  if (ast_int.intVal > self.listElements.length) {
     print('Index out of range');
     exit(1);
   }
 
-  self.listChildren.remove(self.listChildren[ast_int.intVal]);
+  self.listElements.remove(self.listElements[ast_int.intVal]);
 
   return self;
 }
@@ -342,9 +342,9 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
         return value;
       }
     }
-  } else if (node.enumChildren != null && node.enumChildren.isNotEmpty) {
-    for (int i = 0; i < node.enumChildren.length; i++) {
-      AST variable = node.enumChildren[i];
+  } else if (node.enumElements != null && node.enumElements.isNotEmpty) {
+    for (int i = 0; i < node.enumElements.length; i++) {
+      AST variable = node.enumElements[i];
 
       if (variable.variableName == node.variableName) {
         if (variable.ast != null) {
@@ -467,7 +467,11 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
         if (value.type == ASTType.AST_DOUBLE) {
           value.intVal = value.doubleValue.toInt();
         }
-
+        if (objectVarDef.isFinal) {
+          print(
+              'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+          exit(1);
+        }
         objectVarDef.variableValue = value;
         return value;
       }
@@ -482,7 +486,11 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleValue.toInt();
       }
-
+      if (varDef.isFinal) {
+        print(
+            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+        exit(1);
+      }
       varDef.variableValue = value;
       return value;
     }
@@ -492,10 +500,16 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
     var varDef = await getVarDefByName(runtime, globalScope, left.variableName);
 
     if (varDef != null) {
-      var value = await visit(runtime, node.variableValue);
+      var value =
+          await visit(runtime, node.variableAssignmentLeft.variableValue);
 
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleValue.toInt();
+      }
+      if (varDef.isFinal) {
+        print(
+            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+        exit(1);
       }
       varDef.variableValue = value;
 
@@ -903,7 +917,7 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         if (node.binaryOpRight.variableName == 'length') {
           var intAST = initAST(ASTType.AST_INT);
 
-          intAST.intVal = left.listChildren.length;
+          intAST.intVal = left.listElements.length;
 
           return intAST;
         }
@@ -928,9 +942,9 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
       }
     } else if (left.type == ASTType.AST_ENUM) {
       if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-        node.binaryOpRight.enumChildren = left.enumChildren;
+        node.binaryOpRight.enumElements = left.enumElements;
         node.binaryOpRight.scope = left.scope;
-        node.enumChildren = left.enumChildren;
+        node.enumElements = left.enumElements;
         node.scope = left.scope;
       }
     }
@@ -1006,29 +1020,29 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
       return null;
   } else {
     var index = ast.intVal;
-    if (left.type == ASTType.AST_LIST) if (left.listChildren.isNotEmpty &&
-        index < left.listChildren.length) {
-      if (left.listChildren[index] is Map) {
+    if (left.type == ASTType.AST_LIST) if (left.listElements.isNotEmpty &&
+        index < left.listElements.length) {
+      if (left.listElements[index] is Map) {
         var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
         AST mapAst = initAST(ASTType.AST_MAP)
           ..typeValue = type
           ..scope = left.scope
-          ..map = left.listChildren[index];
+          ..map = left.listElements[index];
 
         return mapAst;
-      } else if (left.listChildren[index] is String) {
+      } else if (left.listElements[index] is String) {
         var type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
         AST stringAst = initAST(ASTType.AST_STRING)
           ..typeValue = type
           ..scope = left.scope
-          ..stringValue = left.listChildren[index];
+          ..stringValue = left.listElements[index];
 
         return stringAst;
       }
-      return left.listChildren[index];
+      return left.listElements[index];
     } else {
       print(
-          'Error: Invalid list index: Valid range is: ${left.listChildren.isNotEmpty ? left.listChildren.length - 1 : 0}');
+          'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}');
 
       exit(1);
     }
@@ -1678,7 +1692,7 @@ Future<AST> visitSwitch(Runtime runtime, AST node) async {
       return await visit(runtime, node.switchDefault);
     case ASTType.AST_LIST:
       Iterable<AST> testCase = node.switchCases.keys
-          .where((element) => element.listChildren == caseAST.listChildren);
+          .where((element) => element.listElements == caseAST.listElements);
 
       if (testCase != null && testCase.isNotEmpty) {
         return await visit(runtime, node.switchCases[testCase.first]);
@@ -1787,14 +1801,14 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
     }
   } else if (astIterable.type == ASTType.AST_LIST) {
     var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
-    newVarDef.variableValue = await visit(runtime, astIterable.listChildren[i]);
+    newVarDef.variableValue = await visit(runtime, astIterable.listElements[i]);
     newVarDef.variableName = iterableVarName;
 
     fdefBodyScope.variableDefinitions.add(newVarDef);
 
-    for (; i < astIterable.listChildren.length; i++) {
+    for (; i < astIterable.listElements.length; i++) {
       newVarDef.variableValue =
-          await visit(runtime, (astIterable.listChildren[i] as AST));
+          await visit(runtime, (astIterable.listElements[i] as AST));
 
       if (indexVar != null) indexVar.variableValue.intVal = i;
 
@@ -1858,7 +1872,7 @@ Future<AST> visitStringProperties(AST node, AST left) async {
       {
         var str = left.stringValue;
         var astList = initAST(ASTType.AST_LIST);
-        astList.listChildren = str.codeUnits;
+        astList.listElements = str.codeUnits;
 
         return astList;
       }
@@ -1909,9 +1923,9 @@ Future<AST> visitStringProperties(AST node, AST left) async {
         var binarys = str.codeUnits.map((e) => e.toRadixString(2));
 
         var astList = initAST(ASTType.AST_LIST);
-        astList.listChildren = [];
+        astList.listElements = [];
 
-        for (String binary in binarys) astList.listChildren.add(binary);
+        for (String binary in binarys) astList.listElements.add(binary);
 
         return astList;
       }
@@ -1922,9 +1936,9 @@ Future<AST> visitStringProperties(AST node, AST left) async {
         var octS = str.codeUnits.map((e) => e.toRadixString(8));
 
         var astList = initAST(ASTType.AST_LIST);
-        astList.listChildren = [];
+        astList.listElements = [];
 
-        for (String oct in octS) astList.listChildren.add(oct);
+        for (String oct in octS) astList.listElements.add(oct);
 
         return astList;
       }
@@ -1935,9 +1949,9 @@ Future<AST> visitStringProperties(AST node, AST left) async {
         var hexS = str.codeUnits.map((e) => e.toRadixString(16));
 
         var astList = initAST(ASTType.AST_LIST);
-        astList.listChildren = [];
+        astList.listElements = [];
 
-        for (String hex in hexS) astList.listChildren.add(hex);
+        for (String hex in hexS) astList.listElements.add(hex);
 
         return astList;
       }
@@ -1946,10 +1960,10 @@ Future<AST> visitStringProperties(AST node, AST left) async {
       {
         var str = left.stringValue;
         var astList = initAST(ASTType.AST_LIST);
-        astList.listChildren = [];
+        astList.listElements = [];
 
         var decimals = str.codeUnits;
-        for (int decimal in decimals) astList.listChildren.add(decimal);
+        for (int decimal in decimals) astList.listElements.add(decimal);
 
         return astList;
       }
@@ -2124,7 +2138,7 @@ Future<AST> visitStringMethods(AST node, AST left) async {
 
         var str = left.stringValue;
         var ast = initAST(ASTType.AST_LIST);
-        ast.listChildren = str.split(pattern.stringValue);
+        ast.listElements = str.split(pattern.stringValue);
 
         return ast;
       }

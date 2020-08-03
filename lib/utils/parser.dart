@@ -1,27 +1,12 @@
 import 'dart:io';
 
+import 'package:Birb/utils/constants.dart';
+
 import 'AST.dart';
 import 'data_type.dart';
 import 'lexer.dart';
 import 'scope.dart';
 import 'token.dart';
-
-const String WHILE = 'while';
-const String FOR = 'for';
-const String IF = 'if';
-const String ELSE = 'else';
-const String SWITCH = 'switch';
-const String CASE = 'case';
-const String DEFAULT = 'default';
-const String RETURN = 'return';
-const String BREAK = 'break';
-const String CONTINUE = 'continue';
-const String NEW = 'new';
-const String ITERATE = 'iterate';
-const String ASSERT = 'assert';
-const String NULL = 'null';
-const String TRUE = 'true';
-const String FALSE = 'false';
 
 class Parser {
   Lexer lexer;
@@ -80,6 +65,10 @@ bool isDataType(String tokenValue) {
       tokenValue == 'Source');
 }
 
+bool isModifier(String tokenValue) {
+  return tokenValue == CONST || tokenValue == FINAL || tokenValue == STATIC;
+}
+
 AST parseOneStatementCompound(Parser parser, Scope scope) {
   var compound = initASTWithLine(ASTType.AST_COMPOUND, parser.lexer.lineNum);
   compound.scope = scope;
@@ -109,6 +98,14 @@ AST parseStatement(Parser parser, Scope scope) {
     case TokenType.TOKEN_ID:
       {
         var tokenValue = parser.curToken.value;
+
+        if (isModifier(tokenValue)) {
+          eat(parser, TokenType.TOKEN_ID);
+          if (tokenValue == FINAL)
+            return parseFuncDef(parser, scope, false, true);
+
+          return parseFuncDef(parser, scope, true);
+        }
 
         if (isDataType(tokenValue)) {
           return parseFuncDef(parser, scope);
@@ -441,7 +438,7 @@ AST parseClass(Parser parser, Scope scope) {
 AST parseEnum(Parser parser, Scope scope) {
   var ast = initASTWithLine(ASTType.AST_ENUM, parser.lexer.lineNum);
   ast.scope = scope;
-  ast.enumChildren = [];
+  ast.enumElements = [];
 
   var newScope = initScope(false);
 
@@ -456,7 +453,7 @@ AST parseEnum(Parser parser, Scope scope) {
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
       eat(parser, TokenType.TOKEN_ID);
-      ast.enumChildren.add(parseVariable(parser, newScope));
+      ast.enumElements.add(parseVariable(parser, newScope));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
@@ -464,7 +461,7 @@ AST parseEnum(Parser parser, Scope scope) {
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
         eat(parser, TokenType.TOKEN_ID);
-        ast.enumChildren.add(parseVariable(parser, newScope));
+        ast.enumElements.add(parseVariable(parser, newScope));
       }
     }
   }
@@ -537,15 +534,15 @@ AST parseList(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_LBRACKET);
   var ast = initASTWithLine(ASTType.AST_LIST, parser.lexer.lineNum);
   ast.scope = scope;
-  ast.listChildren = [];
+  ast.listElements = [];
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
-    ast.listChildren.add(parseExpression(parser, scope));
+    ast.listElements.add(parseExpression(parser, scope));
   }
 
   while (parser.curToken.type == TokenType.TOKEN_COMMA) {
     eat(parser, TokenType.TOKEN_COMMA);
-    ast.listChildren.add(parseExpression(parser, scope));
+    ast.listElements.add(parseExpression(parser, scope));
   }
 
   eat(parser, TokenType.TOKEN_RBRACKET);
@@ -677,9 +674,14 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
 AST parseTerm(Parser parser, Scope scope) {
   var tokenValue = parser.curToken.value;
 
-  if (isDataType(tokenValue)) {
-    return parseFuncDef(parser, scope);
+  if (isModifier(tokenValue)) {
+    eat(parser, TokenType.TOKEN_ID);
+    if (tokenValue == FINAL) return parseFuncDef(parser, scope, false, true);
+
+    return parseFuncDef(parser, scope, true);
   }
+
+  if (isDataType(tokenValue)) return parseFuncDef(parser, scope);
 
   var node = parseFactor(parser, scope, false);
   AST astBinaryOp;
@@ -836,7 +838,8 @@ AST parseIf(Parser parser, Scope scope) {
 }
 
 AST parseSwitch(Parser parser, Scope scope) {
-  AST switchAST = initASTWithLine(ASTType.AST_SWITCH, parser.lexer.lineNum)..switchCases = {};
+  AST switchAST = initASTWithLine(ASTType.AST_SWITCH, parser.lexer.lineNum)
+    ..switchCases = {};
 
   eat(parser, TokenType.TOKEN_ID);
   eat(parser, TokenType.TOKEN_LPAREN);
@@ -916,6 +919,14 @@ AST parseIterate(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
 
   AST astFuncName;
+
+  if (isModifier(parser.curToken.value)) {
+    eat(parser, TokenType.TOKEN_ID);
+    if (parser.curToken.value == FINAL)
+      return parseFuncDef(parser, scope, false, true);
+
+    return parseFuncDef(parser, scope, true);
+  }
 
   if (isDataType(parser.curToken.value)) {
     astFuncName = parseFuncDef(parser, scope);
@@ -1021,7 +1032,8 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   return ast;
 }
 
-AST parseFuncDef(Parser parser, Scope scope) {
+AST parseFuncDef(Parser parser, Scope scope,
+    [bool isConst = false, bool isFinal = false]) {
   var astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
@@ -1066,6 +1078,13 @@ AST parseFuncDef(Parser parser, Scope scope) {
     if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
       AST childDef;
 
+      if (isModifier(parser.curToken.value)) {
+        eat(parser, TokenType.TOKEN_ID);
+        if (parser.curToken.value == FINAL)
+          return parseFuncDef(parser, scope, false, true);
+
+        return parseFuncDef(parser, scope, true);
+      }
       if (isDataType(parser.curToken.value)) {
         childDef = parseFuncDef(parser, scope);
       } else {
@@ -1078,6 +1097,14 @@ AST parseFuncDef(Parser parser, Scope scope) {
 
       while (parser.curToken.type == TokenType.TOKEN_COMMA) {
         eat(parser, TokenType.TOKEN_COMMA);
+
+        if (isModifier(parser.curToken.value)) {
+          eat(parser, TokenType.TOKEN_ID);
+          if (parser.curToken.value == FINAL)
+            return parseFuncDef(parser, scope, false, true);
+
+          return parseFuncDef(parser, scope, true);
+        }
 
         if (isDataType(parser.curToken.value)) {
           childDef = parseFuncDef(parser, scope);
@@ -1097,6 +1124,14 @@ AST parseFuncDef(Parser parser, Scope scope) {
 
       AST childDef;
 
+      if (isModifier(parser.curToken.value)) {
+        eat(parser, TokenType.TOKEN_ID);
+        if (parser.curToken.value == FINAL)
+          return parseFuncDef(parser, scope, false, true);
+
+        return parseFuncDef(parser, scope, true);
+      }
+
       if (isDataType(parser.curToken.value)) {
         childDef = parseFuncDef(parser, scope);
       } else {
@@ -1109,6 +1144,14 @@ AST parseFuncDef(Parser parser, Scope scope) {
 
       while (parser.curToken.type == TokenType.TOKEN_COMMA) {
         eat(parser, TokenType.TOKEN_COMMA);
+
+        if (isModifier(parser.curToken.value)) {
+          eat(parser, TokenType.TOKEN_ID);
+          if (parser.curToken.value == FINAL)
+            return parseFuncDef(parser, scope, false, true);
+
+          return parseFuncDef(parser, scope, true);
+        }
 
         if (isDataType(parser.curToken.value)) {
           childDef = parseFuncDef(parser, scope);
@@ -1130,10 +1173,11 @@ AST parseFuncDef(Parser parser, Scope scope) {
     return ast;
   } else {
     var astVarDef =
-        initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum);
-    astVarDef.scope = scope;
-    astVarDef.variableName = funcName;
-    astVarDef.variableType = astType;
+        initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum)
+          ..scope = scope
+          ..variableName = funcName
+          ..variableType = astType;
+    astVarDef.isFinal = isFinal;
 
     if (isEnum) {
       var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
@@ -1165,6 +1209,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.stringValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
             parserTypeError(parser);
@@ -1173,6 +1220,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.intVal}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
             parserTypeError(parser);
@@ -1181,6 +1231,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.doubleValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
             parserTypeError(parser);
@@ -1189,6 +1242,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.boolValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
             parserTypeError(parser);
@@ -1197,6 +1253,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.listElements}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
             parserTypeError(parser);
@@ -1205,10 +1264,14 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.map}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
             parserTypeError(parser);
           break;
+
         case ASTType.AST_COMPOUND:
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
             parserTypeError(parser);
@@ -1240,6 +1303,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.stringValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
             parserTypeError(parser);
@@ -1248,6 +1314,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.intVal}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
             parserTypeError(parser);
@@ -1256,6 +1325,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.doubleValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
             parserTypeError(parser);
@@ -1264,6 +1336,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.boolValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
             parserTypeError(parser);
@@ -1272,6 +1347,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(
+                  funcName, '${astVarDef.variableValue.listElements}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
             parserTypeError(parser);
@@ -1280,6 +1358,9 @@ AST parseFuncDef(Parser parser, Scope scope) {
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
             astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents
+                  .replaceAll(funcName, '${astVarDef.variableValue.map}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
             parserTypeError(parser);

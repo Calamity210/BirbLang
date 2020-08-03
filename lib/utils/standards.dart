@@ -339,7 +339,7 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
 
   astVal = initAST(ASTType.AST_LIST);
-  astVal.listChildren = response.bodyBytes;
+  astVal.listElements = response.bodyBytes;
   ast.variableValue = astVal;
 
   astObj.classChildren.add(ast);
@@ -457,7 +457,7 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
 
   astVal = initAST(ASTType.AST_LIST);
-  astVal.listChildren = response.bodyBytes;
+  astVal.listElements = response.bodyBytes;
   ast.variableValue = astVal;
 
   astObj.classChildren.add(ast);
@@ -522,7 +522,7 @@ AST funcDecodeJson(Runtime runtime, AST self, List args) {
   AST jsonAST;
   if (decoded is List)
     jsonAST = initAST(ASTType.AST_LIST)
-      ..listChildren = decoded;
+      ..listElements = decoded;
 
   else
     jsonAST = initAST(ASTType.AST_MAP)
@@ -551,7 +551,7 @@ AST funcEncodeJson(Runtime runtime, AST self, List args) {
         jsonMap[key] = val.doubleValue;
         break;
       case ASTType.AST_LIST:
-        jsonMap[key] = val.listChildren;
+        jsonMap[key] = val.listElements;
         break;
       case ASTType.AST_MAP:
         jsonMap[key] = val.map;

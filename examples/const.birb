@@ -1,0 +1,2 @@
+const String henlo = "Henlo Birbo";
+screm(henlo);
