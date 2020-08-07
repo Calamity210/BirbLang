@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/utils/scope.dart';
 import 'package:http/http.dart';
 
@@ -53,10 +54,9 @@ AST funcScrem(Runtime runtime, AST self, List args) {
       visitBinaryOp(initRuntime(), astArg).then((value) => astArg = value);
     var str = astToString(astArg);
 
-    if (str == null) {
-      print('Screm must contain non-null arguments');
-      exit(1);
-    }
+    if (str == null)
+      throw UnexpectedTokenException('Screm must contain non-null arguments');
+
 
     print(str);
   }

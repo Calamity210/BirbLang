@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:Birb/utils/exceptions.dart';
+
 import 'token.dart';
 
 class Lexer {
@@ -25,11 +27,12 @@ Lexer initLexer(String contents) {
 
 /// Grabs next token from the lexer
 Token getNextToken(Lexer lexer) {
-  while (lexer.currentIndex < lexer.contents.length && lexer.currentChar != null) {
-
+  while (
+      lexer.currentIndex < lexer.contents.length && lexer.currentChar != null) {
     // Skip
-    if (lexer.currentChar == ' ' || lexer.currentChar == '\n' ||lexer.currentChar == '\r')
-      skipWhitespace(lexer);
+    if (lexer.currentChar == ' ' ||
+        lexer.currentChar == '\n' ||
+        lexer.currentChar == '\r') skipWhitespace(lexer);
 
     // Collect a num
     if (isNumeric(lexer.currentChar)) {
@@ -185,7 +188,8 @@ Token getNextToken(Lexer lexer) {
         advance(lexer);
         skipInlineComment(lexer);
         continue;
-      } else if (lexer.currentChar == '*') {    // Block comment
+      } else if (lexer.currentChar == '*') {
+        // Block comment
         advance(lexer);
         skipBlockComment(lexer);
         continue;
@@ -234,8 +238,7 @@ Token getNextToken(Lexer lexer) {
       case ':':
         return advanceWithToken(lexer, TokenType.TOKEN_COLON);
       default:
-        print('[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
-        exit(1);
+        throw UnexpectedTokenException('[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
         break;
     }
   }
@@ -266,14 +269,12 @@ Token advanceWithToken(Lexer lexer, TokenType type) {
   return token;
 }
 
-/// Expects a character and exits with statusCode (1) if the wrong
+/// Expects a character and throws UnexpectedTokenException if the wrong
 /// Character is received
 void expect(Lexer lexer, String c) {
-  if (lexer.currentChar != c) {
-    print(
+  if (lexer.currentChar != c)
+    throw UnexpectedTokenException(
         'Error: [Line ${lexer.lineNum}] Lexer expected the current char to be `$c`, but it was `${lexer.currentChar}`.');
-    exit(1);
-  }
 }
 
 /// Skips any whitespaces since we don't want to have whitespace tokens
@@ -319,10 +320,8 @@ Token collectString(Lexer lexer) {
   var initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '"') {
-    if (lexer.currentIndex == lexer.contents.length - 1) {
-      print('[Line ${lexer.lineNum}] Missing closing `"`');
-      exit(1);
-    }
+    if (lexer.currentIndex == lexer.contents.length - 1)
+     throw UnexpectedTokenException('[Line ${lexer.lineNum}] Missing closing `"`');
 
     advance(lexer);
   }
@@ -345,10 +344,8 @@ Token collectSingleQuoteString(Lexer lexer) {
   var initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '\'') {
-    if (lexer.currentIndex == lexer.contents.length - 1) {
-      print('[Line ${lexer.lineNum}] Missing closing `\'`');
-      exit(1);
-    }
+    if (lexer.currentIndex == lexer.contents.length - 1)
+     throw UnexpectedTokenException('[Line ${lexer.lineNum}] Missing closing `\'`');
 
     advance(lexer);
   }

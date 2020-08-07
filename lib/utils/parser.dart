@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:Birb/utils/constants.dart';
+import 'package:Birb/utils/exceptions.dart';
 
 import 'AST.dart';
 import 'data_type.dart';
@@ -23,24 +22,18 @@ Parser initParser(Lexer lexer) {
   return parser;
 }
 
-/// Throws an error and exits
-void parserTypeError(Parser parser) {
-  print('[Line ${parser.lexer.lineNum}] Invalid type');
-  exit(1);
-}
+/// Throws an UnexpectedTypeException
+void parserTypeError(Parser parser) =>
+  throw UnexpectedTypeException('[Line ${parser.lexer.lineNum}] Invalid type');
 
-/// Throws an error and exits
-void parserSyntaxError(Parser parser) {
-  print('[Line ${parser.lexer.lineNum}] Syntax error');
-  exit(1);
-}
+/// Throws a SyntaxException
+void parserSyntaxError(Parser parser) =>
+    throw SyntaxException('[Line ${parser.lexer.lineNum}] Syntax error');
 
-/// Throws an error and exits
-void parserUnexpectedToken(Parser parser, TokenType type) {
-  print(
-      '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
-  exit(1);
-}
+/// Throws a UnexpectedTokenException
+void parserUnexpectedToken(Parser parser, TokenType type) =>
+    throw UnexpectedTokenException(
+        '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
 
 /// Sets the ast to be a child of a class
 AST asClassChild(AST ast, AST object) {
@@ -199,13 +192,9 @@ AST parseStatement(Parser parser, Scope scope) {
       }
       break;
     case TokenType.TOKEN_ANON_ID:
-      {
-        print(
-            '[Line ${parser.lexer.lineNum}] Expected token `${parser.curToken.value}`');
-        exit(1);
-      }
+      throw UnexpectedTokenException(
+          '[Line ${parser.lexer.lineNum}] Expected token `${parser.curToken.value}`');
       break;
-
     default:
       return initASTWithLine(ASTType.AST_NOOP, parser.lexer.lineNum);
   }
@@ -494,23 +483,17 @@ AST parseMap(Parser parser, Scope scope) {
 
       if (parser.curToken.type == TokenType.TOKEN_COLON)
         eat(parser, TokenType.TOKEN_COLON);
-      else {
-        print(
+      else
+        throw UnexpectedTokenException(
             'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-        exit(1);
-      }
 
-      if (parser.curToken.type == TokenType.TOKEN_COMMA) {
-        print(
+      if (parser.curToken.type == TokenType.TOKEN_COMMA)
+        throw UnexpectedTokenException(
             'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-        exit(1);
-      }
       ast.map[key] = parseExpression(parser, scope);
-    } else {
-      print(
+    } else
+      throw UnexpectedTokenException(
           'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');
-      exit(1);
-    }
   }
 
   while (parser.curToken.type == TokenType.TOKEN_COMMA) {
@@ -521,17 +504,14 @@ AST parseMap(Parser parser, Scope scope) {
 
     if (parser.curToken.type == TokenType.TOKEN_COLON)
       eat(parser, TokenType.TOKEN_COLON);
-    else {
-      print(
+    else
+      throw UnexpectedTokenException(
           'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-      exit(1);
-    }
 
-    if (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      print(
+    if (parser.curToken.type == TokenType.TOKEN_COMMA)
+      throw UnexpectedTokenException(
           'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-      exit(1);
-    }
+
     ast.map[key] = parseExpression(parser, scope);
   }
 
@@ -672,8 +652,7 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
     case TokenType.TOKEN_LBRACKET:
       return parseList(parser, scope);
     default:
-      print('Unexpected ${parser.curToken.value}');
-      exit(1);
+      throw UnexpectedTokenException('Unexpected ${parser.curToken.value}');
       break;
   }
 }
@@ -1040,7 +1019,8 @@ AST parseFuncDef(Parser parser, Scope scope,
   String funcName;
   var isEnum = false;
 
-  if (parser.prevToken.value == 'StrBuffer' && parser.curToken.type == TokenType.TOKEN_LPAREN)
+  if (parser.prevToken.value == 'StrBuffer' &&
+      parser.curToken.type == TokenType.TOKEN_LPAREN)
     return parseStringBuffer(parser, scope, isConst, isFinal);
 
   if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
@@ -1054,7 +1034,6 @@ AST parseFuncDef(Parser parser, Scope scope,
   } else {
     isEnum = true;
   }
-
 
   // Function Definition?, otherwise Variable definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
