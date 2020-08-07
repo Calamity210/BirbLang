@@ -18,6 +18,7 @@ enum ASTType {
   AST_FUNC_CALL,
   AST_NULL,
   AST_STRING,
+  AST_STRING_BUFFER,
   AST_DOUBLE,
   AST_LIST,
   AST_MAP,
@@ -64,6 +65,9 @@ class AST {
 
   // AST_STRING
   String stringValue;
+
+  // AST_STRING_BUFFER
+  StringBuffer stringBuffer;
 
   DataType typeValue;
 
@@ -178,6 +182,8 @@ String astToString(AST ast) {
       return 'null';
     case ASTType.AST_STRING:
       return ast.stringValue;
+    case ASTType.AST_STRING_BUFFER:
+      return '[ StrBuffer ]';
     case ASTType.AST_DOUBLE:
       return ast.doubleValue.toStringAsPrecision(6).padRight(12);
     case ASTType.AST_LIST:

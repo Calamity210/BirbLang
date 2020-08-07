@@ -1,8 +1,2 @@
-void print(int a) {
-screm(a);
-}
-
-void foo() {
-    screm("foo");
-}
-print(1).then(foo());
+StrBuffer buf = StrBuffer("henlo");
+screm(buf.toString());

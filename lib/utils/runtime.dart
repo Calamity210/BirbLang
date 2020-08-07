@@ -122,15 +122,15 @@ void collectAndSweepGarbage(Runtime runtime, List old_def_list, Scope scope) {
     scope.variableDefinitions.remove(garbage[i]);
 }
 
-Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
-  if (fcall.funcCallArgs.length != fdef.funcDefArgs.length) {
+Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
+  if (fCall.funcCallArgs.length != fDef.funcDefArgs.length) {
     print(
-      'Error: [Line ${fcall.lineNum}] ${fdef.funcName} Expected ${fdef.funcDefArgs.length} arguments but found ${fcall.funcCallArgs.length} arguments\n',
+      'Error: [Line ${fCall.lineNum}] ${fDef.funcName} Expected ${fDef.funcDefArgs.length} arguments but found ${fCall.funcCallArgs.length} arguments\n',
     );
     exit(1);
   }
 
-  var funcDefBodyScope = fdef.funcDefBody.scope;
+  var funcDefBodyScope = fDef.funcDefBody.scope;
 
   for (int i = funcDefBodyScope.variableDefinitions.length - 1; i > 0; i--) {
     funcDefBodyScope.variableDefinitions
@@ -139,16 +139,16 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
     funcDefBodyScope.variableDefinitions.length = 0;
   }
 
-  for (int x = 0; x < fcall.funcCallArgs.length; x++) {
-    AST astArg = fcall.funcCallArgs[x];
+  for (int x = 0; x < fCall.funcCallArgs.length; x++) {
+    AST astArg = fCall.funcCallArgs[x];
 
-    if (x > fdef.funcDefArgs.length - 1) {
+    if (x > fDef.funcDefArgs.length - 1) {
       print('Error: [Line ${astArg.lineNum}] Too many arguments\n');
       exit(1);
       break;
     }
 
-    AST astFDefArg = fdef.funcDefArgs[x];
+    AST astFDefArg = fDef.funcDefArgs[x];
     var argName = astFDefArg.variableName;
 
     var newVariableDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -167,24 +167,24 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
     funcDefBodyScope.variableDefinitions.add(newVariableDef);
   }
 
-  return await visit(runtime, fdef.funcDefBody);
+  return await visit(runtime, fDef.funcDefBody);
 }
 
-AST registerGlobalFunction(Runtime runtime, String fname, AstFuncPointer fptr) {
-  var fdef = initAST(ASTType.AST_FUNC_DEFINITION);
-  fdef.funcName = fname;
-  fdef.fptr = fptr;
-  runtime.scope.functionDefinitions.add(fdef);
-  return fdef;
+AST registerGlobalFunction(Runtime runtime, String fName, AstFuncPointer fptr) {
+  var fDef = initAST(ASTType.AST_FUNC_DEFINITION);
+  fDef.funcName = fName;
+  fDef.fptr = fptr;
+  runtime.scope.functionDefinitions.add(fDef);
+  return fDef;
 }
 
 AST registerGlobalFutureFunction(
-    Runtime runtime, String fname, AstFutureFuncPointer fptr) {
-  var fdef = initAST(ASTType.AST_FUNC_DEFINITION)
-    ..funcName = fname
+    Runtime runtime, String fName, AstFutureFuncPointer fptr) {
+  var fDef = initAST(ASTType.AST_FUNC_DEFINITION)
+    ..funcName = fName
     ..futureptr = fptr;
-  runtime.scope.functionDefinitions.add(fdef);
-  return fdef;
+  runtime.scope.functionDefinitions.add(fDef);
+  return fDef;
 }
 
 AST registerGlobalVariable(Runtime runtime, String vname, String vval) {
@@ -195,6 +195,15 @@ AST registerGlobalVariable(Runtime runtime, String vname, String vval) {
     ..variableValue.stringValue = vval;
   runtime.scope.variableDefinitions.add(vdef);
   return vdef;
+}
+
+AST registerFunction(Scope scope, String fName, AstFuncPointer fptr) {
+  AST fDef = initAST(ASTType.AST_FUNC_DEFINITION);
+  fDef.funcName = fName;
+  fDef.fptr = fptr;
+  scope.functionDefinitions.add(fDef);
+
+  return fDef;
 }
 
 Future<AST> visit(Runtime runtime, AST node) async {
@@ -222,6 +231,8 @@ Future<AST> visit(Runtime runtime, AST node) async {
     case ASTType.AST_NULL:
       return node;
     case ASTType.AST_STRING:
+      return node;
+    case ASTType.AST_STRING_BUFFER:
       return node;
     case ASTType.AST_DOUBLE:
       return node;
@@ -785,6 +796,9 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
     } else if (dataType == DATATYPE.DATA_TYPE_STRING) {
       finalRes.type = ASTType.AST_STRING;
       finalRes.stringValue = '';
+    } else if (dataType == DATATYPE.DATA_TYPE_STRING_BUFFER) {
+      finalRes.type = ASTType.AST_STRING_BUFFER;
+      finalRes.stringBuffer = StringBuffer();
     }
 
     var callArgs = [];
@@ -915,7 +929,12 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
       } else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
         return visitStringMethods(node, left);
       }
-    } else if (left.type == ASTType.AST_CLASS) {
+    } if (left.type == ASTType.AST_STRING_BUFFER) {
+      if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+       return visitStrBufMethods(node, left);
+      }
+    }
+    else if (left.type == ASTType.AST_CLASS) {
       if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
           node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
           node.binaryOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
@@ -989,6 +1008,8 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
     return await visit(runtime, newAST);
   }
 }
+
+
 
 Future<AST> visitListAccess(Runtime runtime, AST node) async {
   var left = await visit(runtime, node.binaryOpLeft);
@@ -1751,14 +1772,14 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
     }
   }
 
-  var fdefBodyScope = fDef.funcDefBody.scope;
+  var fDefBodyScope = fDef.funcDefBody.scope;
   var iterableVarName = (fDef.funcDefArgs[0] as AST).variableName;
 
   int i = 0;
 
-  for (int j = fdefBodyScope.variableDefinitions.length - 1; j > 0; j--) {
-    fdefBodyScope.variableDefinitions
-        .remove(fdefBodyScope.variableDefinitions[j]);
+  for (int j = fDefBodyScope.variableDefinitions.length - 1; j > 0; j--) {
+    fDefBodyScope.variableDefinitions
+        .remove(fDefBodyScope.variableDefinitions[j]);
   }
 
   AST indexVar;
@@ -1769,7 +1790,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
     indexVar.variableValue.intVal = i;
     indexVar.variableName = (fDef.funcDefArgs[0] as AST).variableName;
 
-    fdefBodyScope.variableDefinitions.add(indexVar);
+    fDefBodyScope.variableDefinitions.add(indexVar);
   }
 
   if (astIterable.type == ASTType.AST_STRING) {
@@ -1778,7 +1799,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
     newVarDef.variableValue.stringValue = astIterable.stringValue[i];
     newVarDef.variableName = iterableVarName;
 
-    fdefBodyScope.variableDefinitions.add(newVarDef);
+    fDefBodyScope.variableDefinitions.add(newVarDef);
 
     for (; i < astIterable.stringValue.length; i++) {
       newVarDef.variableValue.stringValue = astIterable.stringValue[i];
@@ -1792,7 +1813,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
     newVarDef.variableValue = await visit(runtime, astIterable.listElements[i]);
     newVarDef.variableName = iterableVarName;
 
-    fdefBodyScope.variableDefinitions.add(newVarDef);
+    fDefBodyScope.variableDefinitions.add(newVarDef);
 
     for (; i < astIterable.listElements.length; i++) {
       newVarDef.variableValue =
@@ -1850,7 +1871,7 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
   }
 }
 
-Future<AST> visitStringProperties(AST node, AST left) async {
+AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
@@ -1958,7 +1979,7 @@ Future<AST> visitStringProperties(AST node, AST left) async {
   }
 }
 
-Future<AST> visitStringMethods(AST node, AST left) async {
+AST visitStringMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'codeUnitAt':
       {
@@ -2193,4 +2214,13 @@ Future<AST> visitStringMethods(AST node, AST left) async {
     default:
       print('Error: No method ${node.binaryOpRight.variableName} for String');
   }
+}
+AST visitStrBufMethods(AST node, AST left) {
+ switch(node.binaryOpRight.funcCallExpression.variableName) {
+   case 'toString':
+     {
+       AST strAST = initAST(ASTType.AST_STRING)..stringValue = left.stringBuffer.toString();
+       return strAST;
+     }
+ }
 }

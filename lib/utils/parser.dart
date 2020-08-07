@@ -51,18 +51,19 @@ AST asClassChild(AST ast, AST object) {
 
 /// Check if the token is a DataType
 bool isDataType(String tokenValue) {
-  return (tokenValue == 'Future' ||
+  return tokenValue == 'Future' ||
       tokenValue == 'void' ||
       tokenValue == 'var' ||
       tokenValue == 'int' ||
       tokenValue == 'String' ||
+      tokenValue == 'StrBuffer' ||
       tokenValue == 'double' ||
       tokenValue == 'bool' ||
       tokenValue == 'class' ||
       tokenValue == 'enum' ||
       tokenValue == 'List' ||
       tokenValue == 'Map' ||
-      tokenValue == 'Source');
+      tokenValue == 'Source';
 }
 
 /// Check if the current token is a variable modifier
@@ -248,6 +249,9 @@ AST parseType(Parser parser, Scope scope) {
       break;
     case 'String':
       type.type = DATATYPE.DATA_TYPE_STRING;
+      break;
+    case 'StrBuffer':
+      type.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
       break;
     case 'var':
       type.type = DATATYPE.DATA_TYPE_VAR;
@@ -1036,6 +1040,9 @@ AST parseFuncDef(Parser parser, Scope scope,
   String funcName;
   var isEnum = false;
 
+  if (parser.prevToken.value == 'StrBuffer' && parser.curToken.type == TokenType.TOKEN_LPAREN)
+    return parseStringBuffer(parser, scope, isConst, isFinal);
+
   if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
     funcName = parser.curToken.value;
 
@@ -1047,6 +1054,7 @@ AST parseFuncDef(Parser parser, Scope scope,
   } else {
     isEnum = true;
   }
+
 
   // Function Definition?, otherwise Variable definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
@@ -1238,6 +1246,17 @@ AST parseFuncDef(Parser parser, Scope scope,
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
             parserTypeError(parser);
           break;
+        case ASTType.AST_STRING_BUFFER:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
+            astVarDef.variableType = astType;
+            if (isConst)
+              parser.lexer.contents = parser.lexer.contents.replaceAll(funcName,
+                  '${astVarDef.variableValue.stringBuffer.toString()}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
+            parserTypeError(parser);
+          break;
         case ASTType.AST_INT:
           if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
             astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
@@ -1304,4 +1323,18 @@ AST parseFuncDef(Parser parser, Scope scope,
 
     return astVarDef;
   }
+}
+
+AST parseStringBuffer(Parser parser, Scope scope,
+    [bool isConst = false, bool isFinal = false]) {
+  eat(parser, TokenType.TOKEN_LPAREN);
+  AST strBufferAST =
+      initASTWithLine(ASTType.AST_STRING_BUFFER, parser.lexer.lineNum)
+        ..stringBuffer = StringBuffer(parser.curToken.value)
+        ..isFinal = isFinal;
+
+  eat(parser, TokenType.TOKEN_STRING_VALUE);
+  eat(parser, TokenType.TOKEN_RPAREN);
+
+  return strBufferAST;
 }
