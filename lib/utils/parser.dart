@@ -23,8 +23,8 @@ Parser initParser(Lexer lexer) {
 }
 
 /// Throws an UnexpectedTypeException
-void parserTypeError(Parser parser) =>
-  throw UnexpectedTypeException('[Line ${parser.lexer.lineNum}] Invalid type');
+void parserTypeError(Parser parser) => throw UnexpectedTypeException(
+    '[Line ${parser.lexer.lineNum}] Invalid type');
 
 /// Throws a SyntaxException
 void parserSyntaxError(Parser parser) =>
@@ -353,7 +353,7 @@ AST parseVariable(Parser parser, Scope scope) {
     var astAssign =
         initASTWithLine(ASTType.AST_VARIABLE_ASSIGNMENT, parser.lexer.lineNum);
     astAssign.variableAssignmentLeft = ast;
-    ast.variableValue = parseExpression(parser, scope);
+    astAssign.variableValue = parseExpression(parser, scope);
     astAssign.scope = scope;
 
     return astAssign;
@@ -765,12 +765,9 @@ AST parseContinue(Parser parser, Scope scope) {
 
 AST parseReturn(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  var ast = initASTWithLine(ASTType.AST_RETURN, parser.lexer.lineNum);
-  ast.scope = scope;
-
-  if (parser.curToken.type != TokenType.TOKEN_SEMI) {
-    ast = parseExpression(parser, scope);
-  }
+  var ast = initASTWithLine(ASTType.AST_RETURN, parser.lexer.lineNum)
+    ..scope = scope
+    ..returnValue = parseExpression(parser, scope) ?? initAST(ASTType.AST_NULL);
 
   return ast;
 }

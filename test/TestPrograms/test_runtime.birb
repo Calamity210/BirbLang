@@ -15,7 +15,7 @@ class Birb {
 List favouriteFood = Birb.favouriteFood;
 Map goodBadMap = Birb.goodBadMap;
 
-   class foo = new Birb;
+   class foo = Birb;
   void printDetails() {
     screm(foo.favouriteGreeting + " am " + foo.name);
     screm("I am " + foo.age + " years old");

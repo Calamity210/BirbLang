@@ -57,12 +57,8 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
-  try {
     lexer = initLexer(File(arguments[0]).readAsStringSync());
     parser = initParser(lexer);
     node = parse(parser);
     await visit(runtime, node);
-  } catch (e) {
-    print(e.toString());
-  }
 }

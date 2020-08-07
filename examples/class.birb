@@ -1,5 +1,13 @@
-class Foo {
-    Map i = {"content": 10};
+class Test {
+    String name = "";
+    int age = 0;
+
+    void construct(String name, int age) {
+        nest.name = "Peter";
+        nest.age = 18;
+    }
 }
 
-screm(Foo.i["content"]);
+class test = Test;
+test.construct("Peter", 18);
+screm(test.name + " : " + test.age);
