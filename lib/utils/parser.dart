@@ -405,11 +405,7 @@ AST parseClass(Parser parser, Scope scope) {
 
   var newScope = initScope(false);
 
-  if (scope != null) {
-    if (scope.owner != null) {
-      newScope.owner = scope.owner;
-    }
-  }
+  if (scope != null) if (scope.owner != null) newScope.owner = scope.owner;
 
   eat(parser, TokenType.TOKEN_LBRACE);
 
@@ -418,7 +414,10 @@ AST parseClass(Parser parser, Scope scope) {
       ast.classChildren.add(asClassChild(parseFuncDef(parser, newScope), ast));
     }
 
-    while (parser.curToken.type == TokenType.TOKEN_SEMI) {
+    while (parser.curToken.type == TokenType.TOKEN_SEMI ||
+        (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
+            parser.curToken.type != TokenType.TOKEN_RBRACE)) {
+      if(parser.curToken.type == TokenType.TOKEN_SEMI)
       eat(parser, TokenType.TOKEN_SEMI);
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
