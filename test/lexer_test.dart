@@ -7,7 +7,7 @@ import 'package:test/test.dart' as test;
 void main() {
   test.test('Lexer gets tokens correctly', () {
     Lexer lexer =
-        initLexer(File('test/TestPrograms/test_lexer.birb').readAsStringSync());
+        initLexer(File('./test/TestPrograms/test_lexer.birb').readAsStringSync());
 
     assert(lexer != null);
     test.expect(lexer.currentChar, test.equals('v'));

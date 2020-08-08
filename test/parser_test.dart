@@ -6,9 +6,9 @@ import 'package:Birb/utils/parser.dart';
 import 'package:test/test.dart' as test;
 
 void main() {
-  test.test('Parser doesn\'t crash' , () {
+  test.test("Parser doesn't crash" , () {
     Lexer lexer = initLexer(
-        File('test/TestPrograms/test_parser.birb').readAsStringSync());
+        File('./test/TestPrograms/test_parser.birb').readAsStringSync());
     Parser parser = initParser(lexer);
     AST ast = parse(parser);
 
