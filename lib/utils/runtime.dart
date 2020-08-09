@@ -290,6 +290,10 @@ bool boolEval(AST node) {
       return node.boolValue;
     case ASTType.AST_STRING:
       return node.stringValue.isNotEmpty;
+    case ASTType.AST_MAP:
+      return node.map.isNotEmpty;
+    case ASTType.AST_LIST:
+      return node.listElements.isNotEmpty;
     default:
       return false;
   }
@@ -845,7 +849,8 @@ Future<AST> visitFuncCall(Runtime runtime, AST node) async {
       await runtimeFuncLookup(runtime, runtime.scope, node);
   if (globalScopeFuncDef != null) return globalScopeFuncDef;
 
-  throw UndefinedVariableException('Error: [Line ${node.lineNum}] Undefined method `?`');
+  throw UndefinedVariableException(
+      'Error: [Line ${node.lineNum}] Undefined method `?`');
 }
 
 Future<AST> visitCompound(Runtime runtime, AST node) async {
@@ -1002,7 +1007,8 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
   if (ast.type == ASTType.AST_STRING) {
     var key = ast.stringValue;
     if (left.type != ASTType.AST_MAP)
-      throw UnexpectedTypeException('Error: [Line ${node.lineNum}] Expected a Map');
+      throw UnexpectedTypeException(
+          'Error: [Line ${node.lineNum}] Expected a Map');
 
     if (left.map.containsKey(key)) {
       if (left.map[key] is String) {
@@ -1036,7 +1042,8 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
       }
       return left.listElements[index];
     } else {
-      throw RangeException( 'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}');
+      throw RangeException(
+          'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}');
     }
 
     throw UnexpectedTypeException('List Access left value is not iterable.');
@@ -1547,7 +1554,8 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
       break;
 
     default:
-      throw InvalidOperatorException('Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
+      throw InvalidOperatorException(
+          'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
   }
 
   return node;
@@ -1611,9 +1619,28 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
           return variable..doubleValue *= variable.doubleValue;
       }
       break;
+    case TokenType.TOKEN_NOT:
+      {
+        AST boolAST = initAST(ASTType.AST_BOOL);
+        switch (node.unaryOpRight.type) {
+          case ASTType.AST_VARIABLE:
+            {
+              boolAST.boolValue =
+                  !boolEval(await visitVariable(runtime, node.unaryOpRight));
+              return boolAST;
+            }
+            break;
+          default:
+            boolAST.boolValue = !boolEval(node.unaryOpRight);
+            break;
+        }
+        break;
+      }
+      break;
 
     default:
-      throw InvalidOperatorException('Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator');
+      throw InvalidOperatorException(
+          'Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator');
   }
 
   return returnValue;
@@ -1621,22 +1648,33 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
 
 Future<AST> visitIf(Runtime runtime, AST node) async {
   if (node.ifExpression == null)
-    throw UnexpectedTypeException('Error: [Line ${node.lineNum}] If expression can\'t be empty');
+    throw UnexpectedTypeException(
+        'Error: [Line ${node.lineNum}] If expression can\'t be empty');
 
-  if (boolEval(await visit(runtime, node.ifExpression))) {
-    await visit(runtime, node.ifBody);
+  if (node.ifExpression.type == ASTType.AST_UNARYOP) {
+    if (boolEval(await visit(runtime, node.ifExpression.unaryOpRight)) == false) {
+      await visit(runtime, node.ifBody);
+    } else {
+      if (node.ifElse != null) return await visit(runtime, node.ifElse);
+
+      if (node.elseBody != null) return await visit(runtime, node.elseBody);
+    }
   } else {
-    if (node.ifElse != null) return await visit(runtime, node.ifElse);
+    if (boolEval(await visit(runtime, node.ifExpression))) {
+      await visit(runtime, node.ifBody);
+    } else {
+      if (node.ifElse != null) return await visit(runtime, node.ifElse);
 
-    if (node.elseBody != null) return await visit(runtime, node.elseBody);
+      if (node.elseBody != null) return await visit(runtime, node.elseBody);
+    }
   }
-
   return node;
 }
 
 Future<AST> visitSwitch(Runtime runtime, AST node) async {
   if (node.switchExpression == null)
-    throw UnexpectedTypeException('Error: [Line ${node.lineNum}] If expression can\'t be empty');
+    throw UnexpectedTypeException(
+        'Error: [Line ${node.lineNum}] If expression can\'t be empty');
 
   AST caseAST = await visit(runtime, node.switchExpression);
 
@@ -1733,7 +1771,8 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
 
       if (fDef.funcName == node.iterateFunction.variableName) {
         if (fDef.fptr != null)
-          throw UnexpectedTypeException('Error: Can not iterate with native method');
+          throw UnexpectedTypeException(
+              'Error: Can not iterate with native method');
         break;
       }
     }
@@ -1819,7 +1858,8 @@ Future<AST> visitAssert(Runtime runtime, AST node) async {
 
 void runtimeExpectArgs(List inArgs, List<ASTType> args) {
   if (inArgs.length < args.length)
-      throw InvalidArgumentsException('${inArgs.length} argument(s) were provided, while ${args.length} were expected');
+    throw InvalidArgumentsException(
+        '${inArgs.length} argument(s) were provided, while ${args.length} were expected');
 
   for (int i = 0; i < args.length; i++) {
     if (args[i] == ASTType.AST_ANY) continue;

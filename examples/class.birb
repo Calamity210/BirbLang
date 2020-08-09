@@ -1,22 +1,2 @@
-class Test {
-    String name = "";
-    int age = 0;
-
-    void construct(String name, int age) {
-        nest.name = "peter";
-        nest.age = 18;
-    }
-
-    int getAge() {
-        return nest.age;
-    }
-
-    String getName() {
-        return nest.name;
-    }
-}
-
-class test = Test;
-test.construct("Peter", 18);
-
-screm(test.getName() + " : " + test.getAge());
+bool foo = false;
+if (!foo) screm(foo);

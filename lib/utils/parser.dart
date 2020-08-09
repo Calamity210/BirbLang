@@ -110,6 +110,9 @@ AST parseStatement(Parser parser, Scope scope) {
 
         if (isDataType(tokenValue)) {
           return parseFuncDef(parser, scope);
+        } else if (tokenValue == '!') {
+          AST statementAST = parseStatement(parser, scope)..isNegated = true;
+          return statementAST;
         }
         switch (tokenValue) {
           case WHILE:
@@ -417,8 +420,8 @@ AST parseClass(Parser parser, Scope scope) {
     while (parser.curToken.type == TokenType.TOKEN_SEMI ||
         (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
             parser.curToken.type != TokenType.TOKEN_RBRACE)) {
-      if(parser.curToken.type == TokenType.TOKEN_SEMI)
-      eat(parser, TokenType.TOKEN_SEMI);
+      if (parser.curToken.type == TokenType.TOKEN_SEMI)
+        eat(parser, TokenType.TOKEN_SEMI);
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
         ast.classChildren
@@ -541,7 +544,8 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
       parser.curToken.type == TokenType.TOKEN_SUB ||
       parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_NOT) {
     var unOpOperator = parser.curToken;
     eat(parser, unOpOperator.type);
 
