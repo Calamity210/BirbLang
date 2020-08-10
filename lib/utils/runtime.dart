@@ -366,11 +366,10 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
     var varDef = await getVarDefByName(runtime, localScope, node.variableName);
 
     if (varDef != null) {
-      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION) {
+      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION)
         return varDef;
-      }
 
-      var value = await visitVariable(runtime, node);
+      var value = await visit(runtime, varDef.variableValue);
       value.typeValue = varDef.variableType.typeValue;
 
       return value;
@@ -867,7 +866,7 @@ Future<AST> visitCompound(Runtime runtime, AST node) async {
 
     if (child == null) continue;
 
-    var visited = await visit(runtime, child);
+    AST visited = await visit(runtime, child);
     if (visited != null) {
       if (visited.type == ASTType.AST_RETURN) {
         if (visited.returnValue != null) {

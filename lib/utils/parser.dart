@@ -110,9 +110,6 @@ AST parseStatement(Parser parser, Scope scope) {
 
         if (isDataType(tokenValue)) {
           return parseFuncDef(parser, scope);
-        } else if (tokenValue == '!') {
-          AST statementAST = parseStatement(parser, scope)..isNegated = true;
-          return statementAST;
         }
         switch (tokenValue) {
           case WHILE:

@@ -57,7 +57,6 @@ class AST {
 
   // AST_BOOL
   bool boolValue = false;
-  bool isNegated = false;
 
   bool isClassChild = false;
 
