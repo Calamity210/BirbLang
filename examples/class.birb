@@ -1,2 +1,21 @@
-bool foo = false;
-if (!foo) screm(foo);
+class Test {
+    String name = "";
+    int age = 0;
+
+    void construct(String name, int age) {
+        nest.name = name;
+        nest.age = age;
+    }
+
+    int getAge() {
+        return nest.age;
+    }
+
+    String getName() {
+        return nest.name;
+    }
+}
+
+class test = Test;
+test.construct("Peter", 18);
+screm(test.getName() + " : " + test.getAge());
