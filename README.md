@@ -1,5 +1,6 @@
 # Birb
 Minimal Birb programming language
+[![Run on Repl.it](https://repl.it/badge/github/Calamity210/BirbLang)](https://repl.it/github/Calamity210/BirbLang)
 
 # Contribution
 
