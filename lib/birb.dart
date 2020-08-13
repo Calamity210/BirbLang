@@ -23,15 +23,20 @@ Future<void> main(List<String> arguments) async {
 
   // No file path is specified, Initiate the birb shell
   if (arguments.isEmpty) {
-    int lineNum = 0;
     isInteractive = true;
 
     print('<<<<< Birb Shell Initiated >>>>>');
 
     while (isInteractive) {
-      lineNum++;
-      stdout.write('$lineNum: ');
-      var str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+      stdout.write('> ');
+      String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+      
+      if (RexExp('[^=]+{').hasMatch(str) && !RexExp('(?<=\{).*(?=\})').hasMatch(str)) {
+        while (!RexExp('(?<=\{).*(?=\})').hasMatch(str)) {
+          stdout.write('>> ')
+         str += stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+        }
+      }
 
       lexer = initLexer(str);
       parser = initParser(lexer);
