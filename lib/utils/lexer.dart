@@ -20,7 +20,7 @@ Lexer initLexer(String contents) {
     ..contents = contents.trim()
     ..currentIndex = 0
     ..lineNum = 1;
-  lexer.currentChar = lexer.contents[lexer.currentIndex];
+  lexer.currentChar = contents.isEmpty ? '' : lexer.contents[lexer.currentIndex];
 
   return lexer;
 }
