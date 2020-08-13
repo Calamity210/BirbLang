@@ -30,33 +30,34 @@ Future<void> main(List<String> arguments) async {
     while (isInteractive) {
       stdout.write('> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
-      
-      if (RexExp('[^=]+{').hasMatch(str) && !RexExp('(?<=\{).*(?=\})').hasMatch(str)) {
-        while (!RexExp('(?<=\{).*(?=\})').hasMatch(str)) {
-          stdout.write('>> ')
-         str += stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+      print(RegExp('{').allMatches(str).length);
+      if (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
+        while (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
+          stdout.write('>> ');
+          str += stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
         }
       }
-
-      lexer = initLexer(str);
-      parser = initParser(lexer);
-      node = parse(parser);
-
-      await visit(runtime, node);
 
       // Exit shell
       if (str == 'quit()') {
         isInteractive = false;
         break;
       }
+
+      lexer = initLexer(str);
+      parser = initParser(lexer);
+      node = parse(parser);
+      await visit(runtime, node);
+
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
     return;
   }
 
-    lexer = initLexer(File(arguments[0]).readAsStringSync());
-    parser = initParser(lexer);
-    node = parse(parser);
-    await visit(runtime, node);
+  lexer = initLexer(File(arguments[0]).readAsStringSync());
+  parser = initParser(lexer);
+  node = parse(parser);
+  await visit(runtime, node);
 }
+
