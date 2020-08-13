@@ -498,9 +498,11 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
     var varDef = await getVarDefByName(runtime, globalScope, left.variableName);
 
     if (varDef != null) {
+      //TODO: Change to node variableAssignLeft variableValue if it breaks anything
       var value =
-          await visit(runtime, node.variableAssignmentLeft.variableValue);
+          await visit(runtime, node.variableValue);
 
+      if (value == null) return null;
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleValue.toInt();
       }
