@@ -24,7 +24,6 @@ Future<void> main(List<String> arguments) async {
   // No file path is specified, Initiate the birb shell
   if (arguments.isEmpty) {
     int lineNum = 0;
-    String input = '';
     isInteractive = true;
 
     print('<<<<< Birb Shell Initiated >>>>>');
@@ -34,23 +33,17 @@ Future<void> main(List<String> arguments) async {
       stdout.write('$lineNum: ');
       var str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
-      // Compile program
-      if (str == 'runBirb()') {
-        lexer = initLexer(input);
-        parser = initParser(lexer);
-        node = parse(parser);
+      lexer = initLexer(str);
+      parser = initParser(lexer);
+      node = parse(parser);
 
-        await visit(runtime, node);
-        isInteractive = false;
-      }
+      await visit(runtime, node);
 
       // Exit shell
       if (str == 'quit()') {
         isInteractive = false;
         break;
       }
-
-      input += '$str\n';
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
