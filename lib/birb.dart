@@ -23,25 +23,18 @@ Future<void> main(List<String> arguments) async {
 
   // No file path is specified, Initiate the birb shell
   if (arguments.isEmpty) {
-    int lineNum = 0;
-    String input = '';
     isInteractive = true;
 
     print('<<<<< Birb Shell Initiated >>>>>');
 
     while (isInteractive) {
-      lineNum++;
-      stdout.write('$lineNum: ');
-      var str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
-
-      // Compile program
-      if (str == 'runBirb()') {
-        lexer = initLexer(input);
-        parser = initParser(lexer);
-        node = parse(parser);
-
-        await visit(runtime, node);
-        isInteractive = false;
+      stdout.write('> ');
+      String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+      if (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
+        while (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
+          stdout.write('>> ');
+          str += stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+        }
       }
 
       // Exit shell
@@ -50,15 +43,20 @@ Future<void> main(List<String> arguments) async {
         break;
       }
 
-      input += '$str\n';
+      lexer = initLexer(str);
+      parser = initParser(lexer);
+      node = parse(parser);
+      await visit(runtime, node);
+
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
     return;
   }
 
-    lexer = initLexer(File(arguments[0]).readAsStringSync());
-    parser = initParser(lexer);
-    node = parse(parser);
-    await visit(runtime, node);
+  lexer = initLexer(File(arguments[0]).readAsStringSync());
+  parser = initParser(lexer);
+  node = parse(parser);
+  await visit(runtime, node);
 }
+
