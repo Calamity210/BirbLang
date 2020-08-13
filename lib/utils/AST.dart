@@ -53,7 +53,7 @@ class AST {
   int lineNum;
 
   // AST_INT
-  int intVal;
+  int intVal = 0;
 
   // AST_BOOL
   bool boolValue = false;
@@ -61,7 +61,7 @@ class AST {
   bool isClassChild = false;
 
   // AST_DOUBLE
-  double doubleValue;
+  double doubleValue = 0;
 
   // AST_STRING
   String stringValue;
