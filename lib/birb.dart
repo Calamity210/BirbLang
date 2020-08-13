@@ -30,6 +30,7 @@ Future<void> main(List<String> arguments) async {
     while (isInteractive) {
       stdout.write('> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
+
       if (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
         while (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
           stdout.write('>> ');

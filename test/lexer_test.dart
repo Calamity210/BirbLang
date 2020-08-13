@@ -5,6 +5,11 @@ import 'package:Birb/utils/token.dart';
 import 'package:test/test.dart' as test;
 
 void main() {
+  test.test('Lexer handles empty input correctly', () {
+    Lexer lexer = initLexer('');
+    test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_EOF));
+  });
+
   test.test('Lexer gets tokens correctly', () {
     Lexer lexer =
         initLexer(File('./test/TestPrograms/test_lexer.birb').readAsStringSync());
