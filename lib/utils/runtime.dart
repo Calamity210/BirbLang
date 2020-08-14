@@ -98,7 +98,7 @@ AST mapRemoveFptr(Runtime runtime, AST self, List args) {
   return self;
 }
 
-void collectAndSweepGarbage(Runtime runtime, List old_def_list, Scope scope) {
+void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
   if (scope == runtime.scope) {
     return;
   }
@@ -109,8 +109,8 @@ void collectAndSweepGarbage(Runtime runtime, List old_def_list, Scope scope) {
     AST newDef = scope.variableDefinitions[i];
     var exists = false;
 
-    for (int j = 0; j < old_def_list.length; j++) {
-      AST oldDef = old_def_list[j];
+    for (int j = 0; j < oldDefList.length; j++) {
+      AST oldDef = oldDefList[j];
 
       if (oldDef == newDef) exists = true;
     }
@@ -2246,13 +2246,14 @@ AST visitStrBufMethods(AST node, AST left) {
 
     case 'writeAsciiCode':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-      left.stringBuffer.writeCharCode((node.binaryOpRight.funcCallArgs[0] as AST).intVal);
+      left.stringBuffer
+          .writeCharCode((node.binaryOpRight.funcCallArgs[0] as AST).intVal);
       return left;
-      
+
     case 'writeLine':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-      left.stringBuffer
-          .write('${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
+      left.stringBuffer.write(
+          '${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
   }
   throw NoSuchPropertyException(
       node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
