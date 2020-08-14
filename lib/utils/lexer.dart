@@ -56,7 +56,7 @@ Token getNextToken(Lexer lexer) {
       }
 
       // +=
-      if (lexer.currentChar == '=') {
+      else if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_PLUS_EQUAL;
         value += lexer.currentChar;
         advance(lexer);
@@ -81,7 +81,7 @@ Token getNextToken(Lexer lexer) {
       }
 
       // -=
-      if (lexer.currentChar == '=') {
+      else if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_SUB_EQUAL;
         value += lexer.currentChar;
 
@@ -105,7 +105,7 @@ Token getNextToken(Lexer lexer) {
       }
 
       // *=
-      if (lexer.currentChar == '=') {
+      else if (lexer.currentChar == '=') {
         type = TokenType.TOKEN_MUL_EQUAL;
         value += lexer.currentChar;
         advance(lexer);
@@ -252,7 +252,13 @@ void advance(Lexer lexer) {
     lexer.currentChar = lexer.contents[lexer.currentIndex];
   } else if (lexer.currentIndex == lexer.contents.length - 1) {
     lexer.currentIndex++;
+    lexer.currentChar = null;
   }
+}
+
+/// Checks whether the input has been fully consumed
+bool isAtEnd(Lexer lexer) {
+  return lexer.currentIndex == lexer.contents.length;
 }
 
 /// Advances while returning a Token
@@ -288,7 +294,7 @@ void skipWhitespace(Lexer lexer) {
 
 /// Skip comments since they are only notes for the developers
 void skipInlineComment(Lexer lexer) {
-  while (lexer.currentChar != '\n' && lexer.currentChar != '\n') {
+  while (lexer.currentChar != '\n' && lexer.currentChar != '\n' && !isAtEnd(lexer)) {
     advance(lexer);
   }
 }
