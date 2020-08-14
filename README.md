@@ -17,7 +17,7 @@ so the output isn't in a `.exe` format.
 
 - When ready, open and pull request and request a review from me - Calamity210.
 
-- Join the discord - https://discord.gg/9R7kkEh
+- Join the discord - https://discord.gg/9dq6YB2
 
 # Docs
 https://gc.spidev.codes/docs/birb/
