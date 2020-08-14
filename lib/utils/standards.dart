@@ -25,12 +25,12 @@ void initStandards(Runtime runtime) async {
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
   registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
 
-  registerGlobalFutureFunction(runtime, 'import', funcImport);
+  registerGlobalFutureFunction(runtime, 'grab', funcGrab);
   registerGlobalFutureFunction(runtime, 'GET', funcGet);
   registerGlobalFutureFunction(runtime, 'POST', funcPost);
 }
 
-Future<AST> funcImport(Runtime runtime, AST self, List args) async {
+Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   AST astStr = args[0];
