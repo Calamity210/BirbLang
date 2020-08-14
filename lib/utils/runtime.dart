@@ -407,7 +407,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
     }
   }
 
-  UndefinedVariableException(
+  throw UndefinedVariableException(
       'Error: [Line ${node.lineNum}] Undefined variable `${node.variableName}`.');
 }
 
@@ -1978,7 +1978,7 @@ AST visitStringProperties(AST node, AST left) {
       break;
 
     default:
-      print('Error: No property ${node.binaryOpRight.variableName} for String');
+      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
   }
 }
 
@@ -2215,7 +2215,7 @@ AST visitStringMethods(AST node, AST left) {
       }
 
     default:
-      print('Error: No method ${node.binaryOpRight.variableName} for String');
+      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
   }
 }
 
@@ -2228,4 +2228,5 @@ AST visitStrBufMethods(AST node, AST left) {
         return strAST;
       }
   }
+  throw NoSuchPropertyException(node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
 }

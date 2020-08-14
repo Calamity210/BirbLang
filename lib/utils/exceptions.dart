@@ -1,3 +1,5 @@
+import 'package:Birb/utils/AST.dart';
+
 class UndefinedMethodException implements Exception {
   String message;
   UndefinedMethodException(this.message);
@@ -117,4 +119,26 @@ class SyntaxException implements Exception {
 
   @override
   String toString() => 'SyntaxException: $message';
+}
+
+class JsonValueTypeException implements Exception {
+  AST value;
+  dynamic key;
+
+  JsonValueTypeException(this.key, this.value);
+
+  @override
+  String toString() => 
+      'JsonValueTypeException: Unsupported value type ${value.type}'
+      'associated with key $key';
+}
+
+class NoSuchPropertyException implements Exception {
+  String propertyName;
+  String typeName;
+
+  NoSuchPropertyException(this.propertyName, this.typeName);
+
+  @override
+  String toString() => 'NoSuchPropertyException: No such property $propertyName for $typeName';
 }
