@@ -366,8 +366,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
     var varDef = await getVarDefByName(runtime, localScope, node.variableName);
 
     if (varDef != null) {
-      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION)
-        return varDef;
+      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION) return varDef;
 
       var value = await visit(runtime, varDef.variableValue);
       value.typeValue = varDef.variableType.typeValue;
@@ -499,8 +498,7 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
 
     if (varDef != null) {
       //TODO: Change to node variableAssignLeft variableValue if it breaks anything
-      var value =
-          await visit(runtime, node.variableValue);
+      var value = await visit(runtime, node.variableValue);
 
       if (value == null) return null;
       if (value.type == ASTType.AST_DOUBLE) {
@@ -1091,7 +1089,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
                 break;
               }
 
-              var astFDefArg = child.funcDefArgs[j];
+              AST astFDefArg = child.funcDefArgs[j];
               String argName = astFDefArg.variableName;
 
               var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
@@ -1653,7 +1651,8 @@ Future<AST> visitIf(Runtime runtime, AST node) async {
         'Error: [Line ${node.lineNum}] If expression can\'t be empty');
 
   if (node.ifExpression.type == ASTType.AST_UNARYOP) {
-    if (boolEval(await visit(runtime, node.ifExpression.unaryOpRight)) == false) {
+    if (boolEval(await visit(runtime, node.ifExpression.unaryOpRight)) ==
+        false) {
       await visit(runtime, node.ifBody);
     } else {
       if (node.ifElse != null) return await visit(runtime, node.ifElse);
@@ -1759,7 +1758,7 @@ Future<AST> visitFor(Runtime runtime, AST node) async {
 
 Future<AST> visitIterate(Runtime runtime, AST node) async {
   var scope = getScope(runtime, node);
-  var astIterable = await visit(runtime, node.iterateIterable);
+  AST astIterable = await visit(runtime, node.iterateIterable);
 
   AST fDef;
 
@@ -1878,8 +1877,8 @@ AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        var str = left.stringValue;
-        var astList = initAST(ASTType.AST_LIST);
+        String str = left.stringValue;
+        AST astList = initAST(ASTType.AST_LIST);
         astList.listElements = str.codeUnits;
 
         return astList;
@@ -1888,8 +1887,8 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'isEmpty':
       {
-        var str = left.stringValue;
-        var astList = initAST(ASTType.AST_BOOL);
+        String str = left.stringValue;
+        AST astList = initAST(ASTType.AST_BOOL);
         astList.boolValue = str.isEmpty;
 
         return astList;
@@ -1898,8 +1897,8 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'isNotEmpty':
       {
-        var str = left.stringValue;
-        var astList = initAST(ASTType.AST_BOOL);
+        String str = left.stringValue;
+        AST astList = initAST(ASTType.AST_BOOL);
         astList.boolValue = str.isNotEmpty;
 
         return astList;
@@ -1907,9 +1906,9 @@ AST visitStringProperties(AST node, AST left) {
       break;
     case 'input':
       {
-        var str = left.stringValue;
+        String str = left.stringValue;
         print(str);
-        var astString = initAST(ASTType.AST_STRING);
+        AST astString = initAST(ASTType.AST_STRING);
         astString.stringValue =
             stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
@@ -1927,10 +1926,10 @@ AST visitStringProperties(AST node, AST left) {
       break;
     case 'toBinary':
       {
-        var str = left.stringValue;
+        String str = left.stringValue;
         var binarys = str.codeUnits.map((e) => e.toRadixString(2));
 
-        var astList = initAST(ASTType.AST_LIST);
+        AST astList = initAST(ASTType.AST_LIST);
         astList.listElements = [];
 
         for (String binary in binarys) astList.listElements.add(binary);
@@ -1940,10 +1939,10 @@ AST visitStringProperties(AST node, AST left) {
       break;
     case 'toOct':
       {
-        var str = left.stringValue;
+        String str = left.stringValue;
         var octS = str.codeUnits.map((e) => e.toRadixString(8));
 
-        var astList = initAST(ASTType.AST_LIST);
+        AST astList = initAST(ASTType.AST_LIST);
         astList.listElements = [];
 
         for (String oct in octS) astList.listElements.add(oct);
@@ -1953,10 +1952,10 @@ AST visitStringProperties(AST node, AST left) {
       break;
     case 'toHex':
       {
-        var str = left.stringValue;
+        String str = left.stringValue;
         var hexS = str.codeUnits.map((e) => e.toRadixString(16));
 
-        var astList = initAST(ASTType.AST_LIST);
+        AST astList = initAST(ASTType.AST_LIST);
         astList.listElements = [];
 
         for (String hex in hexS) astList.listElements.add(hex);
@@ -1966,8 +1965,8 @@ AST visitStringProperties(AST node, AST left) {
       break;
     case 'toDec':
       {
-        var str = left.stringValue;
-        var astList = initAST(ASTType.AST_LIST);
+        String str = left.stringValue;
+        AST astList = initAST(ASTType.AST_LIST);
         astList.listElements = [];
 
         var decimals = str.codeUnits;
@@ -1990,8 +1989,8 @@ AST visitStringMethods(AST node, AST left) {
 
         AST index = node.binaryOpRight.funcCallArgs[0];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_INT);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_INT);
         ast.intVal = str.codeUnitAt(index.intVal);
 
         return ast;
@@ -2004,8 +2003,8 @@ AST visitStringMethods(AST node, AST left) {
 
         AST other = node.binaryOpRight.funcCallArgs[0];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_INT);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_INT);
         ast.intVal = str.compareTo(other.stringValue);
 
         return ast;
@@ -2019,8 +2018,8 @@ AST visitStringMethods(AST node, AST left) {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST index = node.binaryOpRight.funcCallArgs[1];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_BOOL);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_BOOL);
         ast.boolValue = str.contains(pattern.stringValue, index.intVal);
 
         return ast;
@@ -2033,8 +2032,8 @@ AST visitStringMethods(AST node, AST left) {
 
         AST pattern = node.binaryOpRight.funcCallArgs[0];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_BOOL);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_BOOL);
         ast.boolValue = str.endsWith(pattern.stringValue);
 
         return ast;
@@ -2048,8 +2047,8 @@ AST visitStringMethods(AST node, AST left) {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST index = node.binaryOpRight.funcCallArgs[1];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_INT);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_INT);
         ast.intVal = str.indexOf(pattern.stringValue, index.intVal);
 
         return ast;
@@ -2062,8 +2061,8 @@ AST visitStringMethods(AST node, AST left) {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST index = node.binaryOpRight.funcCallArgs[1];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_INT);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_INT);
         ast.intVal = str.lastIndexOf(pattern.stringValue, index.intVal);
 
         return ast;
@@ -2144,8 +2143,8 @@ AST visitStringMethods(AST node, AST left) {
 
         AST pattern = node.binaryOpRight.funcCallArgs[0];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_LIST);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_LIST);
         ast.listElements = str.split(pattern.stringValue);
 
         return ast;
@@ -2159,8 +2158,8 @@ AST visitStringMethods(AST node, AST left) {
         AST pattern = node.binaryOpRight.funcCallArgs[0];
         AST index = node.binaryOpRight.funcCallArgs[1];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_BOOL);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_BOOL);
         ast.boolValue = str.startsWith(pattern.stringValue, index.intVal);
 
         return ast;
@@ -2174,8 +2173,8 @@ AST visitStringMethods(AST node, AST left) {
         AST start = node.binaryOpRight.funcCallArgs[0];
         AST end = node.binaryOpRight.funcCallArgs[1];
 
-        var str = left.stringValue;
-        var ast = initAST(ASTType.AST_STRING);
+        String str = left.stringValue;
+        AST ast = initAST(ASTType.AST_STRING);
         ast.stringValue = str.substring(start.intVal, end.intVal);
 
         return ast;
@@ -2222,11 +2221,39 @@ AST visitStringMethods(AST node, AST left) {
 AST visitStrBufMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
-      {
-        AST strAST = initAST(ASTType.AST_STRING)
-          ..stringValue = left.stringBuffer.toString();
-        return strAST;
-      }
+      AST strAST = initAST(ASTType.AST_STRING)
+        ..stringValue = left.stringBuffer.toString();
+      return strAST;
+
+    case 'clear':
+      left.stringBuffer.clear();
+      return left;
+
+    case 'write':
+      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+
+      left.stringBuffer
+          .write((node.binaryOpRight.funcCallArgs[0] as AST).stringValue);
+      return left;
+
+    case 'writeAll':
+      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
+
+      (node.binaryOpRight.funcCallArgs[0] as AST).listElements.forEach((e) {
+        left.stringBuffer.write((e as AST).stringValue);
+      });
+      return left;
+
+    case 'writeAsciiCode':
+      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+      left.stringBuffer.writeCharCode((node.binaryOpRight.funcCallArgs[0] as AST).intVal);
+      return left;
+      
+    case 'writeLine':
+      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+      left.stringBuffer
+          .write('${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
   }
-  throw NoSuchPropertyException(node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
+  throw NoSuchPropertyException(
+      node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
 }
