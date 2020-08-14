@@ -275,6 +275,8 @@ Future<AST> visit(Runtime runtime, AST node) async {
       return await visitIterate(runtime, node);
     case ASTType.AST_ASSERT:
       return await visitAssert(runtime, node);
+    case ASTType.AST_ANY:
+      return node;
     default:
       throw UncaughtStatementException('Uncaught statement ${node.type}');
   }

@@ -2,7 +2,7 @@ class Test {
     String name = "";
     int age = 0;
 
-    void construct(String name, int age) {
+    void Test(String name, int age) {
         nest.name = name;
         nest.age = age;
     }
@@ -17,5 +17,5 @@ class Test {
 }
 
 class test = Test;
-test.construct("Peter", 18);
+test.Test("Birb", 10);
 screm(test.getName() + " : " + test.getAge());

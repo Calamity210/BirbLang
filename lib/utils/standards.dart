@@ -25,24 +25,23 @@ void initStandards(Runtime runtime) async {
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
   registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
 
-  registerGlobalFutureFunction(runtime, 'import', funcInclude);
+  registerGlobalFutureFunction(runtime, 'import', funcImport);
   registerGlobalFutureFunction(runtime, 'GET', funcGet);
   registerGlobalFutureFunction(runtime, 'POST', funcPost);
 }
 
-Future<AST> funcInclude(Runtime runtime, AST self, List args) async {
+Future<AST> funcImport(Runtime runtime, AST self, List args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   AST astStr = args[0];
-  var filename = astStr.stringValue;
+  String filename = astStr.stringValue;
 
-  var lexer = initLexer(File(filename).readAsStringSync());
-  var parser = initParser(lexer);
-  var node = parse(parser);
-  var runtime = initRuntime();
-  var ast = await visit(runtime, node);
-
-  return ast;
+  Lexer lexer = initLexer(File(filename).readAsStringSync());
+  Parser parser = initParser(lexer);
+  AST node = parse(parser);
+  await visit(runtime, node);
+  
+  return initAST(ASTType.AST_ANY);
 }
 
 /// STDOUT
@@ -55,7 +54,6 @@ AST funcScrem(Runtime runtime, AST self, List args) {
 
     if (str == null)
       throw UnexpectedTokenException('Screm must contain non-null arguments');
-
 
     print(str);
   }
