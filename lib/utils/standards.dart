@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Birb/utils/exceptions.dart';
-import 'package:Birb/utils/scope.dart';
 import 'package:http/http.dart';
 
 import 'AST.dart';
@@ -538,6 +537,8 @@ AST funcEncodeJson(Runtime runtime, AST self, List args) {
       case ASTType.AST_MAP:
         jsonMap[key] = val.map;
         break;
+      default:
+        throw JsonValueTypeException(key, val);
     }
     return;
   });
