@@ -142,3 +142,12 @@ class NoSuchPropertyException implements Exception {
   @override
   String toString() => 'NoSuchPropertyException: No such property $propertyName for $typeName';
 }
+class NoSuchMethodException implements Exception {
+  String methodName;
+  String typeName;
+
+  NoSuchMethodException(this.methodName, this.typeName);
+
+  @override
+  String toString() => 'NoSuchMethodException: No such method $methodName for $typeName';
+}

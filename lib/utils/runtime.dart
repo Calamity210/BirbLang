@@ -916,16 +916,16 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
       }
     }
     if (left.type == ASTType.AST_STRING) {
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
         return visitStringProperties(node, left);
-      } else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+      else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
         return visitStringMethods(node, left);
-      }
     }
     if (left.type == ASTType.AST_STRING_BUFFER) {
-      if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
+      if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+        return visitStrBufProperties(node, left);
+      else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
         return visitStrBufMethods(node, left);
-      }
     } else if (left.type == ASTType.AST_CLASS) {
       if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
           node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
@@ -1879,104 +1879,75 @@ AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        String str = left.stringValue;
-        AST astList = initAST(ASTType.AST_LIST);
-        astList.listElements = str.codeUnits;
-
+        AST astList = initAST(ASTType.AST_LIST)
+          ..listElements = left.stringValue.codeUnits;
         return astList;
       }
-      break;
 
     case 'isEmpty':
       {
-        String str = left.stringValue;
-        AST astList = initAST(ASTType.AST_BOOL);
-        astList.boolValue = str.isEmpty;
-
-        return astList;
+        AST astBool = initAST(ASTType.AST_BOOL)
+          ..boolValue = left.stringValue.isEmpty;
+        return astBool;
       }
-      break;
 
     case 'isNotEmpty':
       {
-        String str = left.stringValue;
-        AST astList = initAST(ASTType.AST_BOOL);
-        astList.boolValue = str.isNotEmpty;
-
-        return astList;
+        AST astBool = initAST(ASTType.AST_BOOL)
+          ..boolValue = left.stringValue.isNotEmpty;
+        return astBool;
       }
-      break;
+
     case 'input':
       {
-        String str = left.stringValue;
-        print(str);
-        AST astString = initAST(ASTType.AST_STRING);
-        astString.stringValue =
-            stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
+        print(left.stringValue);
+        AST astString = initAST(ASTType.AST_STRING)
+          ..stringValue =
+              stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
         return astString;
       }
-      break;
+
     case 'length':
       {
-        var intAST = initAST(ASTType.AST_INT);
-
-        intAST.intVal = left.stringValue.length;
+        var intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
 
         return intAST;
       }
-      break;
     case 'toBinary':
       {
-        String str = left.stringValue;
-        var binarys = str.codeUnits.map((e) => e.toRadixString(2));
-
-        AST astList = initAST(ASTType.AST_LIST);
-        astList.listElements = [];
-
-        for (String binary in binarys) astList.listElements.add(binary);
+        AST astList = initAST(ASTType.AST_LIST)
+          ..listElements = left.stringValue.codeUnits
+              .map((e) => e.toRadixString(2))
+              .toList();
 
         return astList;
       }
-      break;
     case 'toOct':
       {
-        String str = left.stringValue;
-        var octS = str.codeUnits.map((e) => e.toRadixString(8));
-
-        AST astList = initAST(ASTType.AST_LIST);
-        astList.listElements = [];
-
-        for (String oct in octS) astList.listElements.add(oct);
+        AST astList = initAST(ASTType.AST_LIST)
+          ..listElements = left.stringValue.codeUnits
+              .map((e) => e.toRadixString(8))
+              .toList();
 
         return astList;
       }
-      break;
     case 'toHex':
       {
-        String str = left.stringValue;
-        var hexS = str.codeUnits.map((e) => e.toRadixString(16));
-
-        AST astList = initAST(ASTType.AST_LIST);
-        astList.listElements = [];
-
-        for (String hex in hexS) astList.listElements.add(hex);
+        AST astList = initAST(ASTType.AST_LIST)
+          ..listElements = left.stringValue.codeUnits
+              .map((e) => e.toRadixString(16))
+              .toList();
 
         return astList;
       }
-      break;
+
     case 'toDec':
       {
-        String str = left.stringValue;
-        AST astList = initAST(ASTType.AST_LIST);
-        astList.listElements = [];
-
-        var decimals = str.codeUnits;
-        for (int decimal in decimals) astList.listElements.add(decimal);
-
+        AST astList = initAST(ASTType.AST_LIST)
+          ..listElements = left.stringValue.codeUnits;
         return astList;
       }
-      break;
 
     default:
       throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
@@ -1989,25 +1960,21 @@ AST visitStringMethods(AST node, AST left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
-        AST index = node.binaryOpRight.funcCallArgs[0];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_INT);
-        ast.intVal = str.codeUnitAt(index.intVal);
+        AST ast = initAST(ASTType.AST_INT)
+          ..intVal = left.stringValue
+              .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
 
         return ast;
       }
-      break;
+
     case 'compareTo':
       {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST other = node.binaryOpRight.funcCallArgs[0];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_INT);
-        ast.intVal = str.compareTo(other.stringValue);
+        AST ast = initAST(ASTType.AST_INT)
+          ..intVal = left.stringValue
+              .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
 
         return ast;
       }
@@ -2017,12 +1984,8 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST index = node.binaryOpRight.funcCallArgs[1];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue = str.contains(pattern.stringValue, index.intVal);
+        AST ast = initAST(ASTType.AST_BOOL)..boolValue =
+            left.stringValue.contains(node.binaryOpRight.funcCallArgs[0].stringValue, node.binaryOpRight.funcCallArgs[1].intVal);
 
         return ast;
       }
@@ -2032,11 +1995,7 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue = str.endsWith(pattern.stringValue);
+        AST ast = initAST(ASTType.AST_BOOL)..boolValue = left.stringValue.endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
 
         return ast;
       }
@@ -2046,26 +2005,21 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST index = node.binaryOpRight.funcCallArgs[1];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_INT);
-        ast.intVal = str.indexOf(pattern.stringValue, index.intVal);
+        List args = node.binaryOpRight.funcCallArgs;
+        AST ast = initAST(ASTType.AST_INT)..intVal =
+            left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
 
         return ast;
       }
+
     case 'lastIndexOf':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST index = node.binaryOpRight.funcCallArgs[1];
-
-        String str = left.stringValue;
-        AST ast = initAST(ASTType.AST_INT);
-        ast.intVal = str.lastIndexOf(pattern.stringValue, index.intVal);
+        List args = node.binaryOpRight.funcCallArgs;
+        AST ast = initAST(ASTType.AST_INT)..intVal =
+            left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
 
         return ast;
       }
@@ -2074,12 +2028,10 @@ AST visitStringMethods(AST node, AST left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-
-        AST width = node.binaryOpRight.funcCallArgs[0];
-        AST padding = node.binaryOpRight.funcCallArgs[1];
+        List args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue =
-            left.stringValue.padLeft(width.intVal, padding.stringValue);
+            left.stringValue.padLeft(args[0].intVal, args[1].stringValue);
 
         return left;
       }
@@ -2087,53 +2039,48 @@ AST visitStringMethods(AST node, AST left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-
-        AST width = node.binaryOpRight.funcCallArgs[0];
-        AST padding = node.binaryOpRight.funcCallArgs[1];
+        List args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue =
-            left.stringValue.padRight(width.intVal, padding.stringValue);
+            left.stringValue.padRight(args[0].intVal, args[1].stringValue);
 
         return left;
       }
+
     case 'replaceAll':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST replace = node.binaryOpRight.funcCallArgs[1];
+        List args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue = left.stringValue
-            .replaceAll(pattern.stringValue, replace.stringValue);
+            .replaceAll(args[0].stringValue, args[1].stringValue);
 
         return left;
       }
+
     case 'replaceFirst':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST replace = node.binaryOpRight.funcCallArgs[1];
-        AST index = node.binaryOpRight.funcCallArgs[2];
+        List args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue = left.stringValue.replaceFirst(
-            pattern.stringValue, replace.stringValue, index.intVal);
+            args[0].stringValue,args[1].stringValue, args[2].intVal);
 
         return left;
       }
+
     case 'replaceRange':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_STRING]);
 
-        AST start = node.binaryOpRight.funcCallArgs[0];
-        AST end = node.binaryOpRight.funcCallArgs[1];
-        AST replace = node.binaryOpRight.funcCallArgs[2];
-
+        List args = node.binaryOpRight.funcCallArgs;
         left.stringValue
-            .replaceRange(start.intVal, end.intVal, replace.stringValue);
+            .replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
 
         return left;
       }
@@ -2143,11 +2090,8 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-
-        String str = left.stringValue;
         AST ast = initAST(ASTType.AST_LIST);
-        ast.listElements = str.split(pattern.stringValue);
+        ast.listElements = left.stringValue.split(node.binaryOpRight.funcCallArgs[0].stringValue);
 
         return ast;
       }
@@ -2157,12 +2101,11 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST pattern = node.binaryOpRight.funcCallArgs[0];
-        AST index = node.binaryOpRight.funcCallArgs[1];
+        List args = node.binaryOpRight.funcCallArgs;
 
-        String str = left.stringValue;
         AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue = str.startsWith(pattern.stringValue, index.intVal);
+        ast.boolValue =
+            left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
 
         return ast;
       }
@@ -2172,12 +2115,10 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
 
-        AST start = node.binaryOpRight.funcCallArgs[0];
-        AST end = node.binaryOpRight.funcCallArgs[1];
+        List args = node.binaryOpRight.funcCallArgs;
 
-        String str = left.stringValue;
         AST ast = initAST(ASTType.AST_STRING);
-        ast.stringValue = str.substring(start.intVal, end.intVal);
+        ast.stringValue = left.stringValue.substring(args[0].intVal, args[1].intVal);
 
         return ast;
       }
@@ -2216,7 +2157,34 @@ AST visitStringMethods(AST node, AST left) {
       }
 
     default:
-      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
+      throw NoSuchMethodException(node.binaryOpRight.variableName, 'String');
+  }
+}
+
+Future<AST> visitStrBufProperties(AST node, AST left) async {
+  switch (node.binaryOpRight.variableName) {
+    case 'isEmpty':
+      {
+        AST astBool = initAST(ASTType.AST_BOOL)..boolValue = left.stringBuffer.isEmpty;
+
+        return astBool;
+      }
+
+    case 'isNotEmpty':
+      {
+        AST astBool = initAST(ASTType.AST_BOOL)..boolValue = left.stringBuffer.isNotEmpty;
+
+        return astBool;
+      }
+    case 'length':
+      {
+        AST astInt = initAST(ASTType.AST_INT)..intVal = left.stringBuffer.length;
+
+        return astInt;
+      }
+    default:
+      throw NoSuchPropertyException(
+          node.binaryOpRight.variableName, 'StrBuffer');
   }
 }
 
@@ -2257,6 +2225,6 @@ AST visitStrBufMethods(AST node, AST left) {
       left.stringBuffer.write(
           '${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
   }
-  throw NoSuchPropertyException(
+  throw NoSuchMethodException(
       node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
 }
