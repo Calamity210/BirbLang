@@ -1216,7 +1216,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents.replaceAll(
+              parser.lexer.program = parser.lexer.program.replaceAll(
                   funcName, '${astVarDef.variableValue.stringValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
@@ -1227,7 +1227,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents.replaceAll(funcName,
+              parser.lexer.program = parser.lexer.program.replaceAll(funcName,
                   '${astVarDef.variableValue.stringBuffer.toString()}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
@@ -1238,7 +1238,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents
+              parser.lexer.program = parser.lexer.program
                   .replaceAll(funcName, '${astVarDef.variableValue.intVal}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
@@ -1249,7 +1249,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents.replaceAll(
+              parser.lexer.program = parser.lexer.program.replaceAll(
                   funcName, '${astVarDef.variableValue.doubleValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
@@ -1260,7 +1260,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents
+              parser.lexer.program = parser.lexer.program
                   .replaceAll(funcName, '${astVarDef.variableValue.boolValue}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
@@ -1271,7 +1271,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents.replaceAll(
+              parser.lexer.program = parser.lexer.program.replaceAll(
                   funcName, '${astVarDef.variableValue.listElements}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
@@ -1282,7 +1282,7 @@ AST parseFuncDef(Parser parser, Scope scope,
             astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
             astVarDef.variableType = astType;
             if (isConst)
-              parser.lexer.contents = parser.lexer.contents
+              parser.lexer.program = parser.lexer.program
                   .replaceAll(funcName, '${astVarDef.variableValue.map}');
           }
           if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)

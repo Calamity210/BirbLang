@@ -67,6 +67,6 @@ void main() {
     test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_SEMI));
     test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_RBRACE));
 
-    test.expect(lexer.currentIndex, test.equals(lexer.contents.length));
+    test.expect(lexer.currentIndex, test.equals(lexer.program.length));
   });
 }

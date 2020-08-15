@@ -3,22 +3,19 @@ import 'package:Birb/utils/exceptions.dart';
 import 'token.dart';
 
 class Lexer {
-  /// The program to lex
-  String contents;
+  String program;
   String currentChar;
-
   int currentIndex;
   int lineNum;
 }
 
-/// Takes in a string of content(programs),
 /// Initializes and returns a new lexer
-Lexer initLexer(String contents) {
+Lexer initLexer(String program) {
   var lexer = Lexer()
-    ..contents = contents.trim()
+    ..program = program.trim()
     ..currentIndex = 0
     ..lineNum = 1;
-  lexer.currentChar = contents.isEmpty ? '' : lexer.contents[lexer.currentIndex];
+  lexer.currentChar = program.isEmpty ? '' : lexer.program[lexer.currentIndex];
 
   return lexer;
 }
@@ -26,7 +23,7 @@ Lexer initLexer(String contents) {
 /// Grabs next token from the lexer
 Token getNextToken(Lexer lexer) {
   while (
-      lexer.currentIndex < lexer.contents.length && lexer.currentChar != null) {
+      lexer.currentIndex < lexer.program.length && lexer.currentChar != null) {
     // Skip
     if (lexer.currentChar == ' ' ||
         lexer.currentChar == '\n' ||
@@ -44,8 +41,8 @@ Token getNextToken(Lexer lexer) {
 
     // +
     if (lexer.currentChar == '+') {
-      var value = lexer.currentChar;
-      var type = TokenType.TOKEN_PLUS;
+      String value = lexer.currentChar;
+      TokenType type = TokenType.TOKEN_PLUS;
       advance(lexer);
 
       // ++
@@ -67,8 +64,8 @@ Token getNextToken(Lexer lexer) {
 
     // -
     if (lexer.currentChar == '-') {
-      var value = lexer.currentChar;
-      var type = TokenType.TOKEN_SUB;
+      String value = lexer.currentChar;
+      TokenType type = TokenType.TOKEN_SUB;
 
       advance(lexer);
 
@@ -93,8 +90,8 @@ Token getNextToken(Lexer lexer) {
 
     // *
     if (lexer.currentChar == '*') {
-      var value = lexer.currentChar;
-      var type = TokenType.TOKEN_MUL;
+      String value = lexer.currentChar;
+      TokenType type = TokenType.TOKEN_MUL;
       advance(lexer);
 
       // **
@@ -116,8 +113,7 @@ Token getNextToken(Lexer lexer) {
 
     // &
     if (lexer.currentChar == '&') {
-      var value = lexer.currentChar;
-
+      String value = lexer.currentChar;
       advance(lexer);
 
       // &&
@@ -131,24 +127,21 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '|') {
-      var value = lexer.currentChar;
+      String value = lexer.currentChar;
 
       advance(lexer);
 
       // ||
       if (lexer.currentChar == '|') {
         value += lexer.currentChar;
-
         advance(lexer);
-
         return initToken(TokenType.TOKEN_OR, value);
       }
     }
 
     if (lexer.currentChar == '=') {
-      var value = lexer.currentChar;
-
-      var type = TokenType.TOKEN_EQUAL;
+      String value = lexer.currentChar;
+      TokenType type = TokenType.TOKEN_EQUAL;
 
       advance(lexer);
 
@@ -164,8 +157,8 @@ Token getNextToken(Lexer lexer) {
     }
 
     if (lexer.currentChar == '!') {
-      var value = lexer.currentChar;
-      var type = TokenType.TOKEN_NOT;
+      String value = lexer.currentChar;
+      TokenType type = TokenType.TOKEN_NOT;
       advance(lexer);
 
       // !=
@@ -196,6 +189,7 @@ Token getNextToken(Lexer lexer) {
       }
     }
 
+    // END OF FILE
     if (lexer.currentChar == '' || lexer.currentChar == null) {
       return initToken(TokenType.TOKEN_EOF, '');
     }
@@ -236,21 +230,23 @@ Token getNextToken(Lexer lexer) {
       case ':':
         return advanceWithToken(lexer, TokenType.TOKEN_COLON);
       default:
-        throw UnexpectedTokenException('[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
+        throw UnexpectedTokenException(
+            '[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
         break;
     }
   }
 
+  // END OF FILE
   return initToken(TokenType.TOKEN_EOF, '');
 }
 
 /// Advances to the next character
 void advance(Lexer lexer) {
   if (lexer.currentChar != '' &&
-      lexer.currentIndex < lexer.contents.length - 1) {
+      lexer.currentIndex < lexer.program.length - 1) {
     lexer.currentIndex += 1;
-    lexer.currentChar = lexer.contents[lexer.currentIndex];
-  } else if (lexer.currentIndex == lexer.contents.length - 1) {
+    lexer.currentChar = lexer.program[lexer.currentIndex];
+  } else if (lexer.currentIndex == lexer.program.length - 1) {
     lexer.currentIndex++;
     lexer.currentChar = null;
   }
@@ -258,23 +254,22 @@ void advance(Lexer lexer) {
 
 /// Checks whether the input has been fully consumed
 bool isAtEnd(Lexer lexer) {
-  return lexer.currentIndex == lexer.contents.length;
+  return lexer.currentIndex == lexer.program.length;
 }
 
 /// Advances while returning a Token
 Token advanceWithToken(Lexer lexer, TokenType type) {
-  var value = lexer.currentChar;
+  String value = lexer.currentChar;
+  Token token = initToken(type, value);
 
   advance(lexer);
-  var token = initToken(type, value);
-
   skipWhitespace(lexer);
 
   return token;
 }
 
-/// Expects a character and throws UnexpectedTokenException if the wrong
-/// Character is received
+/// Expects a character and throws UnexpectedTokenException if
+/// the wrong character is received
 void expect(Lexer lexer, String c) {
   if (lexer.currentChar != c)
     throw UnexpectedTokenException(
@@ -294,7 +289,9 @@ void skipWhitespace(Lexer lexer) {
 
 /// Skip comments since they are only notes for the developers
 void skipInlineComment(Lexer lexer) {
-  while (lexer.currentChar != '\n' && lexer.currentChar != '\n' && !isAtEnd(lexer)) {
+  while (lexer.currentChar != '\n' &&
+      lexer.currentChar != '\n' &&
+      !isAtEnd(lexer)) {
     advance(lexer);
   }
 }
@@ -318,23 +315,22 @@ void skipBlockComment(Lexer lexer) {
 /// Collect a string from within double quotation marks
 Token collectString(Lexer lexer) {
   expect(lexer, '"');
-
   advance(lexer);
 
-  var initialIndex = lexer.currentIndex;
+  int initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '"') {
-    if (lexer.currentIndex == lexer.contents.length - 1)
-     throw UnexpectedTokenException('[Line ${lexer.lineNum}] Missing closing `"`');
+    if (lexer.currentIndex == lexer.program.length - 1)
+      throw UnexpectedTokenException(
+          '[Line ${lexer.lineNum}] Missing closing `"`');
 
     advance(lexer);
   }
 
-  var value = lexer.contents.substring(initialIndex, lexer.currentIndex);
+  String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value);
 
   advance(lexer);
-
-  var token = initToken(TokenType.TOKEN_STRING_VALUE, value);
 
   return token;
 }
@@ -342,35 +338,33 @@ Token collectString(Lexer lexer) {
 /// Collect a string from within single quotation marks
 Token collectSingleQuoteString(Lexer lexer) {
   expect(lexer, '\'');
-
   advance(lexer);
 
-  var initialIndex = lexer.currentIndex;
+  int initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '\'') {
-    if (lexer.currentIndex == lexer.contents.length - 1)
-     throw UnexpectedTokenException('[Line ${lexer.lineNum}] Missing closing `\'`');
+    if (lexer.currentIndex == lexer.program.length - 1)
+      throw UnexpectedTokenException(
+          '[Line ${lexer.lineNum}] Missing closing `\'`');
 
     advance(lexer);
   }
 
-  var value = lexer.contents.substring(initialIndex, lexer.currentIndex);
+  String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value);
 
   advance(lexer);
-
-  var token = initToken(TokenType.TOKEN_STRING_VALUE, value);
 
   return token;
 }
 
 /// Collect numeric tokens
 Token collectNumber(Lexer lexer) {
-  var type = TokenType.TOKEN_INT_VALUE;
-  var value = '';
+  TokenType type = TokenType.TOKEN_INT_VALUE;
+  String value = '';
 
   while (isNumeric(lexer.currentChar)) {
     value += lexer.currentChar;
-
     advance(lexer);
   }
 
@@ -382,7 +376,6 @@ Token collectNumber(Lexer lexer) {
 
     while (isNumeric(lexer.currentChar)) {
       value += lexer.currentChar;
-
       advance(lexer);
     }
   }
@@ -392,22 +385,21 @@ Token collectNumber(Lexer lexer) {
 
 /// Collects identifiers
 Token collectId(Lexer lexer) {
-  var initialIndex = lexer.currentIndex;
+  int initialIndex = lexer.currentIndex;
 
-  while (RegExp('[a-zA-Z0-9]').hasMatch(lexer.currentChar) ||
-      lexer.currentChar == '_') {
+  // Identifiers can only start with `_` or any alphabet
+  if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
     advance(lexer);
+    while (RegExp('[a-zA-Z0-9]').hasMatch(lexer.currentChar)) advance(lexer);
   }
 
-  var value = lexer.contents.substring(initialIndex, lexer.currentIndex);
-
-  return initToken(TokenType.TOKEN_ID, value);
+  return initToken(TokenType.TOKEN_ID,
+      lexer.program.substring(initialIndex, lexer.currentIndex));
 }
 
 /// Check if the character is numeric
 bool isNumeric(String s) {
-  if (s == null) {
-    return false;
-  }
-  return double.tryParse(s) != null || int.tryParse(s) != null;
+  return s == null
+      ? false
+      : double.tryParse(s) != null || int.tryParse(s) != null;
 }
