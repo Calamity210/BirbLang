@@ -140,14 +140,14 @@ class SyntaxException implements Exception {
 class JsonValueTypeException implements Exception {
   // Birb only supports String keys as of yet
   final String key;
-  final ASTType value;
+  final ASTType type;
 
-  const JsonValueTypeException(this.key, this.value);
+  const JsonValueTypeException(this.key, this.type);
 
   @override
   String toString() =>
-      'JsonValueTypeException: Unsupported value type $value'
-      'associated with key $key';
+      'JsonValueTypeException: Unsupported value type `$type`s'
+      'associated with key `$key`';
 }
 
 /// Thrown to indicate that a property was not found for the specified datatype
@@ -158,7 +158,7 @@ class NoSuchPropertyException implements Exception {
   const NoSuchPropertyException(this.propertyName, this.typeName);
 
   @override
-  String toString() => 'NoSuchPropertyException: No such property $propertyName for $typeName';
+  String toString() => 'NoSuchPropertyException: No such property `$propertyName` for `$typeName`';
 }
 
 /// Thrown to indicate that a method was not found for the specified datatype
@@ -169,5 +169,5 @@ class NoSuchMethodException implements Exception {
   const NoSuchMethodException(this.methodName, this.typeName);
 
   @override
-  String toString() => 'NoSuchMethodException: No such method $methodName for $typeName';
+  String toString() => 'NoSuchMethodException: No such method `$methodName` for `$typeName`';
 }
