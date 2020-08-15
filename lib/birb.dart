@@ -44,6 +44,7 @@ Future<void> main(List<String> arguments) async {
         break;
       }
 
+      // Initialize and run program
       lexer = initLexer(str);
       parser = initParser(lexer);
       node = parse(parser);
@@ -55,9 +56,9 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
+  // Initialize and run program
   lexer = initLexer(File(arguments[0]).readAsStringSync());
   parser = initParser(lexer);
   node = parse(parser);
   await visit(runtime, node);
 }
-

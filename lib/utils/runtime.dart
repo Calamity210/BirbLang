@@ -516,7 +516,7 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
     }
   }
 
-  throw SettingUndefinedVariableException(
+  throw AssigningUndefinedVariableException(
       "Error: [Line ${left.lineNum}] Can't set undefined variable ${left.variableName}");
 }
 
@@ -704,7 +704,7 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
       }
     }
   }
-  throw SettingUndefinedVariableException(
+  throw AssigningUndefinedVariableException(
       "Error: [Line ${node.lineNum}] Can't set undefined variable `${node.variableName}`");
 }
 

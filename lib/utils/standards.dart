@@ -536,7 +536,7 @@ AST funcEncodeJson(Runtime runtime, AST self, List args) {
         jsonMap[key] = val.map;
         break;
       default:
-        throw JsonValueTypeException(key, val);
+        throw JsonValueTypeException(key, val.type);
     }
     return;
   });
