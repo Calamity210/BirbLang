@@ -368,6 +368,7 @@ Token collectNumber(Lexer lexer) {
     advance(lexer);
   }
 
+  // double
   if (lexer.currentChar == '.') {
     type = TokenType.TOKEN_DOUBLE_VALUE;
     value += lexer.currentChar;
