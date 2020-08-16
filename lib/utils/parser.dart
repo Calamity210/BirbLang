@@ -894,6 +894,8 @@ AST parseSwitch(Parser parser, Scope scope) {
 
   switchAST.switchDefault = defaultFuncAST;
 
+  eat(parser, TokenType.TOKEN_RBRACE);
+
   return switchAST;
 }
 
