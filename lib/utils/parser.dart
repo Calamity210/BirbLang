@@ -103,13 +103,13 @@ AST parseStatement(Parser parser, Scope scope) {
         if (isModifier(tokenValue)) {
           eat(parser, TokenType.TOKEN_ID);
           if (tokenValue == FINAL)
-            return parseDefinitions(parser, scope, false, true);
+            return parseDefinition(parser, scope, false, true);
 
-          return parseDefinitions(parser, scope, true);
+          return parseDefinition(parser, scope, true);
         }
 
         if (isDataType(tokenValue)) {
-          return parseDefinitions(parser, scope);
+          return parseDefinition(parser, scope);
         }
         switch (tokenValue) {
           case WHILE:
@@ -206,7 +206,7 @@ AST parseStatements(Parser parser, Scope scope) {
   var compound = initASTWithLine(ASTType.AST_COMPOUND, parser.lexer.lineNum);
   compound.scope = scope;
 
-  var statement = parseStatement(parser, scope);
+  AST statement = parseStatement(parser, scope);
 
   compound.compoundValue.add(statement);
 
@@ -412,7 +412,7 @@ AST parseClass(Parser parser, Scope scope) {
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
       ast.classChildren
-          .add(asClassChild(parseDefinitions(parser, newScope), ast));
+          .add(asClassChild(parseDefinition(parser, newScope), ast));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI ||
@@ -423,7 +423,7 @@ AST parseClass(Parser parser, Scope scope) {
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
         ast.classChildren
-            .add(asClassChild(parseDefinitions(parser, newScope), ast));
+            .add(asClassChild(parseDefinition(parser, newScope), ast));
       }
     }
   }
@@ -664,12 +664,12 @@ AST parseTerm(Parser parser, Scope scope) {
   if (isModifier(tokenValue)) {
     eat(parser, TokenType.TOKEN_ID);
     if (tokenValue == FINAL)
-      return parseDefinitions(parser, scope, false, true);
+      return parseDefinition(parser, scope, false, true);
 
-    return parseDefinitions(parser, scope, true);
+    return parseDefinition(parser, scope, true);
   }
 
-  if (isDataType(tokenValue)) return parseDefinitions(parser, scope);
+  if (isDataType(tokenValue)) return parseDefinition(parser, scope);
 
   var node = parseFactor(parser, scope, false);
   AST astBinaryOp;
@@ -900,13 +900,13 @@ AST parseIterate(Parser parser, Scope scope) {
   if (isModifier(parser.curToken.value)) {
     eat(parser, TokenType.TOKEN_ID);
     if (parser.curToken.value == FINAL)
-      return parseDefinitions(parser, scope, false, true);
+      return parseDefinition(parser, scope, false, true);
 
-    return parseDefinitions(parser, scope, true);
+    return parseDefinition(parser, scope, true);
   }
 
   if (isDataType(parser.curToken.value)) {
-    astFuncName = parseDefinitions(parser, scope);
+    astFuncName = parseDefinition(parser, scope);
   } else {
     eat(parser, TokenType.TOKEN_ID);
     astFuncName = parseVariable(parser, scope);
@@ -1009,7 +1009,7 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   return ast;
 }
 
-AST parseDefinitions(Parser parser, Scope scope,
+AST parseDefinition(Parser parser, Scope scope,
     [bool isConst = false, bool isFinal = false]) {
   AST astType = parseType(parser, scope);
 
@@ -1034,9 +1034,9 @@ AST parseDefinitions(Parser parser, Scope scope,
 
   // Function Definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    parseFunctionDefinition(parser, scope, name, astType);
+    return parseFunctionDefinition(parser, scope, name, astType);
   } else {
-    parseVariableDefinition(
+    return parseVariableDefinition(
         parser, scope, name, astType, isEnum, isConst, isFinal);
   }
 }
@@ -1069,12 +1069,12 @@ AST parseFunctionDefinition(
     if (isModifier(parser.curToken.value)) {
       eat(parser, TokenType.TOKEN_ID);
       if (parser.curToken.value == FINAL)
-        return parseDefinitions(parser, scope, false, true);
+        return parseDefinition(parser, scope, false, true);
 
-      return parseDefinitions(parser, scope, true);
+      return parseDefinition(parser, scope, true);
     }
     if (isDataType(parser.curToken.value)) {
-      childDef = parseDefinitions(parser, scope);
+      childDef = parseDefinition(parser, scope);
     } else {
       eat(parser, TokenType.TOKEN_ID);
       childDef = parseVariable(parser, scope);
@@ -1089,13 +1089,13 @@ AST parseFunctionDefinition(
       if (isModifier(parser.curToken.value)) {
         eat(parser, TokenType.TOKEN_ID);
         if (parser.curToken.value == FINAL)
-          return parseDefinitions(parser, scope, false, true);
+          return parseDefinition(parser, scope, false, true);
 
-        return parseDefinitions(parser, scope, true);
+        return parseDefinition(parser, scope, true);
       }
 
       if (isDataType(parser.curToken.value)) {
-        childDef = parseDefinitions(parser, scope);
+        childDef = parseDefinition(parser, scope);
       } else {
         eat(parser, TokenType.TOKEN_ID);
         childDef = parseVariable(parser, scope);
@@ -1115,13 +1115,13 @@ AST parseFunctionDefinition(
     if (isModifier(parser.curToken.value)) {
       eat(parser, TokenType.TOKEN_ID);
       if (parser.curToken.value == FINAL)
-        return parseDefinitions(parser, scope, false, true);
+        return parseDefinition(parser, scope, false, true);
 
-      return parseDefinitions(parser, scope, true);
+      return parseDefinition(parser, scope, true);
     }
 
     if (isDataType(parser.curToken.value)) {
-      childDef = parseDefinitions(parser, scope);
+      childDef = parseDefinition(parser, scope);
     } else {
       eat(parser, TokenType.TOKEN_ID);
       childDef = parseVariable(parser, scope);
@@ -1136,13 +1136,13 @@ AST parseFunctionDefinition(
       if (isModifier(parser.curToken.value)) {
         eat(parser, TokenType.TOKEN_ID);
         if (parser.curToken.value == FINAL)
-          return parseDefinitions(parser, scope, false, true);
+          return parseDefinition(parser, scope, false, true);
 
-        return parseDefinitions(parser, scope, true);
+        return parseDefinition(parser, scope, true);
       }
 
       if (isDataType(parser.curToken.value)) {
-        childDef = parseDefinitions(parser, scope);
+        childDef = parseDefinition(parser, scope);
       } else {
         eat(parser, TokenType.TOKEN_ID);
         childDef = parseVariable(parser, scope);
@@ -1175,8 +1175,7 @@ AST parseVariableDefinition(
     var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
     astType.scope = scope;
 
-    var type = initDataType();
-    type.type = DATATYPE.DATA_TYPE_ENUM;
+    var type = initDataType()..type = DATATYPE.DATA_TYPE_ENUM;
     astType.typeValue = type;
 
     astVarDef.variableType = astType;
