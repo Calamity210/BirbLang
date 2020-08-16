@@ -103,13 +103,13 @@ AST parseStatement(Parser parser, Scope scope) {
         if (isModifier(tokenValue)) {
           eat(parser, TokenType.TOKEN_ID);
           if (tokenValue == FINAL)
-            return parseFuncDef(parser, scope, false, true);
+            return parseDefinitions(parser, scope, false, true);
 
-          return parseFuncDef(parser, scope, true);
+          return parseDefinitions(parser, scope, true);
         }
 
         if (isDataType(tokenValue)) {
-          return parseFuncDef(parser, scope);
+          return parseDefinitions(parser, scope);
         }
         switch (tokenValue) {
           case WHILE:
@@ -411,7 +411,8 @@ AST parseClass(Parser parser, Scope scope) {
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_ID) {
-      ast.classChildren.add(asClassChild(parseFuncDef(parser, newScope), ast));
+      ast.classChildren
+          .add(asClassChild(parseDefinitions(parser, newScope), ast));
     }
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI ||
@@ -422,7 +423,7 @@ AST parseClass(Parser parser, Scope scope) {
 
       if (parser.curToken.type == TokenType.TOKEN_ID) {
         ast.classChildren
-            .add(asClassChild(parseFuncDef(parser, newScope), ast));
+            .add(asClassChild(parseDefinitions(parser, newScope), ast));
       }
     }
   }
@@ -662,12 +663,13 @@ AST parseTerm(Parser parser, Scope scope) {
 
   if (isModifier(tokenValue)) {
     eat(parser, TokenType.TOKEN_ID);
-    if (tokenValue == FINAL) return parseFuncDef(parser, scope, false, true);
+    if (tokenValue == FINAL)
+      return parseDefinitions(parser, scope, false, true);
 
-    return parseFuncDef(parser, scope, true);
+    return parseDefinitions(parser, scope, true);
   }
 
-  if (isDataType(tokenValue)) return parseFuncDef(parser, scope);
+  if (isDataType(tokenValue)) return parseDefinitions(parser, scope);
 
   var node = parseFactor(parser, scope, false);
   AST astBinaryOp;
@@ -898,13 +900,13 @@ AST parseIterate(Parser parser, Scope scope) {
   if (isModifier(parser.curToken.value)) {
     eat(parser, TokenType.TOKEN_ID);
     if (parser.curToken.value == FINAL)
-      return parseFuncDef(parser, scope, false, true);
+      return parseDefinitions(parser, scope, false, true);
 
-    return parseFuncDef(parser, scope, true);
+    return parseDefinitions(parser, scope, true);
   }
 
   if (isDataType(parser.curToken.value)) {
-    astFuncName = parseFuncDef(parser, scope);
+    astFuncName = parseDefinitions(parser, scope);
   } else {
     eat(parser, TokenType.TOKEN_ID);
     astFuncName = parseVariable(parser, scope);
@@ -1007,298 +1009,299 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   return ast;
 }
 
-AST parseFuncDef(Parser parser, Scope scope,
+AST parseDefinitions(Parser parser, Scope scope,
     [bool isConst = false, bool isFinal = false]) {
-  var astType = parseType(parser, scope);
+  AST astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
 
-  String funcName;
-  var isEnum = false;
+  String name;
+  bool isEnum = false;
 
   if (parser.prevToken.value == 'StrBuffer' &&
       parser.curToken.type == TokenType.TOKEN_LPAREN)
     return parseStringBuffer(parser, scope, isConst, isFinal);
 
   if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
-    funcName = parser.curToken.value;
+    name = parser.curToken.value;
 
-    if (parser.curToken.type == TokenType.TOKEN_ID) {
+    if (parser.curToken.type == TokenType.TOKEN_ID)
       eat(parser, TokenType.TOKEN_ID);
-    } else {
+    else
       eat(parser, TokenType.TOKEN_ANON_ID);
-    }
-  } else {
+  } else
     isEnum = true;
-  }
 
-  // Function Definition?, otherwise Variable definition
+  // Function Definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    var ast = initASTWithLine(ASTType.AST_FUNC_DEFINITION, parser.lexer.lineNum)
-      ..funcName = funcName
-      ..funcDefType = astType
-      ..funcDefArgs = [];
-
-    var newScope = initScope(false)..owner = ast;
-
-    eat(parser, TokenType.TOKEN_LPAREN);
-
-    if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
-      ast.funcDefArgs.add(parseExpression(parser, scope));
-
-      while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-        eat(parser, TokenType.TOKEN_COMMA);
-        ast.funcDefArgs.add(parseExpression(parser, scope));
-      }
-    }
-
-    eat(parser, TokenType.TOKEN_RPAREN);
-
-    if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
-      AST childDef;
-
-      if (isModifier(parser.curToken.value)) {
-        eat(parser, TokenType.TOKEN_ID);
-        if (parser.curToken.value == FINAL)
-          return parseFuncDef(parser, scope, false, true);
-
-        return parseFuncDef(parser, scope, true);
-      }
-      if (isDataType(parser.curToken.value)) {
-        childDef = parseFuncDef(parser, scope);
-      } else {
-        eat(parser, TokenType.TOKEN_ID);
-        childDef = parseVariable(parser, scope);
-      }
-
-      childDef.scope = newScope;
-      ast.compChildren.add(childDef);
-
-      while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-        eat(parser, TokenType.TOKEN_COMMA);
-
-        if (isModifier(parser.curToken.value)) {
-          eat(parser, TokenType.TOKEN_ID);
-          if (parser.curToken.value == FINAL)
-            return parseFuncDef(parser, scope, false, true);
-
-          return parseFuncDef(parser, scope, true);
-        }
-
-        if (isDataType(parser.curToken.value)) {
-          childDef = parseFuncDef(parser, scope);
-        } else {
-          eat(parser, TokenType.TOKEN_ID);
-          childDef = parseVariable(parser, scope);
-        }
-
-        childDef.scope = newScope;
-        ast.compChildren.add(childDef);
-      }
-      return ast;
-    }
-
-    if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-      eat(parser, TokenType.TOKEN_EQUAL);
-
-      AST childDef;
-
-      if (isModifier(parser.curToken.value)) {
-        eat(parser, TokenType.TOKEN_ID);
-        if (parser.curToken.value == FINAL)
-          return parseFuncDef(parser, scope, false, true);
-
-        return parseFuncDef(parser, scope, true);
-      }
-
-      if (isDataType(parser.curToken.value)) {
-        childDef = parseFuncDef(parser, scope);
-      } else {
-        eat(parser, TokenType.TOKEN_ID);
-        childDef = parseVariable(parser, scope);
-      }
-
-      childDef.scope = newScope;
-      ast.compChildren.add(childDef);
-
-      while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-        eat(parser, TokenType.TOKEN_COMMA);
-
-        if (isModifier(parser.curToken.value)) {
-          eat(parser, TokenType.TOKEN_ID);
-          if (parser.curToken.value == FINAL)
-            return parseFuncDef(parser, scope, false, true);
-
-          return parseFuncDef(parser, scope, true);
-        }
-
-        if (isDataType(parser.curToken.value)) {
-          childDef = parseFuncDef(parser, scope);
-        } else {
-          eat(parser, TokenType.TOKEN_ID);
-          childDef = parseVariable(parser, scope);
-        }
-
-        childDef.scope = newScope;
-        ast.compChildren.add(childDef);
-      }
-      return ast;
-    }
-    eat(parser, TokenType.TOKEN_LBRACE);
-    ast.funcDefBody = parseStatements(parser, newScope);
-    ast.funcDefBody.scope = newScope;
-    eat(parser, TokenType.TOKEN_RBRACE);
-
-    return ast;
+    parseFunctionDefinition(parser, scope, name, astType);
   } else {
-    var astVarDef =
-        initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum)
-          ..scope = scope
-          ..variableName = funcName
-          ..variableType = astType;
-    astVarDef.isFinal = isFinal;
-
-    if (isEnum) {
-      var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
-      astType.scope = scope;
-
-      var type = initDataType();
-      type.type = DATATYPE.DATA_TYPE_ENUM;
-      astType.typeValue = type;
-
-      astVarDef.variableType = astType;
-      astVarDef.variableValue = parseEnum(parser, scope);
-      astVarDef.variableName = parser.curToken.value;
-      eat(parser, TokenType.TOKEN_ID);
-    }
-
-    if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-      astVarDef.variableValue = parseExpression(parser, scope);
-
-      switch (astVarDef.variableValue.type) {
-        case ASTType.AST_CLASS:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_ENUM:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_COMPOUND:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
-            parserTypeError(parser);
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-      if (isEnum) {
-        parserSyntaxError(parser);
-      }
-
-      eat(parser, TokenType.TOKEN_EQUAL);
-
-      astVarDef.variableValue = parseExpression(parser, scope);
-
-      switch (astVarDef.variableValue.type) {
-        case ASTType.AST_CLASS:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_ENUM:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_STRING:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program.replaceAll(
-                  funcName, '${astVarDef.variableValue.stringValue}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_STRING_BUFFER:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program.replaceAll(funcName,
-                  '${astVarDef.variableValue.stringBuffer.toString()}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_INT:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program
-                  .replaceAll(funcName, '${astVarDef.variableValue.intVal}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_DOUBLE:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program.replaceAll(
-                  funcName, '${astVarDef.variableValue.doubleValue}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_BOOL:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program
-                  .replaceAll(funcName, '${astVarDef.variableValue.boolValue}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_LIST:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program.replaceAll(
-                  funcName, '${astVarDef.variableValue.listElements}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_MAP:
-          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-            astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
-            astVarDef.variableType = astType;
-            if (isConst)
-              parser.lexer.program = parser.lexer.program
-                  .replaceAll(funcName, '${astVarDef.variableValue.map}');
-          }
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
-            parserTypeError(parser);
-          break;
-        case ASTType.AST_COMPOUND:
-          if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
-            parserTypeError(parser);
-          break;
-        default:
-          break;
-      }
-    }
-
-    return astVarDef;
+    parseVariableDefinition(
+        parser, scope, name, astType, isEnum, isConst, isFinal);
   }
+}
+
+AST parseFunctionDefinition(
+    Parser parser, Scope scope, String funcName, AST astType) {
+  var ast = initASTWithLine(ASTType.AST_FUNC_DEFINITION, parser.lexer.lineNum)
+    ..funcName = funcName
+    ..funcDefType = astType
+    ..funcDefArgs = [];
+
+  var newScope = initScope(false)..owner = ast;
+
+  eat(parser, TokenType.TOKEN_LPAREN);
+
+  if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
+    ast.funcDefArgs.add(parseExpression(parser, scope));
+
+    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
+      eat(parser, TokenType.TOKEN_COMMA);
+      ast.funcDefArgs.add(parseExpression(parser, scope));
+    }
+  }
+
+  eat(parser, TokenType.TOKEN_RPAREN);
+
+  if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
+    AST childDef;
+
+    if (isModifier(parser.curToken.value)) {
+      eat(parser, TokenType.TOKEN_ID);
+      if (parser.curToken.value == FINAL)
+        return parseDefinitions(parser, scope, false, true);
+
+      return parseDefinitions(parser, scope, true);
+    }
+    if (isDataType(parser.curToken.value)) {
+      childDef = parseDefinitions(parser, scope);
+    } else {
+      eat(parser, TokenType.TOKEN_ID);
+      childDef = parseVariable(parser, scope);
+    }
+
+    childDef.scope = newScope;
+    ast.compChildren.add(childDef);
+
+    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
+      eat(parser, TokenType.TOKEN_COMMA);
+
+      if (isModifier(parser.curToken.value)) {
+        eat(parser, TokenType.TOKEN_ID);
+        if (parser.curToken.value == FINAL)
+          return parseDefinitions(parser, scope, false, true);
+
+        return parseDefinitions(parser, scope, true);
+      }
+
+      if (isDataType(parser.curToken.value)) {
+        childDef = parseDefinitions(parser, scope);
+      } else {
+        eat(parser, TokenType.TOKEN_ID);
+        childDef = parseVariable(parser, scope);
+      }
+
+      childDef.scope = newScope;
+      ast.compChildren.add(childDef);
+    }
+    return ast;
+  }
+
+  if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
+    eat(parser, TokenType.TOKEN_EQUAL);
+
+    AST childDef;
+
+    if (isModifier(parser.curToken.value)) {
+      eat(parser, TokenType.TOKEN_ID);
+      if (parser.curToken.value == FINAL)
+        return parseDefinitions(parser, scope, false, true);
+
+      return parseDefinitions(parser, scope, true);
+    }
+
+    if (isDataType(parser.curToken.value)) {
+      childDef = parseDefinitions(parser, scope);
+    } else {
+      eat(parser, TokenType.TOKEN_ID);
+      childDef = parseVariable(parser, scope);
+    }
+
+    childDef.scope = newScope;
+    ast.compChildren.add(childDef);
+
+    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
+      eat(parser, TokenType.TOKEN_COMMA);
+
+      if (isModifier(parser.curToken.value)) {
+        eat(parser, TokenType.TOKEN_ID);
+        if (parser.curToken.value == FINAL)
+          return parseDefinitions(parser, scope, false, true);
+
+        return parseDefinitions(parser, scope, true);
+      }
+
+      if (isDataType(parser.curToken.value)) {
+        childDef = parseDefinitions(parser, scope);
+      } else {
+        eat(parser, TokenType.TOKEN_ID);
+        childDef = parseVariable(parser, scope);
+      }
+
+      childDef.scope = newScope;
+      ast.compChildren.add(childDef);
+    }
+    return ast;
+  }
+  eat(parser, TokenType.TOKEN_LBRACE);
+  ast.funcDefBody = parseStatements(parser, newScope);
+  ast.funcDefBody.scope = newScope;
+  eat(parser, TokenType.TOKEN_RBRACE);
+
+  return ast;
+}
+
+AST parseVariableDefinition(
+    Parser parser, Scope scope, String name, AST astType,
+    [bool isEnum = false, bool isConst = false, bool isFinal = false]) {
+  var astVarDef =
+      initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum)
+        ..scope = scope
+        ..variableName = name
+        ..variableType = astType;
+  astVarDef.isFinal = isFinal;
+
+  if (isEnum) {
+    var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
+    astType.scope = scope;
+
+    var type = initDataType();
+    type.type = DATATYPE.DATA_TYPE_ENUM;
+    astType.typeValue = type;
+
+    astVarDef.variableType = astType;
+    astVarDef.variableValue = parseEnum(parser, scope);
+    astVarDef.variableName = parser.curToken.value;
+    eat(parser, TokenType.TOKEN_ID);
+  }
+
+  // Class
+  if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
+    astVarDef.variableValue = parseExpression(parser, scope);
+
+    switch (astVarDef.variableValue.type) {
+      case ASTType.AST_CLASS:
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_ENUM:
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_COMPOUND:
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
+          parserTypeError(parser);
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
+    if (isEnum) parserSyntaxError(parser);
+
+    eat(parser, TokenType.TOKEN_EQUAL);
+
+    astVarDef.variableValue = parseExpression(parser, scope);
+
+    switch (astVarDef.variableValue.type) {
+      case ASTType.AST_STRING:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.stringValue}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_STRING_BUFFER:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program.replaceAll(
+                name, '${astVarDef.variableValue.stringBuffer.toString()}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_INT:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.intVal}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_DOUBLE:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.doubleValue}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_BOOL:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.boolValue}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_LIST:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.listElements}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_MAP:
+        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+          astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
+          astVarDef.variableType = astType;
+          if (isConst)
+            parser.lexer.program = parser.lexer.program
+                .replaceAll(name, '${astVarDef.variableValue.map}');
+        }
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
+          parserTypeError(parser);
+        break;
+      case ASTType.AST_COMPOUND:
+        if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
+          parserTypeError(parser);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return astVarDef;
 }
 
 AST parseStringBuffer(Parser parser, Scope scope,
