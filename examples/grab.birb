@@ -1,4 +1,1 @@
-grab("./examples/class.birb");
-Test.Test("foo", 20);
-screm(Test.getName());
-screm(Test.getAge());
+(screm("foo"););

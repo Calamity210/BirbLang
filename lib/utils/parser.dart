@@ -206,17 +206,6 @@ AST parseStatement(Parser parser, Scope scope) {
 
       return initASTWithLine(ASTType.AST_NOOP, lineNum);
 
-    case TokenType.TOKEN_LPAREN:
-      int lineNum = parser.lexer.lineNum;
-      while(parser.curToken.type != TokenType.TOKEN_RPAREN) {
-        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing parenthesis `)` was found');
-        eat(parser, parser.curToken.type);
-      }
-      eat(parser, TokenType.TOKEN_RPAREN);
-      eat(parser, TokenType.TOKEN_SEMI);
-
-      return initASTWithLine(ASTType.AST_NOOP, lineNum);
-
     case TokenType.TOKEN_LBRACKET:
       int lineNum = parser.lexer.lineNum;
       while(parser.curToken.type != TokenType.TOKEN_RBRACKET) {
