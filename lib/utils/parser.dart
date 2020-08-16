@@ -202,7 +202,6 @@ AST parseStatement(Parser parser, Scope scope) {
         eat(parser, parser.curToken.type);
       }
       eat(parser, TokenType.TOKEN_RBRACE);
-      eat(parser, TokenType.TOKEN_SEMI);
 
       return initASTWithLine(ASTType.AST_NOOP, lineNum);
 
