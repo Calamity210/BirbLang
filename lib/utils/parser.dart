@@ -195,6 +195,39 @@ AST parseStatement(Parser parser, Scope scope) {
       throw UnexpectedTokenException(
           '[Line ${parser.lexer.lineNum}] Expected token `${parser.curToken.value}`');
       break;
+    case TokenType.TOKEN_LBRACE:
+      int lineNum = parser.lexer.lineNum;
+      while(parser.curToken.type != TokenType.TOKEN_RBRACE) {
+        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
+        eat(parser, parser.curToken.type);
+      }
+      eat(parser, TokenType.TOKEN_RBRACE);
+      eat(parser, TokenType.TOKEN_SEMI);
+
+      return initASTWithLine(ASTType.AST_NOOP, lineNum);
+
+    case TokenType.TOKEN_LPAREN:
+      int lineNum = parser.lexer.lineNum;
+      while(parser.curToken.type != TokenType.TOKEN_RPAREN) {
+        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing parenthesis `)` was found');
+        eat(parser, parser.curToken.type);
+      }
+      eat(parser, TokenType.TOKEN_RPAREN);
+      eat(parser, TokenType.TOKEN_SEMI);
+
+      return initASTWithLine(ASTType.AST_NOOP, lineNum);
+
+    case TokenType.TOKEN_LBRACKET:
+      int lineNum = parser.lexer.lineNum;
+      while(parser.curToken.type != TokenType.TOKEN_RBRACKET) {
+        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing bracket `]` was found');
+        eat(parser, parser.curToken.type);
+      }
+      eat(parser, TokenType.TOKEN_RBRACKET);
+      eat(parser, TokenType.TOKEN_SEMI);
+
+      return initASTWithLine(ASTType.AST_NOOP, lineNum);
+
     default:
       return initASTWithLine(ASTType.AST_NOOP, parser.lexer.lineNum);
   }
@@ -211,10 +244,10 @@ AST parseStatements(Parser parser, Scope scope) {
   compound.compoundValue.add(statement);
 
   while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-      statement.type != ASTType.AST_NOOP) {
-    if (parser.curToken.type == TokenType.TOKEN_SEMI) {
+      parser.prevToken.type == TokenType.TOKEN_RBRACE && statement.type != ASTType.AST_NOOP) {
+    if (parser.curToken.type == TokenType.TOKEN_SEMI)
       eat(parser, TokenType.TOKEN_SEMI);
-    }
+
 
     statement = parseStatement(parser, scope);
 

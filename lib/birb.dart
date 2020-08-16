@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/utils/lexer.dart';
 import 'package:Birb/utils/parser.dart';
 import 'package:Birb/utils/runtime.dart';
@@ -31,11 +32,18 @@ Future<void> main(List<String> arguments) async {
       stdout.write('> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
-      if (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
-        while (RegExp('{').allMatches(str).length != RegExp('}').allMatches(str).length) {
+      if (RegExp('{').allMatches(str).length >
+          RegExp('}').allMatches(str).length) {
+        while (RegExp('{').allMatches(str).length >
+            RegExp('}').allMatches(str).length) {
           stdout.write('>> ');
           str += stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
         }
+      }
+
+      if (RegExp('{').allMatches(str).length <
+          RegExp('}').allMatches(str).length) {
+        throw UnexpectedTokenException('Unexpected token `}`');
       }
 
       // Exit shell
@@ -49,7 +57,6 @@ Future<void> main(List<String> arguments) async {
       parser = initParser(lexer);
       node = parse(parser);
       await visit(runtime, node);
-
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
@@ -57,7 +64,30 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Initialize and run program
-  lexer = initLexer(File(arguments[0]).readAsStringSync());
+  String program = File(arguments[0]).readAsStringSync();
+
+  if (RegExp('{').allMatches(program).length !=
+      RegExp('}').allMatches(program).length) {
+    int lParenCount = RegExp('{').allMatches(program).length;
+    Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
+    int rParenCount = rParenMatches.length;
+
+    if (lParenCount > rParenCount) {
+      throw UnexpectedTokenException(
+          '[Line ${program.split('\n').length}] Expected `}`, but got EOF');
+    } else if (lParenCount < rParenCount) {
+      int parenCount = 0;
+      rParenMatches.forEach((e) {
+        parenCount += 1;
+        if (parenCount > lParenCount) {
+          throw UnexpectedTokenException(
+              '[Line ${program.substring(0, e.start).split('\n').length}]');
+        }
+      });
+    }
+  }
+
+  lexer = initLexer(program);
   parser = initParser(lexer);
   node = parse(parser);
   await visit(runtime, node);

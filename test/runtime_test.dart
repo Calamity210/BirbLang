@@ -21,7 +21,33 @@ void main() {
     test.expect(line, test.equals('There is only 1 item in my good list'));
   });
 
-  test.group('All programs run without errors', () {
+  test.group('All testFile programs run without errors', () {
+    Directory directory = Directory('./test/testFiles');
+    directory.listSync().forEach((file) {
+      test.test('${file.path}', () async {
+        var process =
+        await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+
+        while (await process.stderr.hasNext) {
+          var line = await process.stderr.next;
+          test.expect(
+              line.toLowerCase(), test.isNot(test.contains('exception')));
+          test.expect(
+              line.toLowerCase(), test.isNot(test.contains('error')));
+        }
+        while (await process.stdout.hasNext) {
+          var line = await process.stdout.next;
+          test.expect(
+              line.toLowerCase(), test.isNot(test.contains('exception')));
+          test.expect(
+              line.toLowerCase(), test.isNot(test.contains('error')));
+        }
+        await process.shouldExit();
+      });
+    });
+  });
+
+  test.group('All example programs run without errors', () {
     Directory directory = Directory('./examples/');
     directory.listSync().forEach((file) {
       test.test('${file.path}', () async {
