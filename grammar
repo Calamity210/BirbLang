@@ -98,9 +98,13 @@ variableDef -> (enum IDENTIFIER)? expression? ("=" expression)?
 
 funcDef -> "(" (expression ("," expression)*)? ")" 
     ($rBraceRule | $equalRule | "{" statements "}")
-$rBraceRule -> 
+
+$rBraceRule -> variable ("," $defOrIdVar)* ("," $modifier IDENTIFIER)?
+%expressed% -> dead code in first two conditions, RBRACE token is never consumed.
+
 $equalRule -> "=" $modifier definition
 $equalRule -> "=" ($defOrIdVar) ("," ($defOrIdVar))* ("," $modifier definition)?
+
 $defOrIdVar -> definition | IDENTIFIER variable
 
 stringBuffer -> "(" STRING ")"
