@@ -129,12 +129,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
 
   var funcDefBodyScope = fDef.funcDefBody.scope;
 
-  for (int i = funcDefBodyScope.variableDefinitions.length - 1; i > 0; i--) {
-    funcDefBodyScope.variableDefinitions
-        .add(funcDefBodyScope.variableDefinitions[i]);
-
-    funcDefBodyScope.variableDefinitions.length = 0;
-  }
+  funcDefBodyScope.variableDefinitions.clear();
 
   for (int x = 0; x < fCall.funcCallArgs.length; x++) {
     AST astArg = fCall.funcCallArgs[x];
