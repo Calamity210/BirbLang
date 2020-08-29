@@ -67,7 +67,7 @@ class AST {
   String stringValue;
 
   // AST_STRING_BUFFER
-  StringBuffer stringBuffer;
+  StringBuffer strBuffer;
 
   DataType typeValue;
 

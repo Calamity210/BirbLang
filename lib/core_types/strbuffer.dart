@@ -8,7 +8,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
     case 'isEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringBuffer.isEmpty;
+          ..boolValue = left.strBuffer.isEmpty;
 
         return astBool;
       }
@@ -16,14 +16,14 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
     case 'isNotEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringBuffer.isNotEmpty;
+          ..boolValue = left.strBuffer.isNotEmpty;
 
         return astBool;
       }
     case 'length':
       {
         AST astInt = initAST(ASTType.AST_INT)
-          ..intVal = left.stringBuffer.length;
+          ..intVal = left.strBuffer.length;
 
         return astInt;
       }
@@ -38,17 +38,17 @@ AST visitStrBufferMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
       AST strAST = initAST(ASTType.AST_STRING)
-        ..stringValue = left.stringBuffer.toString();
+        ..stringValue = left.strBuffer.toString();
       return strAST;
 
     case 'clear':
-      left.stringBuffer.clear();
+      left.strBuffer.clear();
       return left;
 
     case 'write':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-      left.stringBuffer
+      left.strBuffer
           .write((node.binaryOpRight.funcCallArgs[0] as AST).stringValue);
       return left;
 
@@ -56,19 +56,19 @@ AST visitStrBufferMethods(AST node, AST left) {
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
 
       (node.binaryOpRight.funcCallArgs[0] as AST).listElements.forEach((e) {
-        left.stringBuffer.write((e as AST).stringValue);
+        left.strBuffer.write((e as AST).stringValue);
       });
       return left;
 
     case 'writeAsciiCode':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-      left.stringBuffer
+      left.strBuffer
           .writeCharCode((node.binaryOpRight.funcCallArgs[0] as AST).intVal);
       return left;
 
     case 'writeLine':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-      left.stringBuffer.write(
+      left.strBuffer.write(
           '${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
   }
   throw NoSuchMethodException(

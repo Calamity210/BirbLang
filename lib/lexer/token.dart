@@ -39,6 +39,7 @@ enum TokenType {
   TOKEN_OR,
   TOKEN_QUESTION,
   TOKEN_COLON,
+  TOKEN_AT,
   TOKEN_EOF
 }
 

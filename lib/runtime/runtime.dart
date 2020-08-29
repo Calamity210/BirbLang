@@ -1,3 +1,4 @@
+import 'package:Birb/core_types/int.dart';
 import 'package:Birb/core_types/list.dart';
 import 'package:Birb/core_types/strbuffer.dart';
 import 'package:Birb/core_types/strings.dart';
@@ -784,7 +785,7 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       finalRes.stringValue = '';
     } else if (dataType == DATATYPE.DATA_TYPE_STRING_BUFFER) {
       finalRes.type = ASTType.AST_STRING_BUFFER;
-      finalRes.stringBuffer = StringBuffer();
+      finalRes.strBuffer = StringBuffer();
     }
 
     var callArgs = [];
@@ -916,6 +917,21 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
           return visitStrBufferMethods(node, left);
         break;
+      case ASTType.AST_INT:
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitIntProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitIntMethods(node, left);
+        break;
+      case ASTType.AST_DOUBLE:
+        // TODO(Calamity210): Handle this case.
+        break;
+      case ASTType.AST_MAP:
+        // TODO(Calamity210): Handle this case.
+        break;
+      case ASTType.AST_BOOL:
+        // TODO(Calamity210): Handle this case.
+        break;
       case ASTType.AST_CLASS:
         AST binOpRight = node.binaryOpRight;
         if (binOpRight.type == ASTType.AST_VARIABLE ||
@@ -943,18 +959,6 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
           node.enumElements = left.enumElements;
           node.scope = left.scope;
         }
-        break;
-      case ASTType.AST_DOUBLE:
-        // TODO(Calamity210): Handle this case.
-        break;
-      case ASTType.AST_MAP:
-        // TODO(Calamity210): Handle this case.
-        break;
-      case ASTType.AST_BOOL:
-        // TODO(Calamity210): Handle this case.
-        break;
-      case ASTType.AST_INT:
-        // TODO(Calamity210): Handle this case.
         break;
       default:
         throw UnexpectedTokenException('Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`');

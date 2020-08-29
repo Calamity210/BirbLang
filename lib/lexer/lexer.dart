@@ -39,165 +39,153 @@ Token getNextToken(Lexer lexer) {
       return collectId(lexer);
     }
 
-    // +
-    if (lexer.currentChar == '+') {
-      String value = lexer.currentChar;
-      TokenType type = TokenType.TOKEN_PLUS;
-      advance(lexer);
-
-      // ++
-      if (lexer.currentChar == '+') {
-        type = TokenType.TOKEN_PLUS_PLUS;
-        value += lexer.currentChar;
+    switch(lexer.currentChar) {
+      case '@':
+        return initToken(TokenType.TOKEN_AT, lexer.currentChar);
+      case '+':
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_PLUS;
         advance(lexer);
-      }
 
-      // +=
-      else if (lexer.currentChar == '=') {
-        type = TokenType.TOKEN_PLUS_EQUAL;
-        value += lexer.currentChar;
+        // ++
+        if (lexer.currentChar == '+') {
+          type = TokenType.TOKEN_PLUS_PLUS;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        // +=
+        else if (lexer.currentChar == '=') {
+          type = TokenType.TOKEN_PLUS_EQUAL;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        return initToken(type, value);
+      case '-':
+
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_SUB;
+
         advance(lexer);
-      }
 
-      return initToken(type, value);
+        // --
+        if (lexer.currentChar == '-') {
+          type = TokenType.TOKEN_SUB_SUB;
+          value += lexer.currentChar;
+
+          advance(lexer);
+        }
+
+        // -=
+        else if (lexer.currentChar == '=') {
+          type = TokenType.TOKEN_SUB_EQUAL;
+          value += lexer.currentChar;
+
+          advance(lexer);
+        }
+
+        return initToken(type, value);
+      case '*':
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_MUL;
+        advance(lexer);
+
+        // **
+        if (lexer.currentChar == '*') {
+          type = TokenType.TOKEN_MUL_MUL;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        // *=
+        else if (lexer.currentChar == '=') {
+          type = TokenType.TOKEN_MUL_EQUAL;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        return initToken(type, value);
+      case '&':
+        String value = lexer.currentChar;
+        advance(lexer);
+
+        // &&
+        if (lexer.currentChar == '&') {
+          value += lexer.currentChar;
+
+          advance(lexer);
+
+          return initToken(TokenType.TOKEN_AND, value);
+        }
+        break;
+      case '|':
+        String value = lexer.currentChar;
+
+        advance(lexer);
+
+        // ||
+        if (lexer.currentChar == '|') {
+          value += lexer.currentChar;
+          advance(lexer);
+          return initToken(TokenType.TOKEN_OR, value);
+        }
+        break;
+      case '=':
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_EQUAL;
+
+        advance(lexer);
+
+        // ==
+        if (lexer.currentChar == '=') {
+          type = TokenType.TOKEN_EQUALITY;
+          value += lexer.currentChar;
+
+          advance(lexer);
+        }
+
+        return initToken(type, value);
+      case '!':
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_NOT;
+        advance(lexer);
+
+        // !=
+        if (lexer.currentChar == '=') {
+          type = TokenType.TOKEN_NOT_EQUAL;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        return initToken(type, value);
+      case '/':
+        advance(lexer);
+
+        // Inline comment
+        if (lexer.currentChar == '/') {
+          advance(lexer);
+          skipInlineComment(lexer);
+          continue;
+        } else if (lexer.currentChar == '*') {
+          // Block comment
+          advance(lexer);
+          skipBlockComment(lexer);
+          continue;
+        } else {
+          return initToken(TokenType.TOKEN_DIV, '/');
+        }
     }
 
-    // -
-    if (lexer.currentChar == '-') {
-      String value = lexer.currentChar;
-      TokenType type = TokenType.TOKEN_SUB;
-
-      advance(lexer);
-
-      // --
-      if (lexer.currentChar == '-') {
-        type = TokenType.TOKEN_SUB_SUB;
-        value += lexer.currentChar;
-
-        advance(lexer);
-      }
-
-      // -=
-      else if (lexer.currentChar == '=') {
-        type = TokenType.TOKEN_SUB_EQUAL;
-        value += lexer.currentChar;
-
-        advance(lexer);
-      }
-
-      return initToken(type, value);
-    }
-
-    // *
-    if (lexer.currentChar == '*') {
-      String value = lexer.currentChar;
-      TokenType type = TokenType.TOKEN_MUL;
-      advance(lexer);
-
-      // **
-      if (lexer.currentChar == '*') {
-        type = TokenType.TOKEN_MUL_MUL;
-        value += lexer.currentChar;
-        advance(lexer);
-      }
-
-      // *=
-      else if (lexer.currentChar == '=') {
-        type = TokenType.TOKEN_MUL_EQUAL;
-        value += lexer.currentChar;
-        advance(lexer);
-      }
-
-      return initToken(type, value);
-    }
-
-    // &
-    if (lexer.currentChar == '&') {
-      String value = lexer.currentChar;
-      advance(lexer);
-
-      // &&
-      if (lexer.currentChar == '&') {
-        value += lexer.currentChar;
-
-        advance(lexer);
-
-        return initToken(TokenType.TOKEN_AND, value);
-      }
-    }
-
-    if (lexer.currentChar == '|') {
-      String value = lexer.currentChar;
-
-      advance(lexer);
-
-      // ||
-      if (lexer.currentChar == '|') {
-        value += lexer.currentChar;
-        advance(lexer);
-        return initToken(TokenType.TOKEN_OR, value);
-      }
-    }
-
-    if (lexer.currentChar == '=') {
-      String value = lexer.currentChar;
-      TokenType type = TokenType.TOKEN_EQUAL;
-
-      advance(lexer);
-
-      // ==
-      if (lexer.currentChar == '=') {
-        type = TokenType.TOKEN_EQUALITY;
-        value += lexer.currentChar;
-
-        advance(lexer);
-      }
-
-      return initToken(type, value);
-    }
-
-    if (lexer.currentChar == '!') {
-      String value = lexer.currentChar;
-      TokenType type = TokenType.TOKEN_NOT;
-      advance(lexer);
-
-      // !=
-      if (lexer.currentChar == '=') {
-        type = TokenType.TOKEN_NOT_EQUAL;
-        value += lexer.currentChar;
-        advance(lexer);
-      }
-
-      return initToken(type, value);
-    }
-
-    if (lexer.currentChar == '/') {
-      advance(lexer);
-
-      // Inline comment
-      if (lexer.currentChar == '/') {
-        advance(lexer);
-        skipInlineComment(lexer);
-        continue;
-      } else if (lexer.currentChar == '*') {
-        // Block comment
-        advance(lexer);
-        skipBlockComment(lexer);
-        continue;
-      } else {
-        return initToken(TokenType.TOKEN_DIV, '/');
-      }
-    }
 
     // END OF FILE
-    if (lexer.currentChar == '' || lexer.currentChar == null) {
+    if (lexer.currentChar == '' || lexer.currentChar == null)
       return initToken(TokenType.TOKEN_EOF, '');
-    }
 
     switch (lexer.currentChar) {
       case '"':
         return collectString(lexer);
-      case '\'':
+      case "'":
         return collectSingleQuoteString(lexer);
       case '{':
         return advanceWithToken(lexer, TokenType.TOKEN_LBRACE);

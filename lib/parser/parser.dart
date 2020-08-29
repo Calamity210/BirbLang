@@ -170,6 +170,47 @@ AST parseStatement(Parser parser, Scope scope) {
         if (a != null) return a;
       }
       break;
+    // DRAFT
+    case TokenType.TOKEN_AT:
+      // TODO(Calamity210): correct implementation to make it more scalable
+
+      // @dart(alias) {}
+      eat(parser, TokenType.TOKEN_AT);
+      eat(parser, TokenType.TOKEN_ID);
+      eat(parser, TokenType.TOKEN_LPAREN);
+
+      AST ast = initASTWithLine(ASTType.AST_CLASS, parser.lexer.lineNum)
+        ..scope = scope
+        ..classChildren = [];
+
+      Scope newScope = initScope(false);
+
+      if (scope != null && scope.owner != null) newScope.owner = scope.owner;
+
+      eat(parser, TokenType.TOKEN_ID);
+      eat(parser, TokenType.TOKEN_RPAREN);
+
+      eat(parser, TokenType.TOKEN_LBRACE);
+
+      if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
+        if (parser.curToken.type == TokenType.TOKEN_ID)
+          ast.classChildren
+              .add(asClassChild(parseDefinition(parser, newScope), ast));
+
+        while (parser.curToken.type == TokenType.TOKEN_SEMI ||
+            (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
+                parser.curToken.type != TokenType.TOKEN_RBRACE)) {
+          if (parser.curToken.type == TokenType.TOKEN_SEMI)
+            eat(parser, TokenType.TOKEN_SEMI);
+
+          if (parser.curToken.type == TokenType.TOKEN_ID)
+            ast.classChildren
+                .add(asClassChild(parseDefinition(parser, newScope), ast));
+        }
+      }
+      eat(parser, TokenType.TOKEN_RBRACE);
+
+      break;
     case TokenType.TOKEN_NUMBER_VALUE:
     case TokenType.TOKEN_STRING_VALUE:
     case TokenType.TOKEN_DOUBLE_VALUE:
@@ -197,8 +238,10 @@ AST parseStatement(Parser parser, Scope scope) {
       break;
     case TokenType.TOKEN_LBRACE:
       int lineNum = parser.lexer.lineNum;
-      while(parser.curToken.type != TokenType.TOKEN_RBRACE) {
-        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
+      while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
+        if (parser.lexer.currentIndex == parser.lexer.program.length)
+          throw UnexpectedTokenException(
+              '[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
         eat(parser, parser.curToken.type);
       }
       eat(parser, TokenType.TOKEN_RBRACE);
@@ -207,8 +250,10 @@ AST parseStatement(Parser parser, Scope scope) {
 
     case TokenType.TOKEN_LBRACKET:
       int lineNum = parser.lexer.lineNum;
-      while(parser.curToken.type != TokenType.TOKEN_RBRACKET) {
-        if (parser.lexer.currentIndex == parser.lexer.program.length) throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing bracket `]` was found');
+      while (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
+        if (parser.lexer.currentIndex == parser.lexer.program.length)
+          throw UnexpectedTokenException(
+              '[Lines $lineNum-${parser.lexer.lineNum}] No closing bracket `]` was found');
         eat(parser, parser.curToken.type);
       }
       eat(parser, TokenType.TOKEN_RBRACKET);
@@ -232,10 +277,10 @@ AST parseStatements(Parser parser, Scope scope) {
   compound.compoundValue.add(statement);
 
   while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-      parser.prevToken.type == TokenType.TOKEN_RBRACE && statement.type != ASTType.AST_NOOP) {
+      parser.prevToken.type == TokenType.TOKEN_RBRACE &&
+          statement.type != ASTType.AST_NOOP) {
     if (parser.curToken.type == TokenType.TOKEN_SEMI)
       eat(parser, TokenType.TOKEN_SEMI);
-
 
     statement = parseStatement(parser, scope);
 
@@ -246,8 +291,8 @@ AST parseStatements(Parser parser, Scope scope) {
 }
 
 AST parseType(Parser parser, Scope scope) {
-  var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
-  astType.scope = scope;
+  AST astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum)
+    ..scope = scope;
 
   var type = initDataType();
 
@@ -415,10 +460,14 @@ AST parseVariable(Parser parser, Scope scope) {
   return ast;
 }
 
-AST parseClass(Parser parser, Scope scope) {
+AST parseBrace(Parser parser, Scope scope) {
   if (parser.prevToken.type != TokenType.TOKEN_ID)
     return parseMap(parser, scope);
 
+  return parseClass(parser, scope);
+}
+
+AST parseClass(Parser parser, Scope scope) {
   AST ast = initASTWithLine(ASTType.AST_CLASS, parser.lexer.lineNum);
 
   ast.scope = scope;
@@ -670,7 +719,7 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
     case TokenType.TOKEN_STRING_VALUE:
       return parseString(parser, scope);
     case TokenType.TOKEN_LBRACE:
-      return parseClass(parser, scope);
+      return parseBrace(parser, scope);
     case TokenType.TOKEN_LBRACKET:
       return parseList(parser, scope);
     default:
@@ -684,8 +733,7 @@ AST parseTerm(Parser parser, Scope scope) {
 
   if (isModifier(tokenValue)) {
     eat(parser, TokenType.TOKEN_ID);
-    if (tokenValue == FINAL)
-      return parseDefinition(parser, scope, false, true);
+    if (tokenValue == FINAL) return parseDefinition(parser, scope, false, true);
 
     return parseDefinition(parser, scope, true);
   }
@@ -1043,7 +1091,7 @@ AST parseDefinition(Parser parser, Scope scope,
 
   if (parser.prevToken.value == 'StrBuffer' &&
       parser.curToken.type == TokenType.TOKEN_LPAREN)
-    return parseStringBuffer(parser, scope, isConst, isFinal);
+    return parseStrBuffer(parser, scope, isConst, isFinal);
 
   if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
     name = parser.curToken.value;
@@ -1254,7 +1302,7 @@ AST parseVariableDefinition(
           astVarDef.variableType = astType;
           if (isConst)
             parser.lexer.program = parser.lexer.program.replaceAll(
-                name, '${astVarDef.variableValue.stringBuffer.toString()}');
+                name, '${astVarDef.variableValue.strBuffer.toString()}');
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
           parserTypeError(parser);
@@ -1326,12 +1374,12 @@ AST parseVariableDefinition(
   return astVarDef;
 }
 
-AST parseStringBuffer(Parser parser, Scope scope,
+AST parseStrBuffer(Parser parser, Scope scope,
     [bool isConst = false, bool isFinal = false]) {
   eat(parser, TokenType.TOKEN_LPAREN);
   AST strBufferAST =
       initASTWithLine(ASTType.AST_STRING_BUFFER, parser.lexer.lineNum)
-        ..stringBuffer = StringBuffer(parser.curToken.value)
+        ..strBuffer = StringBuffer(parser.curToken.value)
         ..isFinal = isFinal;
 
   eat(parser, TokenType.TOKEN_STRING_VALUE);
