@@ -35,6 +35,7 @@ variable -> expression[start="}"]
         | "=" expression
         | $doubleCharOp
         | $opEqualOp expression
+        | #empty <- consumes nothing
 $doubleCharOp -> "++" | "--" | "**"
 $opEqualOp -> "+=" | "-=" | "*=" | "/=" | "%="
 
