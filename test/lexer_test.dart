@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:Birb/utils/lexer.dart';
-import 'package:Birb/utils/token.dart';
+import 'package:Birb/lexer/lexer.dart';
+import 'package:Birb/lexer/token.dart';
 import 'package:test/test.dart' as test;
 
 void main() {

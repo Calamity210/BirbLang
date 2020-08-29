@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:Birb/utils/exceptions.dart';
 
-import 'AST.dart';
-import 'data_type.dart';
-import 'scope.dart';
+import '../utils/AST.dart';
+import '../parser/data_type.dart';
+import '../utils/scope.dart';
 import 'standards.dart';
-import 'token.dart';
+import '../lexer/token.dart';
 
 class Runtime {
   Scope scope;

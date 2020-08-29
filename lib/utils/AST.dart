@@ -1,7 +1,7 @@
-import 'data_type.dart';
-import 'runtime.dart';
+import '../parser/data_type.dart';
+import '../runtime/runtime.dart';
 import 'scope.dart';
-import 'token.dart';
+import '../lexer/token.dart';
 
 typedef AstFuncPointer = AST Function(Runtime runtime, AST self, List args);
 typedef AstFutureFuncPointer = Future<AST> Function(

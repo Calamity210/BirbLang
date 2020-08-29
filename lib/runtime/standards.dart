@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:http/http.dart';
 
-import 'AST.dart';
-import 'data_type.dart';
-import 'lexer.dart';
-import 'parser.dart';
+import '../utils/AST.dart';
+import '../parser/data_type.dart';
+import '../lexer/lexer.dart';
+import '../parser/parser.dart';
 import 'runtime.dart';
 
 AST INITIALIZED_NOOP;

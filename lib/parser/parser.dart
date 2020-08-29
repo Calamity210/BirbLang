@@ -1,11 +1,11 @@
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
 
-import 'AST.dart';
+import '../utils/AST.dart';
 import 'data_type.dart';
-import 'lexer.dart';
-import 'scope.dart';
-import 'token.dart';
+import '../lexer/lexer.dart';
+import '../utils/scope.dart';
+import '../lexer/token.dart';
 
 class Parser {
   Lexer lexer;
