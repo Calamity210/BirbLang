@@ -19,7 +19,7 @@ void initStandards(Runtime runtime) async {
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'openFile', funcFileOpen);
   registerGlobalFunction(runtime, 'writeFile', funcFileWrite);
-  registerGlobalFunction(runtime, 'input', funcInput);
+  registerGlobalFunction(runtime, 'mock', funcMock);
   registerGlobalFunction(runtime, 'Date', funcDate);
   registerGlobalFunction(runtime, 'Time', funcTime);
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
@@ -62,7 +62,7 @@ AST funcScrem(Runtime runtime, AST self, List args) {
 }
 
 /// STDIN
-AST funcInput(Runtime runtime, AST self, List args) {
+AST funcMock(Runtime runtime, AST self, List args) {
   var astString = initAST(ASTType.AST_STRING);
   astString.stringValue =
       stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
@@ -127,7 +127,7 @@ AST funcFileOpen(Runtime runtime, AST self, List args) {
 
     var fDefRead = initAST(ASTType.AST_FUNC_DEFINITION);
     fDefRead.funcName = 'read';
-    fDefRead.fptr = objFileFuncRead;
+    fDefRead.funcPointer = objFileFuncRead;
 
     astObj.funcDefinitions = [];
     astObj.funcDefinitions.add(fDefRead);

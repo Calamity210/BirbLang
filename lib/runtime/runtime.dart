@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:Birb/core_types/list.dart';
+import 'package:Birb/core_types/strbuffer.dart';
+import 'package:Birb/core_types/strings.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 import '../utils/AST.dart';
@@ -28,22 +28,22 @@ Runtime initRuntime() {
 
   var LIST_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
   LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  LIST_ADD_FUNCTION_DEFINITION.fptr = listAddFPtr;
+  LIST_ADD_FUNCTION_DEFINITION.funcPointer = listAddFuncPointer;
   runtime.listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
 
   var LIST_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
   LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  LIST_REMOVE_FUNCTION_DEFINITION.fptr = listRemoveFptr;
+  LIST_REMOVE_FUNCTION_DEFINITION.funcPointer = listRemoveFuncPointer;
   runtime.listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
 
   var MAP_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
   MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  MAP_ADD_FUNCTION_DEFINITION.fptr = mapAddFPtr;
+  MAP_ADD_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
   runtime.mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
 
   var MAP_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
   MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  MAP_REMOVE_FUNCTION_DEFINITION.fptr = mapAddFPtr;
+  MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
   runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
 
   return runtime;
@@ -58,13 +58,13 @@ void multipleVariableDefinitionsError(int lineNum, String variableName) {
       '[Line $lineNum] variable `$variableName` is already defined');
 }
 
-AST listAddFPtr(Runtime runtime, AST self, List args) {
+AST listAddFuncPointer(Runtime runtime, AST self, List args) {
   self.listElements.addAll(args);
 
   return self;
 }
 
-AST listRemoveFptr(Runtime runtime, AST self, List args) {
+AST listRemoveFuncPointer(Runtime runtime, AST self, List args) {
   runtimeExpectArgs(args, [ASTType.AST_INT]);
 
   AST ast_int = args[0];
@@ -78,14 +78,14 @@ AST listRemoveFptr(Runtime runtime, AST self, List args) {
   return self;
 }
 
-AST mapAddFPtr(Runtime runtime, AST self, List args) {
+AST mapAddFuncPointer(Runtime runtime, AST self, List args) {
   runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_ANY]);
 
   self.map[args[0]] = args[1];
   return self;
 }
 
-AST mapRemoveFptr(Runtime runtime, AST self, List args) {
+AST mapRemoveFuncPointer(Runtime runtime, AST self, List args) {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   AST astString = args[0];
@@ -160,37 +160,37 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
   return await visit(runtime, fDef.funcDefBody);
 }
 
-AST registerGlobalFunction(Runtime runtime, String fName, AstFuncPointer fptr) {
+AST registerGlobalFunction(Runtime runtime, String fName, AstFuncPointer funcPointer) {
   var fDef = initAST(ASTType.AST_FUNC_DEFINITION);
   fDef.funcName = fName;
-  fDef.fptr = fptr;
+  fDef.funcPointer = funcPointer;
   runtime.scope.functionDefinitions.add(fDef);
   return fDef;
 }
 
 AST registerGlobalFutureFunction(
-    Runtime runtime, String fName, AstFutureFuncPointer fptr) {
+    Runtime runtime, String fName, AstFutureFuncPointer funcPointer) {
   var fDef = initAST(ASTType.AST_FUNC_DEFINITION)
     ..funcName = fName
-    ..futureptr = fptr;
+    ..futureptr = funcPointer;
   runtime.scope.functionDefinitions.add(fDef);
   return fDef;
 }
 
-AST registerGlobalVariable(Runtime runtime, String vname, String vval) {
-  var vdef = initAST(ASTType.AST_VARIABLE_DEFINITION)
-    ..variableName = vname
+AST registerGlobalVariable(Runtime runtime, String varName, String varVal) {
+  AST varDef = initAST(ASTType.AST_VARIABLE_DEFINITION)
+    ..variableName = varName
     ..variableType = initAST(ASTType.AST_STRING)
     ..variableValue = initAST(ASTType.AST_STRING)
-    ..variableValue.stringValue = vval;
-  runtime.scope.variableDefinitions.add(vdef);
-  return vdef;
+    ..variableValue.stringValue = varVal;
+  runtime.scope.variableDefinitions.add(varDef);
+  return varDef;
 }
 
-AST registerFunction(Scope scope, String fName, AstFuncPointer fptr) {
+AST registerFunction(Scope scope, String fName, AstFuncPointer funcPointer) {
   AST fDef = initAST(ASTType.AST_FUNC_DEFINITION);
   fDef.funcName = fName;
-  fDef.fptr = fptr;
+  fDef.funcPointer = funcPointer;
   scope.functionDefinitions.add(fDef);
 
   return fDef;
@@ -494,7 +494,6 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
     var varDef = await getVarDefByName(runtime, globalScope, left.variableName);
 
     if (varDef != null) {
-      //TODO: Change to node variableAssignLeft variableValue if it breaks anything
       var value = await visit(runtime, node.variableValue);
 
       if (value == null) return null;
@@ -721,7 +720,7 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
   if (funcDef == null) return null;
 
   if (funcDef.futureptr != null) {
-    var visitedFptrArgs = [];
+    var visitedFuncPointerArgs = [];
 
     for (int i = 0; i < node.funcCallArgs.length; i++) {
       AST astArg = node.funcCallArgs[i];
@@ -735,17 +734,17 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       }
 
       visited = visited ?? await visit(runtime, astArg);
-      await visitedFptrArgs.add(visited);
+      await visitedFuncPointerArgs.add(visited);
     }
 
     var ret = await visit(runtime,
-        await funcDef.futureptr(runtime, funcDef, await visitedFptrArgs));
+        await funcDef.futureptr(runtime, funcDef, await visitedFuncPointerArgs));
 
     return ret;
   }
 
-  if (funcDef.fptr != null) {
-    var visitedFptrArgs = [];
+  if (funcDef.funcPointer != null) {
+    var visitedFuncPointerArgs = [];
 
     for (int i = 0; i < node.funcCallArgs.length; i++) {
       AST astArg = node.funcCallArgs[i];
@@ -759,11 +758,11 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       }
 
       visited = visited ?? await visit(runtime, astArg);
-      await visitedFptrArgs.add(visited);
+      await visitedFuncPointerArgs.add(visited);
     }
 
     var ret = await visit(
-        runtime, funcDef.fptr(runtime, funcDef, await visitedFptrArgs));
+        runtime, funcDef.funcPointer(runtime, funcDef, await visitedFuncPointerArgs));
 
     return ret;
   }
@@ -899,53 +898,67 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
   } else {
     var left = await visit(runtime, node.binaryOpLeft);
     // TODO (Calamity): Handle Maps, ints and doubles + use a switch
-    if (left.type == ASTType.AST_LIST) {
-      // TODO (Calamity): Move to functions
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-        if (node.binaryOpRight.variableName == 'length') {
-          var intAST = initAST(ASTType.AST_INT);
 
-          intAST.intVal = left.listElements.length;
-
-          return intAST;
+    switch(left.type) {
+      case ASTType.AST_LIST:
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitListProperties(node, left);
+        break;
+      case ASTType.AST_STRING:
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitStringProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitStringMethods(node, left);
+        break;
+      case ASTType.AST_STRING_BUFFER:
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitStrBufferProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitStrBufferMethods(node, left);
+        break;
+      case ASTType.AST_CLASS:
+        AST binOpRight = node.binaryOpRight;
+        if (binOpRight.type == ASTType.AST_VARIABLE ||
+            binOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
+            binOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
+            binOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
+          binOpRight.classChildren = left.classChildren;
+          binOpRight.scope = left.scope;
+          binOpRight.isClassChild = true;
+          node.classChildren = left.classChildren;
+          node.scope = left.scope;
         }
-      }
-    }
-    if (left.type == ASTType.AST_STRING) {
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
-        return visitStringProperties(node, left);
-      else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
-        return visitStringMethods(node, left);
-    }
-    if (left.type == ASTType.AST_STRING_BUFFER) {
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
-        return visitStrBufProperties(node, left);
-      else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
-        return visitStrBufMethods(node, left);
-    } else if (left.type == ASTType.AST_CLASS) {
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE ||
-          node.binaryOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
-          node.binaryOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
-          node.binaryOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
-        node.binaryOpRight.classChildren = left.classChildren;
-        node.binaryOpRight.scope = left.scope;
-        node.binaryOpRight.isClassChild = true;
-        node.classChildren = left.classChildren;
-        node.scope = left.scope;
-      } else if (node.binaryOpRight.type == ASTType.AST_LIST_ACCESS) {
+        break;
+      case ASTType.AST_LIST_ACCESS:
         node.binaryOpRight.binaryOpLeft.classChildren = left.classChildren;
         node.binaryOpRight.binaryOpLeft.scope = left.scope;
         node.binaryOpRight.binaryOpLeft.isClassChild = true;
         node.binaryOpRight.classChildren = left.classChildren;
         node.binaryOpRight.scope = left.scope;
-      }
-    } else if (left.type == ASTType.AST_ENUM) {
-      if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
-        node.binaryOpRight.enumElements = left.enumElements;
-        node.binaryOpRight.scope = left.scope;
-        node.enumElements = left.enumElements;
-        node.scope = left.scope;
-      }
+        break;
+      case ASTType.AST_ENUM:
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE) {
+          node.binaryOpRight.enumElements = left.enumElements;
+          node.binaryOpRight.scope = left.scope;
+          node.enumElements = left.enumElements;
+          node.scope = left.scope;
+        }
+        break;
+      case ASTType.AST_DOUBLE:
+        // TODO(Calamity210): Handle this case.
+        break;
+      case ASTType.AST_MAP:
+        // TODO(Calamity210): Handle this case.
+        break;
+      case ASTType.AST_BOOL:
+        // TODO(Calamity210): Handle this case.
+        break;
+      case ASTType.AST_INT:
+        // TODO(Calamity210): Handle this case.
+        break;
+      default:
+        throw UnexpectedTokenException('Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`');
+        break;
     }
 
     if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL) {
@@ -957,19 +970,19 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
             AST fDef = left.funcDefinitions[i];
 
             if (fDef.funcName == funcCallName) {
-              if (fDef.fptr != null) {
-                var visitedFptrArgs = [];
+              if (fDef.funcPointer != null) {
+                var visitedFuncPointerArgs = [];
 
                 for (int j = 0;
                     j < node.binaryOpRight.funcCallArgs.length;
                     j++) {
                   AST astArg = node.binaryOpRight.funcCallArgs[j];
                   var visited = await visit(runtime, astArg);
-                  await visitedFptrArgs.add(visited);
+                  await visitedFuncPointerArgs.add(visited);
                 }
 
                 return await visit(
-                    runtime, fDef.fptr(runtime, left, await visitedFptrArgs));
+                    runtime, fDef.funcPointer(runtime, left, await visitedFuncPointerArgs));
               }
             }
           }
@@ -991,7 +1004,7 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
 
     node.scope = getScope(runtime, left);
 
-    var newAST = await visit(runtime, node.binaryOpRight);
+    AST newAST = await visit(runtime, node.binaryOpRight);
 
     return await visit(runtime, newAST);
   }
@@ -1768,7 +1781,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
       fDef = scope.functionDefinitions[i];
 
       if (fDef.funcName == node.iterateFunction.variableName) {
-        if (fDef.fptr != null)
+        if (fDef.funcPointer != null)
           throw UnexpectedTypeException(
               'Error: Can not iterate with native method');
         break;
@@ -1869,373 +1882,4 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
       throw InvalidArgumentsException('Got unexpected arguments, terminating');
     }
   }
-}
-
-/// Visits properties for `String`
-AST visitStringProperties(AST node, AST left) {
-  switch (node.binaryOpRight.variableName) {
-    case 'codeUnits':
-      {
-        AST astList = initAST(ASTType.AST_LIST)
-          ..listElements = left.stringValue.codeUnits;
-        return astList;
-      }
-
-    case 'isEmpty':
-      {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isEmpty;
-        return astBool;
-      }
-
-    case 'isNotEmpty':
-      {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isNotEmpty;
-        return astBool;
-      }
-
-    case 'input':
-      {
-        print(left.stringValue);
-        AST astString = initAST(ASTType.AST_STRING)
-          ..stringValue =
-              stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
-
-        return astString;
-      }
-
-    case 'length':
-      {
-        var intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
-
-        return intAST;
-      }
-    case 'toBinary':
-      {
-        AST astList = initAST(ASTType.AST_LIST)
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(2))
-              .toList();
-
-        return astList;
-      }
-    case 'toOct':
-      {
-        AST astList = initAST(ASTType.AST_LIST)
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(8))
-              .toList();
-
-        return astList;
-      }
-    case 'toHex':
-      {
-        AST astList = initAST(ASTType.AST_LIST)
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(16))
-              .toList();
-
-        return astList;
-      }
-
-    case 'toDec':
-      {
-        AST astList = initAST(ASTType.AST_LIST)
-          ..listElements = left.stringValue.codeUnits;
-        return astList;
-      }
-
-    default:
-      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
-  }
-}
-
-/// Visits methods for `String`
-AST visitStringMethods(AST node, AST left) {
-  switch (node.binaryOpRight.funcCallExpression.variableName) {
-    case 'codeUnitAt':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-
-        AST ast = initAST(ASTType.AST_INT)
-          ..intVal = left.stringValue
-              .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
-
-        return ast;
-      }
-
-    case 'compareTo':
-      {
-        runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-
-        AST ast = initAST(ASTType.AST_INT)
-          ..intVal = left.stringValue
-              .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
-
-        return ast;
-      }
-
-    case 'contains':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
-
-        AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.contains(
-              node.binaryOpRight.funcCallArgs[0].stringValue,
-              node.binaryOpRight.funcCallArgs[1].intVal);
-
-        return ast;
-      }
-
-    case 'endsWith':
-      {
-        runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-
-        AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue
-              .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
-
-        return ast;
-      }
-
-    case 'indexOf':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-        AST ast = initAST(ASTType.AST_INT)
-          ..intVal =
-              left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
-
-        return ast;
-      }
-
-    case 'lastIndexOf':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-        AST ast = initAST(ASTType.AST_INT)
-          ..intVal =
-              left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
-
-        return ast;
-      }
-
-    case 'padLeft':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_INT, ASTType.AST_STRING]);
-        List args = node.binaryOpRight.funcCallArgs;
-
-        left.stringValue =
-            left.stringValue.padLeft(args[0].intVal, args[1].stringValue);
-
-        return left;
-      }
-    case 'padRight':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_INT, ASTType.AST_STRING]);
-        List args = node.binaryOpRight.funcCallArgs;
-
-        left.stringValue =
-            left.stringValue.padRight(args[0].intVal, args[1].stringValue);
-
-        return left;
-      }
-
-    case 'replaceAll':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_STRING]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-
-        left.stringValue = left.stringValue
-            .replaceAll(args[0].stringValue, args[1].stringValue);
-
-        return left;
-      }
-
-    case 'replaceFirst':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_STRING, ASTType.AST_INT]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-
-        left.stringValue = left.stringValue.replaceFirst(
-            args[0].stringValue, args[1].stringValue, args[2].intVal);
-
-        return left;
-      }
-
-    case 'replaceRange':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_STRING]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-        left.stringValue
-            .replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
-
-        return left;
-      }
-
-    case 'split':
-      {
-        runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-
-        AST ast = initAST(ASTType.AST_LIST);
-        ast.listElements = left.stringValue
-            .split(node.binaryOpRight.funcCallArgs[0].stringValue);
-
-        return ast;
-      }
-
-    case 'startsWith':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-
-        AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue =
-            left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
-
-        return ast;
-      }
-
-    case 'substring':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_INT, ASTType.AST_INT]);
-
-        List args = node.binaryOpRight.funcCallArgs;
-
-        AST ast = initAST(ASTType.AST_STRING);
-        ast.stringValue =
-            left.stringValue.substring(args[0].intVal, args[1].intVal);
-
-        return ast;
-      }
-
-    case 'toLowerCase':
-      {
-        left.stringValue = left.stringValue.toLowerCase();
-
-        return left;
-      }
-
-    case 'toUpperCase':
-      {
-        left.stringValue = left.stringValue.toUpperCase();
-
-        return left;
-      }
-
-    case 'trim':
-      {
-        left.stringValue = left.stringValue.trim();
-
-        return left;
-      }
-
-    case 'trimLeft':
-      {
-        left.stringValue = left.stringValue.trimLeft();
-        return left;
-      }
-
-    case 'trimRight':
-      {
-        left.stringValue = left.stringValue.trimRight();
-        return left;
-      }
-
-    default:
-      throw NoSuchMethodException(node.binaryOpRight.variableName, 'String');
-  }
-}
-
-/// Visits properties for `StrBuffer`
-Future<AST> visitStrBufProperties(AST node, AST left) async {
-  switch (node.binaryOpRight.variableName) {
-    case 'isEmpty':
-      {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringBuffer.isEmpty;
-
-        return astBool;
-      }
-
-    case 'isNotEmpty':
-      {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringBuffer.isNotEmpty;
-
-        return astBool;
-      }
-    case 'length':
-      {
-        AST astInt = initAST(ASTType.AST_INT)
-          ..intVal = left.stringBuffer.length;
-
-        return astInt;
-      }
-    default:
-      throw NoSuchPropertyException(
-          node.binaryOpRight.variableName, 'StrBuffer');
-  }
-}
-
-/// Visits methods for `StrBuffer`
-AST visitStrBufMethods(AST node, AST left) {
-  switch (node.binaryOpRight.funcCallExpression.variableName) {
-    case 'toString':
-      AST strAST = initAST(ASTType.AST_STRING)
-        ..stringValue = left.stringBuffer.toString();
-      return strAST;
-
-    case 'clear':
-      left.stringBuffer.clear();
-      return left;
-
-    case 'write':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-
-      left.stringBuffer
-          .write((node.binaryOpRight.funcCallArgs[0] as AST).stringValue);
-      return left;
-
-    case 'writeAll':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
-
-      (node.binaryOpRight.funcCallArgs[0] as AST).listElements.forEach((e) {
-        left.stringBuffer.write((e as AST).stringValue);
-      });
-      return left;
-
-    case 'writeAsciiCode':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-      left.stringBuffer
-          .writeCharCode((node.binaryOpRight.funcCallArgs[0] as AST).intVal);
-      return left;
-
-    case 'writeLine':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
-      left.stringBuffer.write(
-          '${(node.binaryOpRight.funcCallArgs[0] as AST).stringValue}\n');
-  }
-  throw NoSuchMethodException(
-      node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
 }

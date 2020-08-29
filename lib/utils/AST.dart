@@ -143,7 +143,7 @@ class AST {
 
   Scope scope;
 
-  AstFuncPointer fptr;
+  AstFuncPointer funcPointer;
   AstFutureFuncPointer futureptr;
 }
 
