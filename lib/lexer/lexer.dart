@@ -368,14 +368,16 @@ Token collectNumber(Lexer lexer) {
 
   // double
   if (lexer.currentChar == '.') {
-    type = TokenType.TOKEN_DOUBLE_VALUE;
-    value += lexer.currentChar;
-
-    advance(lexer);
-
-    while (isNumeric(lexer.currentChar)) {
+    if (isNumeric(lexer.program[lexer.currentIndex + 1])) {
+      type = TokenType.TOKEN_DOUBLE_VALUE;
       value += lexer.currentChar;
+
       advance(lexer);
+
+      while (isNumeric(lexer.currentChar)) {
+        value += lexer.currentChar;
+        advance(lexer);
+      }
     }
   }
 

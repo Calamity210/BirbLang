@@ -1,0 +1,4 @@
+int length = "foo".length;
+screm(length);
+
+screm(length.isEven);

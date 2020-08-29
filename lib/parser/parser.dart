@@ -1085,6 +1085,16 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
     var astExpr = parseExpression(parser, scope);
 
+    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+      eat(parser, TokenType.TOKEN_DOT);
+      var astAttAccess =
+      initASTWithLine(ASTType.AST_ATTRIBUTE_ACCESS, parser.lexer.lineNum);
+      astAttAccess.binaryOpLeft = astExpr;
+      astAttAccess.binaryOpRight = parseFactor(parser, scope, false);
+
+      astExpr = astAttAccess;
+    }
+
     if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
       astExpr.scope = initScope(false);
     }
@@ -1318,6 +1328,16 @@ AST parseVariableDefinition(
     eat(parser, TokenType.TOKEN_EQUAL);
 
     astVarDef.variableValue = parseExpression(parser, scope);
+
+    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+      eat(parser, TokenType.TOKEN_DOT);
+      var astAttAccess =
+      initASTWithLine(ASTType.AST_ATTRIBUTE_ACCESS, parser.lexer.lineNum);
+      astAttAccess.binaryOpLeft = astVarDef.variableValue;
+      astAttAccess.binaryOpRight = parseFactor(parser, scope, false);
+
+      astVarDef.variableValue = astAttAccess;
+    }
 
     switch (astVarDef.variableValue.type) {
       case ASTType.AST_STRING:
