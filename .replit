@@ -1,2 +1,0 @@
-language = "dart"
-run = "dart ./lib/birb.dart"

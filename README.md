@@ -1,4 +1,4 @@
-<p align="center"><img src="logo.png" height="150px"></p>
+<p align="center"><img src="misc/logo.png" height="150px"></p>
 <h1 align="center">Birb</h1>
 <p align="center">
 <img src="https://github.com/Calamity210/BirbLang/workflows/Dart CI/badge.svg">
