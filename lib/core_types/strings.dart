@@ -297,6 +297,6 @@ AST visitStringMethods(AST node, AST left) {
       }
 
     default:
-      throw NoSuchMethodException(node.binaryOpRight.variableName, 'String');
+      throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'String');
   }
 }
