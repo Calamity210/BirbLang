@@ -77,19 +77,6 @@ AST visitIntMethods(AST node, AST left) {
         return intAST;
       }
 
-    case 'ceil':
-      {
-        AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.ceil();
-        return intAST;
-      }
-
-    case 'ceilToDouble':
-      {
-        AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.intVal.ceilToDouble();
-        return doubleAST;
-      }
-
     case 'clamp':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
@@ -107,19 +94,6 @@ AST visitIntMethods(AST node, AST left) {
           ..intVal =
               left.intVal.compareTo(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
-      }
-
-    case 'floor':
-      {
-        AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.floor();
-        return intAST;
-      }
-
-    case 'floorToDouble':
-      {
-        AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.intVal.floorToDouble();
-        return doubleAST;
       }
 
     case 'gcd':
@@ -158,30 +132,11 @@ AST visitIntMethods(AST node, AST left) {
         return intAST;
       }
 
-    case 'round':
-      {
-        AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.round();
-        return intAST;
-      }
-
-    case 'roundToDouble':
-      {
-        AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.intVal.roundToDouble();
-        return doubleAST;
-      }
-
     case 'toDouble':
       {
         AST doubleAST = initAST(ASTType.AST_DOUBLE)
           ..doubleValue = left.intVal.toDouble();
         return doubleAST;
-      }
-
-    case 'toInt':
-      {
-        AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.toInt();
-        return intAST;
       }
 
     case 'toRadixString':
@@ -243,19 +198,6 @@ AST visitIntMethods(AST node, AST left) {
           ..intVal =
               left.intVal.toUnsigned(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
-      }
-
-    case 'truncate':
-      {
-        AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.truncate();
-        return intAST;
-      }
-
-    case 'truncateToDouble':
-      {
-        AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.intVal.truncateToDouble();
-        return doubleAST;
       }
 
     default:
