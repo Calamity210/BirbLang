@@ -1,0 +1,12 @@
+@dart (foo) {
+    String str = "hi";
+    void main() =>
+     print('foo');
+
+     String strMethod() {
+        return "bar";
+     }
+}
+
+screm(foo.strMethod());
+

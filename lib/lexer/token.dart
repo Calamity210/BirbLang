@@ -40,6 +40,7 @@ enum TokenType {
   TOKEN_QUESTION,
   TOKEN_COLON,
   TOKEN_AT,
+  TOKEN_INLINE,
   TOKEN_EOF
 }
 

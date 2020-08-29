@@ -41,7 +41,9 @@ Token getNextToken(Lexer lexer) {
 
     switch(lexer.currentChar) {
       case '@':
-        return initToken(TokenType.TOKEN_AT, lexer.currentChar);
+        String curChar = lexer.currentChar;
+        advance(lexer);
+        return initToken(TokenType.TOKEN_AT, curChar);
       case '+':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_PLUS;
@@ -140,6 +142,14 @@ Token getNextToken(Lexer lexer) {
         // ==
         if (lexer.currentChar == '=') {
           type = TokenType.TOKEN_EQUALITY;
+          value += lexer.currentChar;
+
+          advance(lexer);
+        }
+
+        // =>
+        if (lexer.currentChar == '>') {
+          type = TokenType.TOKEN_INLINE;
           value += lexer.currentChar;
 
           advance(lexer);

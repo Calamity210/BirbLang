@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
 
@@ -170,7 +172,6 @@ AST parseStatement(Parser parser, Scope scope) {
         if (a != null) return a;
       }
       break;
-    // DRAFT
     case TokenType.TOKEN_AT:
       // TODO(Calamity210): correct implementation to make it more scalable
 
@@ -179,7 +180,18 @@ AST parseStatement(Parser parser, Scope scope) {
       eat(parser, TokenType.TOKEN_ID);
       eat(parser, TokenType.TOKEN_LPAREN);
 
-      AST ast = initASTWithLine(ASTType.AST_CLASS, parser.lexer.lineNum)
+      AST astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum)
+        ..scope = scope
+        ..typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+
+      AST astVarDef =
+          initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum)
+            ..scope = scope
+            ..variableName = parser.curToken.value
+            ..variableType = astType
+            ..isFinal = true;
+
+      AST classAST = initASTWithLine(ASTType.AST_CLASS, parser.lexer.lineNum)
         ..scope = scope
         ..classChildren = [];
 
@@ -190,12 +202,14 @@ AST parseStatement(Parser parser, Scope scope) {
       eat(parser, TokenType.TOKEN_ID);
       eat(parser, TokenType.TOKEN_RPAREN);
 
+      int dartProgramStartIndex = parser.lexer.currentIndex;
+
       eat(parser, TokenType.TOKEN_LBRACE);
 
       if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
         if (parser.curToken.type == TokenType.TOKEN_ID)
-          ast.classChildren
-              .add(asClassChild(parseDefinition(parser, newScope), ast));
+          classAST.classChildren
+              .add(asClassChild(parseDefinition(parser, newScope), classAST));
 
         while (parser.curToken.type == TokenType.TOKEN_SEMI ||
             (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
@@ -204,12 +218,26 @@ AST parseStatement(Parser parser, Scope scope) {
             eat(parser, TokenType.TOKEN_SEMI);
 
           if (parser.curToken.type == TokenType.TOKEN_ID)
-            ast.classChildren
-                .add(asClassChild(parseDefinition(parser, newScope), ast));
+            classAST.classChildren
+                .add(asClassChild(parseDefinition(parser, newScope), classAST));
         }
       }
+      String dartProgram = parser.lexer.program
+          .substring(dartProgramStartIndex, parser.lexer.currentIndex)
+          .trim();
+
+      dartProgram = dartProgram.substring(0, dartProgram.length - 1);
+
+      Uri dartProgramUri =
+          Uri.dataFromString(dartProgram, mimeType: 'application/dart');
+
+      Isolate.spawnUri(dartProgramUri, [], null);
+
       eat(parser, TokenType.TOKEN_RBRACE);
 
+      astVarDef.variableValue = classAST;
+
+      return astVarDef;
       break;
     case TokenType.TOKEN_NUMBER_VALUE:
     case TokenType.TOKEN_STRING_VALUE:
@@ -1134,6 +1162,13 @@ AST parseFunctionDefinition(
 
   eat(parser, TokenType.TOKEN_RPAREN);
 
+  if (parser.curToken.type == TokenType.TOKEN_INLINE) {
+    eat(parser, TokenType.TOKEN_INLINE);
+    ast.funcDefBody = parseStatement(parser, newScope);
+    ast.funcDefBody.scope = newScope;
+    return ast;
+  }
+
   if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
     AST childDef;
 
@@ -1239,8 +1274,8 @@ AST parseVariableDefinition(
       initASTWithLine(ASTType.AST_VARIABLE_DEFINITION, parser.lexer.lineNum)
         ..scope = scope
         ..variableName = name
-        ..variableType = astType;
-  astVarDef.isFinal = isFinal;
+        ..variableType = astType
+        ..isFinal = isFinal;
 
   if (isEnum) {
     var astType = initASTWithLine(ASTType.AST_TYPE, parser.lexer.lineNum);
