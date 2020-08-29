@@ -1,3 +1,0 @@
-@dart (foo) {
-    void main() => print('foo');
-}
