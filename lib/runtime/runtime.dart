@@ -1,7 +1,4 @@
-import 'package:Birb/core_types/int.dart';
-import 'package:Birb/core_types/list.dart';
-import 'package:Birb/core_types/strbuffer.dart';
-import 'package:Birb/core_types/strings.dart';
+import 'package:Birb/core_types/core_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 import '../utils/AST.dart';
@@ -161,7 +158,8 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
   return await visit(runtime, fDef.funcDefBody);
 }
 
-AST registerGlobalFunction(Runtime runtime, String fName, AstFuncPointer funcPointer) {
+AST registerGlobalFunction(
+    Runtime runtime, String fName, AstFuncPointer funcPointer) {
   var fDef = initAST(ASTType.AST_FUNC_DEFINITION);
   fDef.funcName = fName;
   fDef.funcPointer = funcPointer;
@@ -738,8 +736,10 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       await visitedFuncPointerArgs.add(visited);
     }
 
-    var ret = await visit(runtime,
-        await funcDef.futureptr(runtime, funcDef, await visitedFuncPointerArgs));
+    var ret = await visit(
+        runtime,
+        await funcDef.futureptr(
+            runtime, funcDef, await visitedFuncPointerArgs));
 
     return ret;
   }
@@ -762,8 +762,8 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
       await visitedFuncPointerArgs.add(visited);
     }
 
-    var ret = await visit(
-        runtime, funcDef.funcPointer(runtime, funcDef, await visitedFuncPointerArgs));
+    var ret = await visit(runtime,
+        funcDef.funcPointer(runtime, funcDef, await visitedFuncPointerArgs));
 
     return ret;
   }
@@ -900,7 +900,7 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
     var left = await visit(runtime, node.binaryOpLeft);
     // TODO (Calamity): Handle Maps, ints and doubles + use a switch
 
-    switch(left.type) {
+    switch (left.type) {
       case ASTType.AST_LIST:
         if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
           return visitListProperties(node, left);
@@ -924,7 +924,10 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
           return visitIntMethods(node, left);
         break;
       case ASTType.AST_DOUBLE:
-        // TODO(Calamity210): Handle this case.
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitDoubleProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitDoubleProperties(node, left);
         break;
       case ASTType.AST_MAP:
         // TODO(Calamity210): Handle this case.
@@ -961,7 +964,8 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         }
         break;
       default:
-        throw UnexpectedTokenException('Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`');
+        throw UnexpectedTokenException(
+            'Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`');
         break;
     }
 
@@ -986,7 +990,9 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
                 }
 
                 return await visit(
-                    runtime, fDef.funcPointer(runtime, left, await visitedFuncPointerArgs));
+                    runtime,
+                    fDef.funcPointer(
+                        runtime, left, await visitedFuncPointerArgs));
               }
             }
           }
