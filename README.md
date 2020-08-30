@@ -10,6 +10,7 @@
 - Clone the repository
 - Navigate to the new directory and install birb by running:
 ```shell
+$ pub get
 $ dart2native lib/Birb.dart
 ```
 
