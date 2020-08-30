@@ -39,7 +39,7 @@ AST visitDoubleProperties(AST node, AST left) {
 
     case 'sign':
       {
-        AST doubleAST = initAST(ASTType.AST_INT)
+        AST doubleAST = initAST(ASTType.AST_DOUBLE)
           ..doubleValue = left.doubleValue.sign;
         return doubleAST;
       }
