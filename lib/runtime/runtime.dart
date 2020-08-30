@@ -904,6 +904,8 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
       case ASTType.AST_LIST:
         if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
           return visitListProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitListMethods(node, left);
         break;
       case ASTType.AST_STRING:
         if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
