@@ -1,0 +1,10 @@
+grab("./packages/math.birb");
+
+screm(math.e);
+screm(math.pi);
+screm(math.sqrt2);
+screm(math.sqrt1a2);
+screm(math.log10e);
+screm(math.log2e);
+screm(math.ln10);
+screm(math.ln2);
