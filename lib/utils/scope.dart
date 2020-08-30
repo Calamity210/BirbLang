@@ -1,4 +1,4 @@
-import 'AST.dart';
+import 'package:Birb/utils/AST.dart';
 
 class Scope {
   AST owner;

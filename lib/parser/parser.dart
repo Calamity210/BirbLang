@@ -3,11 +3,11 @@ import 'dart:isolate';
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
 
-import '../utils/AST.dart';
+import 'package:Birb/utils/AST.dart';
 import 'data_type.dart';
-import '../lexer/lexer.dart';
-import '../utils/scope.dart';
-import '../lexer/token.dart';
+import 'package:Birb/lexer/lexer.dart';
+import 'package:Birb/utils/scope.dart';
+import 'package:Birb/lexer/token.dart';
 
 class Parser {
   Lexer lexer;

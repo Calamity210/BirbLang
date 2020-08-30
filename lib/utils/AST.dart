@@ -1,9 +1,8 @@
 import 'package:Birb/utils/ast/ast_types.dart' as types;
-
-import '../parser/data_type.dart';
-import '../runtime/runtime.dart';
-import 'scope.dart';
-import '../lexer/token.dart';
+import 'package:Birb/parser/data_type.dart';
+import 'package:Birb/runtime/runtime.dart';
+import 'package:Birb/lexer/token.dart';
+import 'package:Birb/utils/scope.dart';
 
 typedef AstFuncPointer = AST Function(Runtime runtime, AST self, List args);
 typedef AstFutureFuncPointer = Future<AST> Function(

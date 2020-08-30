@@ -1,6 +1,6 @@
 import 'package:Birb/utils/exceptions.dart';
 
-import 'token.dart';
+import 'package:Birb/lexer/token.dart';
 
 class Lexer {
   String program;

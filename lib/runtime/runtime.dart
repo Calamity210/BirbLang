@@ -1,11 +1,10 @@
 import 'package:Birb/core_types/core_types.dart';
 import 'package:Birb/utils/exceptions.dart';
-
-import '../utils/AST.dart';
-import '../parser/data_type.dart';
-import '../utils/scope.dart';
-import 'standards.dart';
-import '../lexer/token.dart';
+import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/scope.dart';
+import 'package:Birb/parser/data_type.dart';
+import 'package:Birb/runtime/standards.dart';
+import 'package:Birb/lexer/token.dart';
 
 class Runtime {
   Scope scope;
@@ -684,8 +683,7 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
           {
             if (astVarDef.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_DOUBLE) {
-              astVarDef.variableValue.intVal %=
-                  value.doubleVal ?? value.intVal;
+              astVarDef.variableValue.intVal %= value.doubleVal ?? value.intVal;
               return astVarDef.variableValue;
             }
           }

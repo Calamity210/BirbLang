@@ -5,8 +5,8 @@ lines = [line.strip().split(' ') for line in lines if line.strip() != '']
 
 classes = []
 with open('lib/utils/ast/ast_types.dart', 'w') as f:
-    f.write("import 'ast_node.dart';\n")
-    f.write("import '../AST.dart';\n\n")
+    f.write("import 'package:Birb/utils/ast/ast_node.dart';\n")
+    f.write("import 'package:Birb/utils/AST.dart';';\n\n")
     for astType in lines:
         type, name, fields = astType[0], astType[1], astType[2:]
         classes.append((type, name))
