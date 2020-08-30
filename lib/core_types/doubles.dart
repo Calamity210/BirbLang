@@ -1,4 +1,5 @@
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `Doubles`s
 AST visitDoubleProperties(AST node, AST left) {
@@ -44,4 +45,6 @@ AST visitDoubleProperties(AST node, AST left) {
         return doubleAST;
       }
   }
+
+  throw NoSuchPropertyException(node.binaryOpRight.variableName, 'double');
 }
