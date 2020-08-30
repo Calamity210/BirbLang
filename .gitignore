@@ -8,7 +8,7 @@ build/
 # Directory created by dartdoc
 doc/api/
 
-# Intellij and VsCode stuff
+# Intellij and VS Code stuff
 .idea/
 .vscode/
 
