@@ -8,9 +8,8 @@ build/
 # Directory created by dartdoc
 doc/api/
 
-# Intellij and VsCode stuff
+# Intellij stuff
 .idea/
-.vscode/
 
 # Executable
 birb
