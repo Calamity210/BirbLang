@@ -8,3 +8,12 @@ AST visitListProperties(AST node, AST left) {
       return intAST;
   }
 }
+
+AST visitListMethods(AST node, AST left) {
+  switch (node.binaryOpRight.funcCallExpression.variableName) {
+    case 'toString':
+      {
+        // TODO: (Add that)
+      }
+  }
+}

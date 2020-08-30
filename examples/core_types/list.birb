@@ -1,4 +1,3 @@
 final List shop = ["Apples", "Cars", "Computers"];
 
 screm(shop.length);
-screm(shop.toString());
