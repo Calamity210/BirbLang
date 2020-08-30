@@ -1,0 +1,7 @@
+// type class_name ..field=init
+COMPOUND CompoundNode compoundValue=[]
+FUNC_CALL FuncCallNode funcCallArgs=[]
+FUNC_DEFINITION FuncDefNode funcDefArgs=[] compChildren=[]
+CLASS ClassNode classChildren=[]
+ENUM EnumNode enumElements=[]
+LIST ListNode listElements=[]

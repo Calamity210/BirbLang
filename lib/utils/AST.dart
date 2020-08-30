@@ -1,3 +1,5 @@
+import 'package:Birb/utils/ast/ast_types.dart' as types;
+
 import '../parser/data_type.dart';
 import '../runtime/runtime.dart';
 import 'scope.dart';
@@ -149,16 +151,7 @@ class AST {
 
 /// Initializes the Abstract Syntax tree with default values
 AST initAST(ASTType type) {
-  var ast = AST()..type = type;
-  ast.compoundValue = ast.type == ASTType.AST_COMPOUND ? [] : null;
-  ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
-  ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
-  ast.classChildren = ast.type == ASTType.AST_CLASS ? [] : null;
-  ast.enumElements = ast.type == ASTType.AST_ENUM ? [] : null;
-  ast.listElements = ast.type == ASTType.AST_LIST ? [] : null;
-  ast.compChildren = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
-
-  return ast;
+  return types.initAST(type);
 }
 
 AST initASTWithLine(ASTType type, int line) {
