@@ -1,0 +1,11 @@
+int age = 12;
+
+// Properties
+
+screm(age.bitLength);
+screm(age.isFinite);
+screm(age.isInfinite);
+screm(age.isNaN);
+screm(age.isNegative);
+screm(age.sign);
+screm(age.runtimeType);

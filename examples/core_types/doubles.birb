@@ -1,8 +1,11 @@
 double price = 10.101010;
 
+// Properties
+
 screm(price.hashCode);
 screm(price.isFinite);
 screm(price.isInfinite);
 screm(price.isNaN);
 screm(price.isNegative);
 screm(price.sign);
+screm(price.runtimeType);

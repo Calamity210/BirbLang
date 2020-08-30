@@ -26,21 +26,19 @@ void main() {
     directory.listSync().forEach((file) {
       test.test('${file.path}', () async {
         var process =
-        await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+            await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
 
         while (await process.stderr.hasNext) {
           var line = await process.stderr.next;
           test.expect(
               line.toLowerCase(), test.isNot(test.contains('exception')));
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('error')));
+          test.expect(line.toLowerCase(), test.isNot(test.contains('error')));
         }
         while (await process.stdout.hasNext) {
           var line = await process.stdout.next;
           test.expect(
               line.toLowerCase(), test.isNot(test.contains('exception')));
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('error')));
+          test.expect(line.toLowerCase(), test.isNot(test.contains('error')));
         }
         await process.shouldExit();
       });
@@ -50,26 +48,52 @@ void main() {
   test.group('All example programs run without errors', () {
     Directory directory = Directory('./examples/');
     directory.listSync().forEach((file) {
-      test.test('${file.path}', () async {
-        var process =
-            await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+      List dirSplit = file.path.split('.');
 
-        while (await process.stderr.hasNext) {
-          var line = await process.stderr.next;
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('exception')));
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('error')));
-        }
-        while (await process.stdout.hasNext) {
-          var line = await process.stdout.next;
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('exception')));
-          test.expect(
-              line.toLowerCase(), test.isNot(test.contains('error')));
-        }
-        await process.shouldExit();
-      });
+      if (dirSplit.length == 3) {
+        test.test('${file.path}', () async {
+          var process =
+              await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+
+          while (await process.stderr.hasNext) {
+            var line = await process.stderr.next;
+            test.expect(
+                line.toLowerCase(), test.isNot(test.contains('exception')));
+            test.expect(line.toLowerCase(), test.isNot(test.contains('error')));
+          }
+          while (await process.stdout.hasNext) {
+            var line = await process.stdout.next;
+            test.expect(
+                line.toLowerCase(), test.isNot(test.contains('exception')));
+            test.expect(line.toLowerCase(), test.isNot(test.contains('error')));
+          }
+          await process.shouldExit();
+        });
+      } else {
+        Directory directory = Directory(file.path);
+        directory.listSync().forEach((file) {
+          test.test('${file.path}', () async {
+            var process =
+                await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+
+            while (await process.stderr.hasNext) {
+              var line = await process.stderr.next;
+              test.expect(
+                  line.toLowerCase(), test.isNot(test.contains('exception')));
+              test.expect(
+                  line.toLowerCase(), test.isNot(test.contains('error')));
+            }
+            while (await process.stdout.hasNext) {
+              var line = await process.stdout.next;
+              test.expect(
+                  line.toLowerCase(), test.isNot(test.contains('exception')));
+              test.expect(
+                  line.toLowerCase(), test.isNot(test.contains('error')));
+            }
+            await process.shouldExit();
+          });
+        });
+      }
     });
   });
 }
