@@ -36,11 +36,15 @@ Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   AST astStr = args[0];
   String filename = astStr.stringValue;
 
+  if (filename.startsWith('birb:')) {
+    filename = './packages/' + filename.split(':')[1] + '.birb';
+  }
+
   Lexer lexer = initLexer(File(filename).readAsStringSync());
   Parser parser = initParser(lexer);
   AST node = parse(parser);
   await visit(runtime, node);
-  
+
   return initAST(ASTType.AST_ANY);
 }
 

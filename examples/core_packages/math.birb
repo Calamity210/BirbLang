@@ -1,4 +1,4 @@
-grab("./packages/math.birb");
+grab("birb:math");
 
 screm(math.e);
 screm(math.pi);
