@@ -29,7 +29,7 @@ Future<void> main(List<String> arguments) async {
     print('<<<<< Birb Shell Initiated >>>>>');
 
     while (isInteractive) {
-      stdout.write('> ');
+      stdout.write('>>> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
       if (RegExp('{').allMatches(str).length >
@@ -53,13 +53,14 @@ Future<void> main(List<String> arguments) async {
       }
 
       // Initialize and run program
-      lexer = initLexer(str);
-      parser = initParser(lexer);
-      node = parse(parser);
-      await visit(runtime, node);
+      if (str != '') {
+        lexer = initLexer(str);
+        parser = initParser(lexer);
+        node = parse(parser);
+        await visit(runtime, node);
+      }
     }
 
-    print('<<<<< Birb Shell Terminated >>>>>');
     return;
   }
 
