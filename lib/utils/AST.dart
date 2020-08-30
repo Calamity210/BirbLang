@@ -58,12 +58,12 @@ class AST {
   int intVal = 0;
 
   // AST_BOOL
-  bool boolValue = false;
+  bool boolVal = false;
 
   bool isClassChild = false;
 
   // AST_DOUBLE
-  double doubleValue = 0;
+  double doubleVal = 0;
 
   // AST_STRING
   String stringValue;
@@ -103,7 +103,6 @@ class AST {
 
   List funcDefinitions;
   List funcDefArgs;
-
   AST funcDefBody;
   AST funcDefType;
 
@@ -112,8 +111,6 @@ class AST {
   List listElements;
   Map<String, dynamic> map;
   List compChildren;
-
-  dynamic classValue;
 
   // AST_IF
   AST ifExpression;
@@ -146,7 +143,7 @@ class AST {
   Scope scope;
 
   AstFuncPointer funcPointer;
-  AstFutureFuncPointer futureptr;
+  AstFutureFuncPointer futureFuncPointer;
 }
 
 /// Initializes the Abstract Syntax tree with default values
@@ -178,13 +175,13 @@ String astToString(AST ast) {
     case ASTType.AST_STRING_BUFFER:
       return '[ StrBuffer ]';
     case ASTType.AST_DOUBLE:
-      return ast.doubleValue.toStringAsPrecision(6).padRight(12);
+      return ast.doubleVal.toStringAsPrecision(6).padRight(12);
     case ASTType.AST_LIST:
       return ast.listElements.toString();
     case ASTType.AST_MAP:
       return ast.map.toString();
     case ASTType.AST_BOOL:
-      return ast.boolValue.toString();
+      return ast.boolVal.toString();
     case ASTType.AST_INT:
       return ast.intVal.toString();
     case ASTType.AST_TYPE:

@@ -1,7 +1,35 @@
 // type class_name ..field=init
 COMPOUND CompoundNode compoundValue=[]
-FUNC_CALL FuncCallNode funcCallArgs=[]
-FUNC_DEFINITION FuncDefNode funcDefArgs=[] compChildren=[]
+FUNC_CALL FuncCallNode funcName funcCallArgs=[]
+FUNC_DEFINITION FuncDefNode funcName funcDefBody funcDefType funcDefArgs=[] funcPointer futureFuncPointer compChildren=[]
 CLASS ClassNode classChildren=[]
 ENUM EnumNode enumElements=[]
 LIST ListNode listElements=[]
+MAP MapNode map={}
+VARIABLE VariableNode variableName variableValue variableType isFinal
+VARIABLE_DEFINITION VarDefNode variableName variableValue variableType variableAssignmentLeft isFinal savedFuncCall
+VARIABLE_ASSIGNMENT VarAssignmentNode variableName variableValue variableType variableAssignmentLeft isFinal
+NULL NullNode
+STRING StringNode stringValue
+STRING_BUFFER StrBufferNode strBuffer
+INT IntNode intVal=0 doubleVal=0
+DOUBLE DoubleNode doubleVal=0 intVal=0
+BOOL BoolNode boolVal=false
+ANY AnyNode
+TYPE TypeNode
+BINARYOP BinaryOpNode binaryOpLeft binaryOpRight binaryOperator
+UNARYOP UnaryOpNode unaryOpRight unaryOperator
+NOOP NoopNode
+BREAK BreakNode
+RETURN ReturnNode returnValue
+CONTINUE ContinueNode
+TERNARY TernaryNode ternaryExpression ternaryBody ternaryElseBody
+IF IfNode ifExpression ifBody ifElse
+ELSE ElseNode elseBody
+SWITCH SwitchNode switchExpression switchCases switchDefault
+WHILE WhileNode whileExpression whileBody
+FOR ForNode forInitStatement forConditionStatement forChangeStatement forBody
+ATTRIBUTE_ACCESS AttributeAccessNode classChildren binaryOpRight binaryOpLeft enumElements
+LIST_ACCESS ListAccessNode listAccessPointer
+ITERATE IterateNode iterateIterable iterateFunction
+ASSERT AssertNode assertExpression

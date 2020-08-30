@@ -18,14 +18,14 @@ AST visitStringProperties(AST node, AST left) {
     case 'isEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isEmpty;
+          ..boolVal = left.stringValue.isEmpty;
         return astBool;
       }
 
     case 'isNotEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isNotEmpty;
+          ..boolVal = left.stringValue.isNotEmpty;
         return astBool;
       }
 
@@ -117,7 +117,7 @@ AST visitStringMethods(AST node, AST left) {
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
         AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.contains(
+          ..boolVal = left.stringValue.contains(
               node.binaryOpRight.funcCallArgs[0].stringValue,
               node.binaryOpRight.funcCallArgs[1].intVal);
 
@@ -130,7 +130,7 @@ AST visitStringMethods(AST node, AST left) {
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
         AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue
+          ..boolVal = left.stringValue
               .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
 
         return ast;
@@ -243,7 +243,7 @@ AST visitStringMethods(AST node, AST left) {
         List args = node.binaryOpRight.funcCallArgs;
 
         AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue =
+        ast.boolVal =
             left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
 
         return ast;

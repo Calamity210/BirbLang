@@ -8,7 +8,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
     case 'isEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.strBuffer.isEmpty;
+          ..boolVal = left.strBuffer.isEmpty;
 
         return astBool;
       }
@@ -16,7 +16,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
     case 'isNotEmpty':
       {
         AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.strBuffer.isNotEmpty;
+          ..boolVal = left.strBuffer.isNotEmpty;
 
         return astBool;
       }

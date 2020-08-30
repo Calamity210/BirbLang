@@ -8,11 +8,13 @@ build/
 # Directory created by dartdoc
 doc/api/
 
-# Intellij stuff
+# Intellij and vsc stuff
 .idea/
+.vscode
 
 # Executable
 birb
+birb.exe
 
 # Desktop Services Store
 **/.DS_Store

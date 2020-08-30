@@ -13,40 +13,40 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isEven':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isEven;
+        AST boolAST = initAST(ASTType.AST_BOOL)..boolVal = left.intVal.isEven;
         return boolAST;
       }
 
     case 'isFinite':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.intVal.isFinite;
+          ..boolVal = left.intVal.isFinite;
         return boolAST;
       }
 
     case 'isInfinite':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.intVal.isInfinite;
+          ..boolVal = left.intVal.isInfinite;
         return boolAST;
       }
 
     case 'isNaN':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isNaN;
+        AST boolAST = initAST(ASTType.AST_BOOL)..boolVal = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.intVal.isNegative;
+          ..boolVal = left.intVal.isNegative;
         return boolAST;
       }
 
     case 'isOdd':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isOdd;
+        AST boolAST = initAST(ASTType.AST_BOOL)..boolVal = left.intVal.isOdd;
         return boolAST;
       }
 
@@ -135,7 +135,7 @@ AST visitIntMethods(AST node, AST left) {
     case 'toDouble':
       {
         AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.intVal.toDouble();
+          ..doubleVal = left.intVal.toDouble();
         return doubleAST;
       }
 

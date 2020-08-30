@@ -5,10 +5,22 @@ import 'package:Birb/utils/scope.dart';
 
 class ASTNode implements AST {
   @override
+  AST parent;
+
+  @override
+  bool isClassChild;
+
+  @override
   ASTType type;
 
   @override
+  DataType typeValue;
+
+  @override
   int lineNum;
+
+  @override
+  Scope scope;
 
   @override
   AST get assertExpression => throw Exception('Not part of $runtimeType => $type');
@@ -36,19 +48,14 @@ class ASTNode implements AST {
   set binaryOperator(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
-  bool get boolValue => throw Exception('Not part of $runtimeType => $type');
+  bool get boolVal => throw Exception('Not part of $runtimeType => $type');
   @override
-  set boolValue(_) => throw Exception('Not part of $runtimeType => $type');
+  set boolVal(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   List get classChildren => throw Exception('Not part of $runtimeType => $type');
   @override
   set classChildren(_) => throw Exception('Not part of $runtimeType => $type');
-
-  @override
-  dynamic get classValue => throw Exception('Not part of $runtimeType => $type');
-  @override
-  set classValue(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   List get compChildren => throw Exception('Not part of $runtimeType => $type');
@@ -61,9 +68,9 @@ class ASTNode implements AST {
   set compoundValue(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
-  double get doubleValue => throw Exception('Not part of $runtimeType => $type');
+  double get doubleVal => throw Exception('Not part of $runtimeType => $type');
   @override
-  set doubleValue(_) => throw Exception('Not part of $runtimeType => $type');
+  set doubleVal(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   AST get elseBody => throw Exception('Not part of $runtimeType => $type');
@@ -136,9 +143,9 @@ class ASTNode implements AST {
   set funcPointer(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
-  AstFutureFuncPointer get futureptr => throw Exception('Not part of $runtimeType => $type');
+  AstFutureFuncPointer get futureFuncPointer => throw Exception('Not part of $runtimeType => $type');
   @override
-  set futureptr(_) => throw Exception('Not part of $runtimeType => $type');
+  set futureFuncPointer(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   AST get ifBody => throw Exception('Not part of $runtimeType => $type');
@@ -159,11 +166,6 @@ class ASTNode implements AST {
   int get intVal => throw Exception('Not part of $runtimeType => $type');
   @override
   set intVal(_) => throw Exception('Not part of $runtimeType => $type');
-
-  @override
-  bool get isClassChild => throw Exception('Not part of $runtimeType => $type');
-  @override
-  set isClassChild(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   bool get isFinal => throw Exception('Not part of $runtimeType => $type');
@@ -196,11 +198,6 @@ class ASTNode implements AST {
   set map(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
-  AST get parent => throw Exception('Not part of $runtimeType => $type');
-  @override
-  set parent(_) => throw Exception('Not part of $runtimeType => $type');
-
-  @override
   AST get returnValue => throw Exception('Not part of $runtimeType => $type');
   @override
   set returnValue(_) => throw Exception('Not part of $runtimeType => $type');
@@ -209,11 +206,6 @@ class ASTNode implements AST {
   AST get savedFuncCall => throw Exception('Not part of $runtimeType => $type');
   @override
   set savedFuncCall(_) => throw Exception('Not part of $runtimeType => $type');
-
-  @override
-  Scope get scope => throw Exception('Not part of $runtimeType => $type');
-  @override
-  set scope(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   StringBuffer get strBuffer => throw Exception('Not part of $runtimeType => $type');
@@ -254,11 +246,6 @@ class ASTNode implements AST {
   AST get ternaryExpression => throw Exception('Not part of $runtimeType => $type');
   @override
   set ternaryExpression(_) => throw Exception('Not part of $runtimeType => $type');
-
-  @override
-  DataType get typeValue => throw Exception('Not part of $runtimeType => $type');
-  @override
-  set typeValue(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   AST get unaryOpRight => throw Exception('Not part of $runtimeType => $type');

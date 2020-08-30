@@ -7,41 +7,41 @@ AST visitDoubleProperties(AST node, AST left) {
     case 'isFinite':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isFinite;
+          ..boolVal = left.doubleVal.isFinite;
         return boolAST;
       }
 
     case 'isInfinite':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isInfinite;
+          ..boolVal = left.doubleVal.isInfinite;
         return boolAST;
       }
 
     case 'isNaN':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isNaN;
+        AST boolAST = initAST(ASTType.AST_BOOL)..boolVal = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
         AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isNegative;
+          ..boolVal = left.doubleVal.isNegative;
         return boolAST;
       }
 
     case 'hashCode':
       {
         AST intAST = initAST(ASTType.AST_INT)
-          ..intVal = left.doubleValue.hashCode;
+          ..intVal = left.doubleVal.hashCode;
         return intAST;
       }
 
     case 'sign':
       {
         AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.doubleValue.sign;
+          ..doubleVal = left.doubleVal.sign;
         return doubleAST;
       }
   }

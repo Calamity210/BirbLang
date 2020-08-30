@@ -375,7 +375,7 @@ AST parseType(Parser parser, Scope scope) {
 AST parseDouble(Parser parser, Scope scope) {
   var ast = initASTWithLine(ASTType.AST_DOUBLE, parser.lexer.lineNum);
   ast.scope = scope;
-  ast.doubleValue = double.parse(parser.curToken.value);
+  ast.doubleVal = double.parse(parser.curToken.value);
 
   eat(parser, TokenType.TOKEN_DOUBLE_VALUE);
 
@@ -408,7 +408,7 @@ AST parseBool(Parser parser, Scope scope) {
     ..scope = scope;
 
   if (parser.curToken.value == 'false' || parser.curToken.value == 'true') {
-    ast.boolValue = parser.curToken.value == 'true';
+    ast.boolVal = parser.curToken.value == 'true';
   } else {
     print('Expected a boolean value, but got ${parser.curToken.value}');
   }
@@ -1379,7 +1379,7 @@ AST parseVariableDefinition(
           astVarDef.variableType = astType;
           if (isConst)
             parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.doubleValue}');
+                .replaceAll(name, '${astVarDef.variableValue.doubleVal}');
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
           parserTypeError(parser);
@@ -1390,7 +1390,7 @@ AST parseVariableDefinition(
           astVarDef.variableType = astType;
           if (isConst)
             parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.boolValue}');
+                .replaceAll(name, '${astVarDef.variableValue.boolVal}');
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
           parserTypeError(parser);

@@ -17,8 +17,6 @@ void initStandards(Runtime runtime) async {
   registerGlobalVariable(runtime, 'birbVer', '0.0.1');
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'exit', funcExit);
-  registerGlobalFunction(runtime, 'openFile', funcFileOpen);
-  registerGlobalFunction(runtime, 'writeFile', funcFileWrite);
   registerGlobalFunction(runtime, 'mock', funcMock);
   registerGlobalFunction(runtime, 'Date', funcDate);
   registerGlobalFunction(runtime, 'Time', funcTime);
@@ -80,73 +78,6 @@ AST funcExit(Runtime runtime, AST self, List args) {
 
   exit(exitAST.intVal);
   return null;
-}
-
-AST objFileFuncRead(Runtime runtime, AST self, List args) {
-  File f = self.classValue;
-  var astString = initAST(ASTType.AST_STRING);
-
-  astString.stringValue = f.readAsStringSync();
-  return astString;
-}
-
-AST funcFileOpen(Runtime runtime, AST self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_STRING]);
-
-  var filename = (args[0] as AST).stringValue;
-  FileMode mode;
-  switch ((args[1] as AST).stringValue) {
-    case 'READ':
-      mode = FileMode.read;
-      break;
-    case 'WRITE':
-      mode = FileMode.write;
-      break;
-    case 'APPEND':
-      mode = FileMode.append;
-      break;
-    case 'WRITEONLY':
-      mode = FileMode.writeOnly;
-      break;
-    case 'WRITEONLYAPPEND':
-      mode = FileMode.writeOnlyAppend;
-      break;
-    default:
-      print('No mode `${(args[1] as AST).stringValue}` found');
-      exit(1);
-  }
-
-  File f = File(filename);
-  AST astObj;
-
-  f.open(mode: mode).then((value) {
-    astObj = initAST(ASTType.AST_CLASS);
-    astObj.variableType = initAST(ASTType.AST_TYPE);
-    astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
-    astObj.classValue = value;
-
-    var fDefRead = initAST(ASTType.AST_FUNC_DEFINITION);
-    fDefRead.funcName = 'read';
-    fDefRead.funcPointer = objFileFuncRead;
-
-    astObj.funcDefinitions = [];
-    astObj.funcDefinitions.add(fDefRead);
-  });
-  return astObj;
-}
-
-AST funcFileWrite(Runtime runtime, AST self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_CLASS]);
-
-  var retAST = initAST(ASTType.AST_INT);
-  retAST.intVal = 1;
-
-  var line = (args[0] as AST).stringValue;
-  File f = (args[1] as AST).classValue;
-
-  f.writeAsStringSync(line);
-
-  return retAST;
 }
 
 /**
@@ -527,7 +458,7 @@ AST funcEncodeJson(Runtime runtime, AST self, List args) {
         jsonMap[key] = val.intVal;
         break;
       case ASTType.AST_DOUBLE:
-        jsonMap[key] = val.doubleValue;
+        jsonMap[key] = val.doubleVal;
         break;
       case ASTType.AST_LIST:
         jsonMap[key] = val.listElements;
