@@ -1,4 +1,6 @@
+
 import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/lexer/token.dart';
 import 'package:Birb/utils/AST.dart';
 
 class CompoundNode extends ASTNode {
@@ -6,7 +8,7 @@ class CompoundNode extends ASTNode {
   ASTType type = ASTType.AST_COMPOUND;
 
   @override
-  var compoundValue = [];
+  List compoundValue = [];
 
 }
 
@@ -15,10 +17,10 @@ class FuncCallNode extends ASTNode {
   ASTType type = ASTType.AST_FUNC_CALL;
 
   @override
-  var funcName;
+  String funcName;
 
   @override
-  var funcCallArgs = [];
+  List funcCallArgs = [];
 
 }
 
@@ -27,25 +29,25 @@ class FuncDefNode extends ASTNode {
   ASTType type = ASTType.AST_FUNC_DEFINITION;
 
   @override
-  var funcName;
+  String funcName;
 
   @override
-  var funcDefBody;
+  AST funcDefBody;
 
   @override
-  var funcDefType;
+  AST funcDefType;
 
   @override
-  var funcDefArgs = [];
+  List funcDefArgs = [];
 
   @override
-  var funcPointer;
+  AstFuncPointer funcPointer;
 
   @override
-  var futureFuncPointer;
+  AstFutureFuncPointer futureFuncPointer;
 
   @override
-  var compChildren = [];
+  List compChildren = [];
 
 }
 
@@ -54,7 +56,7 @@ class ClassNode extends ASTNode {
   ASTType type = ASTType.AST_CLASS;
 
   @override
-  var classChildren = [];
+  List classChildren = [];
 
 }
 
@@ -63,7 +65,7 @@ class EnumNode extends ASTNode {
   ASTType type = ASTType.AST_ENUM;
 
   @override
-  var enumElements = [];
+  List enumElements = [];
 
 }
 
@@ -72,7 +74,7 @@ class ListNode extends ASTNode {
   ASTType type = ASTType.AST_LIST;
 
   @override
-  var listElements = [];
+  List listElements = [];
 
 }
 
@@ -81,7 +83,7 @@ class MapNode extends ASTNode {
   ASTType type = ASTType.AST_MAP;
 
   @override
-  var map = {};
+  Map<String, dynamic> map = {};
 
 }
 
@@ -90,16 +92,16 @@ class VariableNode extends ASTNode {
   ASTType type = ASTType.AST_VARIABLE;
 
   @override
-  var variableName;
+  String variableName;
 
   @override
-  var variableValue;
+  AST variableValue;
 
   @override
-  var variableType;
+  AST variableType;
 
   @override
-  var isFinal;
+  bool isFinal;
 
 }
 
@@ -108,22 +110,22 @@ class VarDefNode extends ASTNode {
   ASTType type = ASTType.AST_VARIABLE_DEFINITION;
 
   @override
-  var variableName;
+  String variableName;
 
   @override
-  var variableValue;
+  AST variableValue;
 
   @override
-  var variableType;
+  AST variableType;
 
   @override
-  var variableAssignmentLeft;
+  AST variableAssignmentLeft;
 
   @override
-  var isFinal;
+  bool isFinal;
 
   @override
-  var savedFuncCall;
+  AST savedFuncCall;
 
 }
 
@@ -132,19 +134,19 @@ class VarAssignmentNode extends ASTNode {
   ASTType type = ASTType.AST_VARIABLE_ASSIGNMENT;
 
   @override
-  var variableName;
+  String variableName;
 
   @override
-  var variableValue;
+  AST variableValue;
 
   @override
-  var variableType;
+  AST variableType;
 
   @override
-  var variableAssignmentLeft;
+  AST variableAssignmentLeft;
 
   @override
-  var isFinal;
+  bool isFinal;
 
 }
 
@@ -159,7 +161,7 @@ class StringNode extends ASTNode {
   ASTType type = ASTType.AST_STRING;
 
   @override
-  var stringValue;
+  String stringValue;
 
 }
 
@@ -168,7 +170,7 @@ class StrBufferNode extends ASTNode {
   ASTType type = ASTType.AST_STRING_BUFFER;
 
   @override
-  var strBuffer;
+  StringBuffer strBuffer;
 
 }
 
@@ -177,10 +179,10 @@ class IntNode extends ASTNode {
   ASTType type = ASTType.AST_INT;
 
   @override
-  var intVal = 0;
+  int intVal = 0;
 
   @override
-  var doubleVal = 0;
+  double doubleVal = 0;
 
 }
 
@@ -189,10 +191,10 @@ class DoubleNode extends ASTNode {
   ASTType type = ASTType.AST_DOUBLE;
 
   @override
-  var doubleVal = 0;
+  double doubleVal = 0;
 
   @override
-  var intVal = 0;
+  int intVal = 0;
 
 }
 
@@ -201,7 +203,7 @@ class BoolNode extends ASTNode {
   ASTType type = ASTType.AST_BOOL;
 
   @override
-  var boolVal = false;
+  bool boolVal = false;
 
 }
 
@@ -222,13 +224,13 @@ class BinaryOpNode extends ASTNode {
   ASTType type = ASTType.AST_BINARYOP;
 
   @override
-  var binaryOpLeft;
+  AST binaryOpLeft;
 
   @override
-  var binaryOpRight;
+  AST binaryOpRight;
 
   @override
-  var binaryOperator;
+  Token binaryOperator;
 
 }
 
@@ -237,10 +239,10 @@ class UnaryOpNode extends ASTNode {
   ASTType type = ASTType.AST_UNARYOP;
 
   @override
-  var unaryOpRight;
+  AST unaryOpRight;
 
   @override
-  var unaryOperator;
+  Token unaryOperator;
 
 }
 
@@ -261,7 +263,7 @@ class ReturnNode extends ASTNode {
   ASTType type = ASTType.AST_RETURN;
 
   @override
-  var returnValue;
+  AST returnValue;
 
 }
 
@@ -276,13 +278,13 @@ class TernaryNode extends ASTNode {
   ASTType type = ASTType.AST_TERNARY;
 
   @override
-  var ternaryExpression;
+  AST ternaryExpression;
 
   @override
-  var ternaryBody;
+  AST ternaryBody;
 
   @override
-  var ternaryElseBody;
+  AST ternaryElseBody;
 
 }
 
@@ -291,13 +293,13 @@ class IfNode extends ASTNode {
   ASTType type = ASTType.AST_IF;
 
   @override
-  var ifExpression;
+  AST ifExpression;
 
   @override
-  var ifBody;
+  AST ifBody;
 
   @override
-  var ifElse;
+  AST ifElse;
 
 }
 
@@ -306,7 +308,7 @@ class ElseNode extends ASTNode {
   ASTType type = ASTType.AST_ELSE;
 
   @override
-  var elseBody;
+  AST elseBody;
 
 }
 
@@ -315,13 +317,13 @@ class SwitchNode extends ASTNode {
   ASTType type = ASTType.AST_SWITCH;
 
   @override
-  var switchExpression;
+  AST switchExpression;
 
   @override
-  var switchCases;
+  Map<AST, AST> switchCases;
 
   @override
-  var switchDefault;
+  AST switchDefault;
 
 }
 
@@ -330,10 +332,10 @@ class WhileNode extends ASTNode {
   ASTType type = ASTType.AST_WHILE;
 
   @override
-  var whileExpression;
+  AST whileExpression;
 
   @override
-  var whileBody;
+  AST whileBody;
 
 }
 
@@ -342,16 +344,16 @@ class ForNode extends ASTNode {
   ASTType type = ASTType.AST_FOR;
 
   @override
-  var forInitStatement;
+  AST forInitStatement;
 
   @override
-  var forConditionStatement;
+  AST forConditionStatement;
 
   @override
-  var forChangeStatement;
+  AST forChangeStatement;
 
   @override
-  var forBody;
+  AST forBody;
 
 }
 
@@ -360,16 +362,16 @@ class AttributeAccessNode extends ASTNode {
   ASTType type = ASTType.AST_ATTRIBUTE_ACCESS;
 
   @override
-  var classChildren;
+  List classChildren;
 
   @override
-  var binaryOpRight;
+  AST binaryOpRight;
 
   @override
-  var binaryOpLeft;
+  AST binaryOpLeft;
 
   @override
-  var enumElements;
+  List enumElements;
 
 }
 
@@ -378,7 +380,7 @@ class ListAccessNode extends ASTNode {
   ASTType type = ASTType.AST_LIST_ACCESS;
 
   @override
-  var listAccessPointer;
+  AST listAccessPointer;
 
 }
 
@@ -387,10 +389,10 @@ class IterateNode extends ASTNode {
   ASTType type = ASTType.AST_ITERATE;
 
   @override
-  var iterateIterable;
+  AST iterateIterable;
 
   @override
-  var iterateFunction;
+  AST iterateFunction;
 
 }
 
@@ -399,7 +401,7 @@ class AssertNode extends ASTNode {
   ASTType type = ASTType.AST_ASSERT;
 
   @override
-  var assertExpression;
+  AST assertExpression;
 
 }
 
