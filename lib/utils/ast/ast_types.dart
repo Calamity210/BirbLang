@@ -1,4 +1,3 @@
-
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/utils/AST.dart';
@@ -17,9 +16,6 @@ class FuncCallNode extends ASTNode {
   ASTType type = ASTType.AST_FUNC_CALL;
 
   @override
-  String variableName;
-
-  @override
   String funcName;
 
   @override
@@ -27,6 +23,9 @@ class FuncCallNode extends ASTNode {
 
   @override
   List funcCallArgs = [];
+
+  @override
+  String variableName;
 
 }
 
@@ -273,6 +272,9 @@ class BoolNode extends ASTNode {
 
   @override
   bool boolVal = false;
+
+  @override
+  int intVal = 0;
 
 }
 

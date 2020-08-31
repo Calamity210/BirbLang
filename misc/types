@@ -15,7 +15,7 @@ STRING StringNode stringValue=''
 STRING_BUFFER StrBufferNode strBuffer=StringBuffer() isFinal
 INT IntNode intVal=0 doubleVal=0 stringValue='0'
 DOUBLE DoubleNode doubleVal=0 intVal=0 stringValue='0.0'
-BOOL BoolNode boolVal=false
+BOOL BoolNode boolVal=false intVal=0
 ANY AnyNode
 TYPE TypeNode
 BINARYOP BinaryOpNode binaryOpLeft binaryOpRight binaryOperator
