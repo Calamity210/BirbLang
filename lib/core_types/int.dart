@@ -88,12 +88,15 @@ AST visitIntMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'abs':
       {
+        /// Returns the absolute value of this integer.
+        /// For any integer x, the result is the same as x < 0 ? -x : x.
         AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.abs();
         return intAST;
       }
 
     case 'clamp':
       {
+        /// Returns this num clamped to be in the range lowerLimit-upperLimit.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
         List args = node.binaryOpRight.funcCallArgs;
@@ -113,6 +116,12 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'gcd':
       {
+        /// Returns the greatest common divisor of this integer and other.
+        /// If either number is non-zero, the result is the numerically greatest integer dividing both this and other.
+        /// The greatest common divisor is independent of the order, so x.gcd(y) is always the same as y.gcd(x). 
+        
+        /// For any integer x, x.gcd(x) is x.abs().
+        /// If both this and other is zero, the result is also zero.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal = left.intVal.gcd(node.binaryOpRight.funcCallArgs[0].intVal);
@@ -121,6 +130,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'modInverse':
       {
+        /// Returns the modular multiplicative inverse of this integer modulo modulus
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal =
@@ -130,6 +140,8 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'modPow':
       {
+        /// Returns this integer to the power of exponent modulo modulus.
+        /// The exponent must be non-negative and modulus must be positive.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
         List args = node.binaryOpRight.funcCallArgs;
@@ -140,6 +152,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'remainder':
       {
+        /// Returns the remainder of the truncating division of this by other. 
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal =
@@ -149,6 +162,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toDouble':
       {
+        /// Return this num as a double.
         AST doubleAST = initAST(ASTType.AST_DOUBLE)
           ..doubleValue = left.intVal.toDouble();
         return doubleAST;
@@ -156,6 +170,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toRadixString':
       {
+        /// Converts this to a string representation in the given radix.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal
@@ -165,6 +180,9 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toSigned':
       {
+        /// Returns the least significant width bits of this integer, extending the highest retained bit to the sign. 
+        /// This is the same as truncating the value to fit in width bits using an signed 2-s complement representation. 
+        /// The returned value has the same bit value in all positions higher than width.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal =
@@ -174,6 +192,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toString':
       {
+        /// Returns a string representation of this integer.
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal.toString();
         return stringAST;
@@ -181,6 +200,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toStringAsExponential':
       {
+        /// Returns an exponential string-representation
         List args = node.binaryOpRight.funcCallArgs;
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal
@@ -190,6 +210,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toStringAsFixed':
       {
+        /// Returns a decimal-point string-representation
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal
@@ -199,6 +220,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toStringAsPrecision':
       {
+        /// Converts this to a double and returns a string representation with exactly precision significant digits. 
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal
@@ -208,6 +230,8 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toUnsigned':
       {
+        /// Returns the least significant width bits of this integer as a non-negative number (i.e. unsigned representation). 
+        /// The returned value has zeros in all bit positions higher than width
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal =
