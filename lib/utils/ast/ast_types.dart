@@ -25,6 +25,9 @@ class FuncCallNode extends ASTNode {
   @override
   List funcCallArgs = [];
 
+  @override
+  String variableName;
+
 }
 
 class FuncDefNode extends ASTNode {
@@ -270,6 +273,9 @@ class BoolNode extends ASTNode {
 
   @override
   bool boolVal = false;
+
+  @override
+  int intVal = 0;
 
 }
 
