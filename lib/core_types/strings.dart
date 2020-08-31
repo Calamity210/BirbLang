@@ -10,6 +10,7 @@ AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
+        /// Returns an unmodifiable list of the UTF-16 code units of this string.
         AST astList = initAST(ASTType.AST_LIST)
           ..listElements = left.stringValue.codeUnits;
         return astList;
@@ -17,6 +18,7 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'isEmpty':
       {
+        /// Returns true if this string is empty.
         AST astBool = initAST(ASTType.AST_BOOL)
           ..boolValue = left.stringValue.isEmpty;
         return astBool;
@@ -24,6 +26,7 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'isNotEmpty':
       {
+        /// Returns true if this string is not empty.
         AST astBool = initAST(ASTType.AST_BOOL)
           ..boolValue = left.stringValue.isNotEmpty;
         return astBool;
@@ -41,7 +44,8 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'length':
       {
-        var intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
+        /// The length of the string.
+        ASR intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
 
         return intAST;
       }
@@ -90,6 +94,7 @@ AST visitStringMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'codeUnitAt':
       {
+        /// Returns the 16-bit UTF-16 code unit at the given index
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
         AST ast = initAST(ASTType.AST_INT)
@@ -101,6 +106,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'compareTo':
       {
+        /// Compares this string to other
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
@@ -113,6 +119,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'contains':
       {
+        /// Returns true if this string contains a match of other
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
@@ -126,6 +133,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'endsWith':
       {
+        /// Returns true if this string ends with other
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
@@ -251,6 +259,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'substring':
       {
+        /// Returns the substring of this string that extends from startIndex, inclusive, to endIndex, exclusive.
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
 
@@ -265,6 +274,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'toLowerCase':
       {
+        /// Converts all characters in this string to lower case case. 
         left.stringValue = left.stringValue.toLowerCase();
 
         return left;
@@ -272,6 +282,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'toUpperCase':
       {
+        /// Converts all characters in this string to upper case. 
         left.stringValue = left.stringValue.toUpperCase();
 
         return left;
@@ -279,6 +290,7 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'trim':
       {
+        /// Returns the string without any leading and trailing whitespace. 
         left.stringValue = left.stringValue.trim();
 
         return left;
@@ -286,12 +298,14 @@ AST visitStringMethods(AST node, AST left) {
 
     case 'trimLeft':
       {
+        /// Returns the string without any leading whitespace. 
         left.stringValue = left.stringValue.trimLeft();
         return left;
       }
 
     case 'trimRight':
       {
+        /// Returns the string without any trailing whitespace.
         left.stringValue = left.stringValue.trimRight();
         return left;
       }
