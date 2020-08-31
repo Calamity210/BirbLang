@@ -923,7 +923,7 @@ Future<AST> visitAttAccess(Runtime runtime, AST node) async {
         if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
           return visitDoubleProperties(node, left);
         else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
-          return visitDoubleProperties(node, left);
+          return visitDoubleMethods(node, left);
         break;
       case ASTType.AST_MAP:
         // TODO(Calamity210): Handle this case.

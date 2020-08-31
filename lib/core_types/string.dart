@@ -11,22 +11,19 @@ AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        AST astList = ListNode()
-          ..listElements = left.stringValue.codeUnits;
+        AST astList = ListNode()..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
     case 'isEmpty':
       {
-        AST astBool = BoolNode()
-          ..boolVal = left.stringValue.isEmpty;
+        AST astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        AST astBool = BoolNode()
-          ..boolVal = left.stringValue.isNotEmpty;
+        AST astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
         return astBool;
       }
 
@@ -35,7 +32,7 @@ AST visitStringProperties(AST node, AST left) {
         print(left.stringValue);
         AST astString = StringNode()
           ..stringValue =
-          stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
+              stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
         return astString;
       }
@@ -76,8 +73,7 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'toDec':
       {
-        AST astList = ListNode()
-          ..listElements = left.stringValue.codeUnits;
+        AST astList = ListNode()..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
@@ -145,7 +141,7 @@ AST visitStringMethods(AST node, AST left) {
         List args = node.binaryOpRight.funcCallArgs;
         AST ast = IntNode()
           ..intVal =
-          left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
+              left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
 
         return ast;
       }
@@ -158,7 +154,7 @@ AST visitStringMethods(AST node, AST left) {
         List args = node.binaryOpRight.funcCallArgs;
         AST ast = IntNode()
           ..intVal =
-          left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
+              left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
 
         return ast;
       }
@@ -298,6 +294,7 @@ AST visitStringMethods(AST node, AST left) {
       }
 
     default:
-      throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'String');
+      throw NoSuchMethodException(
+          node.binaryOpRight.funcCallExpression.variableName, 'String');
   }
 }

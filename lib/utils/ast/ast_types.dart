@@ -1,4 +1,3 @@
-
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/utils/AST.dart';

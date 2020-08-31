@@ -1,8 +1,0 @@
-double price = 10.101010;
-
-screm(price.hashCode);
-screm(price.isFinite);
-screm(price.isInfinite);
-screm(price.isNaN);
-screm(price.isNegative);
-screm(price.sign);

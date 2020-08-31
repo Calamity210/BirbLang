@@ -1,0 +1,29 @@
+double price = 11.101010;
+
+
+//PROPERTIES
+screm(price.isFinite);
+screm(price.isInfinite);
+screm(price.isNaN);
+screm(price.isNegative);
+screm(price.sign);
+screm(price.runtimeType);
+
+//METHODS
+screm(price.abs());
+screm(price.ceil());
+screm(price.ceilToDouble());
+screm(price.clamp(1.0, 10.0));
+screm(price.compareTo(5.0));
+screm(price.floor());
+screm(price.floorToDouble());
+screm(price.remainder(5.0));
+screm(price.round());
+screm(price.roundToDouble());
+screm(price.toInt());
+screm(price.toString());
+screm(price.toStringAsExponential());
+screm(price.toStringAsFixed(1));
+screm(price.toStringAsPrecision(1));
+screm(price.truncate());
+screm(price.truncateToDouble());

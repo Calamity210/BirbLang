@@ -8,23 +8,20 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
   switch (node.binaryOpRight.variableName) {
     case 'isEmpty':
       {
-        AST astBool = BoolNode()
-          ..boolVal = left.strBuffer.isEmpty;
+        AST astBool = BoolNode()..boolVal = left.strBuffer.isEmpty;
 
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        AST astBool = BoolNode()
-          ..boolVal = left.strBuffer.isNotEmpty;
+        AST astBool = BoolNode()..boolVal = left.strBuffer.isNotEmpty;
 
         return astBool;
       }
     case 'length':
       {
-        AST astInt = IntNode()
-          ..intVal = left.strBuffer.length;
+        AST astInt = IntNode()..intVal = left.strBuffer.length;
 
         return astInt;
       }
@@ -38,8 +35,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
 AST visitStrBufferMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
-      AST strAST = StringNode()
-        ..stringValue = left.strBuffer.toString();
+      AST strAST = StringNode()..stringValue = left.strBuffer.toString();
       return strAST;
 
     case 'clear':
