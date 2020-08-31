@@ -1,7 +1,8 @@
-import '../parser/data_type.dart';
-import '../runtime/runtime.dart';
-import 'scope.dart';
-import '../lexer/token.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/parser/data_type.dart';
+import 'package:Birb/runtime/runtime.dart';
+import 'package:Birb/lexer/token.dart';
+import 'package:Birb/utils/scope.dart';
 
 typedef AstFuncPointer = AST Function(Runtime runtime, AST self, List args);
 typedef AstFutureFuncPointer = Future<AST> Function(
@@ -56,12 +57,12 @@ class AST {
   int intVal = 0;
 
   // AST_BOOL
-  bool boolValue = false;
+  bool boolVal = false;
 
   bool isClassChild = false;
 
   // AST_DOUBLE
-  double doubleValue = 0;
+  double doubleVal = 0;
 
   // AST_STRING
   String stringValue;
@@ -101,7 +102,6 @@ class AST {
 
   List funcDefinitions;
   List funcDefArgs;
-
   AST funcDefBody;
   AST funcDefType;
 
@@ -110,8 +110,6 @@ class AST {
   List listElements;
   Map<String, dynamic> map;
   List compChildren;
-
-  dynamic classValue;
 
   // AST_IF
   AST ifExpression;
@@ -144,26 +142,12 @@ class AST {
   Scope scope;
 
   AstFuncPointer funcPointer;
-  AstFutureFuncPointer futureptr;
+  AstFutureFuncPointer futureFuncPointer;
 }
 
-/// Initializes the Abstract Syntax tree with default values
-AST initAST(ASTType type) {
-  var ast = AST()..type = type;
-  ast.compoundValue = ast.type == ASTType.AST_COMPOUND ? [] : null;
-  ast.funcCallArgs = ast.type == ASTType.AST_FUNC_CALL ? [] : null;
-  ast.funcDefArgs = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
-  ast.classChildren = ast.type == ASTType.AST_CLASS ? [] : null;
-  ast.enumElements = ast.type == ASTType.AST_ENUM ? [] : null;
-  ast.listElements = ast.type == ASTType.AST_LIST ? [] : null;
-  ast.compChildren = ast.type == ASTType.AST_FUNC_DEFINITION ? [] : null;
 
-  return ast;
-}
-
-AST initASTWithLine(ASTType type, int line) {
-  var node = initAST(type)..lineNum = line;
-
+AST initASTWithLine(ASTNode node, int line) {
+  node.lineNum = line;
   return node;
 }
 
@@ -185,13 +169,13 @@ String astToString(AST ast) {
     case ASTType.AST_STRING_BUFFER:
       return '[ StrBuffer ]';
     case ASTType.AST_DOUBLE:
-      return ast.doubleValue.toStringAsPrecision(6).padRight(12);
+      return ast.doubleVal.toStringAsPrecision(6).padRight(12);
     case ASTType.AST_LIST:
       return ast.listElements.toString();
     case ASTType.AST_MAP:
       return ast.map.toString();
     case ASTType.AST_BOOL:
-      return ast.boolValue.toString();
+      return ast.boolVal.toString();
     case ASTType.AST_INT:
       return ast.intVal.toString();
     case ASTType.AST_TYPE:

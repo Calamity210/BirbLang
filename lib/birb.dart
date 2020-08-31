@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:Birb/utils/AST.dart';
 import 'package:Birb/utils/exceptions.dart';
-import 'lexer/lexer.dart';
-import 'parser/parser.dart';
-import 'runtime/runtime.dart';
+import 'package:Birb/lexer/lexer.dart';
+import 'package:Birb/parser/parser.dart';
+import 'package:Birb/runtime/runtime.dart';
 
 Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will

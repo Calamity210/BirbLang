@@ -1,4 +1,5 @@
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `Doubles`s
@@ -6,42 +7,42 @@ AST visitDoubleProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'isFinite':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isFinite;
+        AST boolAST = BoolNode()
+          ..boolVal = left.doubleVal.isFinite;
         return boolAST;
       }
 
     case 'isInfinite':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isInfinite;
+        AST boolAST = BoolNode()
+          ..boolVal = left.doubleVal.isInfinite;
         return boolAST;
       }
 
     case 'isNaN':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isNaN;
+        AST boolAST = BoolNode()..boolVal = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
-        AST boolAST = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.doubleValue.isNegative;
+        AST boolAST = BoolNode()
+          ..boolVal = left.doubleVal.isNegative;
         return boolAST;
       }
 
     case 'hashCode':
       {
-        AST intAST = initAST(ASTType.AST_INT)
-          ..intVal = left.doubleValue.hashCode;
+        AST intAST = IntNode()
+          ..intVal = left.doubleVal.hashCode;
         return intAST;
       }
 
     case 'sign':
       {
-        AST doubleAST = initAST(ASTType.AST_DOUBLE)
-          ..doubleValue = left.doubleValue.sign;
+        AST doubleAST = DoubleNode()
+          ..doubleVal = left.doubleVal.sign;
         return doubleAST;
       }
   }

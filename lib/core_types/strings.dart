@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `String`
@@ -10,29 +11,29 @@ AST visitStringProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        AST astList = initAST(ASTType.AST_LIST)
+        AST astList = ListNode()
           ..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
     case 'isEmpty':
       {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isEmpty;
+        AST astBool = BoolNode()
+          ..boolVal = left.stringValue.isEmpty;
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        AST astBool = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.isNotEmpty;
+        AST astBool = BoolNode()
+          ..boolVal = left.stringValue.isNotEmpty;
         return astBool;
       }
 
     case 'mock':
       {
         print(left.stringValue);
-        AST astString = initAST(ASTType.AST_STRING)
+        AST astString = StringNode()
           ..stringValue =
           stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
@@ -41,13 +42,13 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'length':
       {
-        var intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
+        var intAST = IntNode()..intVal = left.stringValue.length;
 
         return intAST;
       }
     case 'toBinary':
       {
-        AST astList = initAST(ASTType.AST_LIST)
+        AST astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(2))
               .toList();
@@ -56,7 +57,7 @@ AST visitStringProperties(AST node, AST left) {
       }
     case 'toOct':
       {
-        AST astList = initAST(ASTType.AST_LIST)
+        AST astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(8))
               .toList();
@@ -65,7 +66,7 @@ AST visitStringProperties(AST node, AST left) {
       }
     case 'toHex':
       {
-        AST astList = initAST(ASTType.AST_LIST)
+        AST astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(16))
               .toList();
@@ -75,7 +76,7 @@ AST visitStringProperties(AST node, AST left) {
 
     case 'toDec':
       {
-        AST astList = initAST(ASTType.AST_LIST)
+        AST astList = ListNode()
           ..listElements = left.stringValue.codeUnits;
         return astList;
       }
@@ -92,7 +93,7 @@ AST visitStringMethods(AST node, AST left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
-        AST ast = initAST(ASTType.AST_INT)
+        AST ast = IntNode()
           ..intVal = left.stringValue
               .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
 
@@ -104,7 +105,7 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST ast = initAST(ASTType.AST_INT)
+        AST ast = IntNode()
           ..intVal = left.stringValue
               .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -116,8 +117,8 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue.contains(
+        AST ast = BoolNode()
+          ..boolVal = left.stringValue.contains(
               node.binaryOpRight.funcCallArgs[0].stringValue,
               node.binaryOpRight.funcCallArgs[1].intVal);
 
@@ -129,8 +130,8 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST ast = initAST(ASTType.AST_BOOL)
-          ..boolValue = left.stringValue
+        AST ast = BoolNode()
+          ..boolVal = left.stringValue
               .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
 
         return ast;
@@ -142,7 +143,7 @@ AST visitStringMethods(AST node, AST left) {
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
         List args = node.binaryOpRight.funcCallArgs;
-        AST ast = initAST(ASTType.AST_INT)
+        AST ast = IntNode()
           ..intVal =
           left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
 
@@ -155,7 +156,7 @@ AST visitStringMethods(AST node, AST left) {
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
         List args = node.binaryOpRight.funcCallArgs;
-        AST ast = initAST(ASTType.AST_INT)
+        AST ast = IntNode()
           ..intVal =
           left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
 
@@ -228,7 +229,7 @@ AST visitStringMethods(AST node, AST left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        AST ast = initAST(ASTType.AST_LIST);
+        AST ast = ListNode();
         ast.listElements = left.stringValue
             .split(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -242,8 +243,8 @@ AST visitStringMethods(AST node, AST left) {
 
         List args = node.binaryOpRight.funcCallArgs;
 
-        AST ast = initAST(ASTType.AST_BOOL);
-        ast.boolValue =
+        AST ast = BoolNode();
+        ast.boolVal =
             left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
 
         return ast;
@@ -256,7 +257,7 @@ AST visitStringMethods(AST node, AST left) {
 
         List args = node.binaryOpRight.funcCallArgs;
 
-        AST ast = initAST(ASTType.AST_STRING);
+        AST ast = StringNode();
         ast.stringValue =
             left.stringValue.substring(args[0].intVal, args[1].intVal);
 
