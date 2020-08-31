@@ -6,6 +6,7 @@ AST visitDoubleProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'isFinite':
       {
+        /// True if the number is finite; otherwise, false.
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.doubleValue.isFinite;
         return boolAST;
@@ -13,6 +14,7 @@ AST visitDoubleProperties(AST node, AST left) {
 
     case 'isInfinite':
       {
+        /// True if the number is positive infinity or negative infinity; otherwise, false.
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.doubleValue.isInfinite;
         return boolAST;
@@ -20,12 +22,14 @@ AST visitDoubleProperties(AST node, AST left) {
 
     case 'isNaN':
       {
+        /// True if the number is the double Not-a-Number value; otherwise, false.
         AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
+        /// True if the number is negative; otherwise, false. 
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.doubleValue.isNegative;
         return boolAST;
@@ -33,6 +37,8 @@ AST visitDoubleProperties(AST node, AST left) {
 
     case 'hashCode':
       {
+        /// The hash code for this object.
+        /// A hash code is a single integer which represents the state of the object that affects operator == comparisons.
         AST intAST = initAST(ASTType.AST_INT)
           ..intVal = left.doubleValue.hashCode;
         return intAST;
@@ -40,6 +46,7 @@ AST visitDoubleProperties(AST node, AST left) {
 
     case 'sign':
       {
+        /// Returns the sign of the double's numerical value.
         AST doubleAST = initAST(ASTType.AST_DOUBLE)
           ..doubleValue = left.doubleValue.sign;
         return doubleAST;
