@@ -1,0 +1,17 @@
+int i = 11;
+
+screm(i.bitLength);
+screm(i.isEven);
+screm(i.isFinite);
+screm(i.isInfinite);
+screm(i.isNaN);
+screm(i.isNegative);
+screm(i.isOdd);
+screm(i.sign);
+screm(i.runtimeType);
+
+screm(i.abs());
+screm(i.clamp(1, 10));
+screm(i.compareTo(6));
+screm(i.toStringAsExponential());
+screm(i.toUnsigned(1));
