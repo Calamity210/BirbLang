@@ -128,7 +128,7 @@ class VariableNode extends ASTNode {
 
 class VarModNode extends ASTNode {
   @override
-  ASTType type = ASTType.AST_VARIABLE;
+  ASTType type = ASTType.AST_VARIABLE_MODIFIER;
 
   @override
   String variableName;
@@ -147,6 +147,9 @@ class VarModNode extends ASTNode {
 
   @override
   AST binaryOpLeft;
+
+  @override
+  AST binaryOpRight;
 
   @override
   List classChildren = [];
@@ -215,7 +218,7 @@ class StringNode extends ASTNode {
   ASTType type = ASTType.AST_STRING;
 
   @override
-  String stringValue;
+  String stringValue = '';
 
 }
 
@@ -224,7 +227,7 @@ class StrBufferNode extends ASTNode {
   ASTType type = ASTType.AST_STRING_BUFFER;
 
   @override
-  StringBuffer strBuffer;
+  StringBuffer strBuffer = StringBuffer();
 
   @override
   bool isFinal;
@@ -255,6 +258,9 @@ class DoubleNode extends ASTNode {
 
   @override
   int intVal = 0;
+
+  @override
+  String stringValue = '0.0';
 
 }
 
@@ -477,7 +483,7 @@ AST initAST(ASTType type) {
   if (type == ASTType.AST_LIST) return ListNode();
   if (type == ASTType.AST_MAP) return MapNode();
   if (type == ASTType.AST_VARIABLE) return VariableNode();
-  if (type == ASTType.AST_VARIABLE) return VarModNode();
+  if (type == ASTType.AST_VARIABLE_MODIFIER) return VarModNode();
   if (type == ASTType.AST_VARIABLE_DEFINITION) return VarDefNode();
   if (type == ASTType.AST_VARIABLE_ASSIGNMENT) return VarAssignmentNode();
   if (type == ASTType.AST_NULL) return NullNode();

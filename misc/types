@@ -7,11 +7,11 @@ ENUM EnumNode enumElements=[]
 LIST ListNode listElements=[] funcDefinitions=[]
 MAP MapNode map={} funcDefinitions=[]
 VARIABLE VariableNode variableName variableValue variableType isFinal classChildren=[] enumElements=[]
-VARIABLE VarModNode variableName variableValue variableType isFinal binaryOperator binaryOpLeft classChildren=[] enumElements=[]
+VARIABLE_MODIFIER VarModNode variableName variableValue variableType isFinal binaryOperator binaryOpLeft binaryOpRight classChildren=[] enumElements=[]
 VARIABLE_DEFINITION VarDefNode variableName variableValue variableType variableAssignmentLeft isFinal savedFuncCall
 VARIABLE_ASSIGNMENT VarAssignmentNode variableName variableValue variableType variableAssignmentLeft isFinal classChildren=[]
 NULL NullNode
-STRING StringNode stringValue='';
+STRING StringNode stringValue=''
 STRING_BUFFER StrBufferNode strBuffer=StringBuffer() isFinal
 INT IntNode intVal=0 doubleVal=0 stringValue='0'
 DOUBLE DoubleNode doubleVal=0 intVal=0 stringValue='0.0'
