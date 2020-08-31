@@ -13,8 +13,8 @@ doc/api/
 .vscode
 
 # Executable
-birb
-birb.exe
+**/birb
+**/birb.exe
 
 # Desktop Services Store
 **/.DS_Store

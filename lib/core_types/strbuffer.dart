@@ -1,5 +1,6 @@
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `StrBuffer`
@@ -7,7 +8,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
   switch (node.binaryOpRight.variableName) {
     case 'isEmpty':
       {
-        AST astBool = initAST(ASTType.AST_BOOL)
+        AST astBool = BoolNode()
           ..boolVal = left.strBuffer.isEmpty;
 
         return astBool;
@@ -15,14 +16,14 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
 
     case 'isNotEmpty':
       {
-        AST astBool = initAST(ASTType.AST_BOOL)
+        AST astBool = BoolNode()
           ..boolVal = left.strBuffer.isNotEmpty;
 
         return astBool;
       }
     case 'length':
       {
-        AST astInt = initAST(ASTType.AST_INT)
+        AST astInt = IntNode()
           ..intVal = left.strBuffer.length;
 
         return astInt;
@@ -37,7 +38,7 @@ Future<AST> visitStrBufferProperties(AST node, AST left) async {
 AST visitStrBufferMethods(AST node, AST left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
-      AST strAST = initAST(ASTType.AST_STRING)
+      AST strAST = StringNode()
         ..stringValue = left.strBuffer.toString();
       return strAST;
 

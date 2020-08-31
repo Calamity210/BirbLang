@@ -1,4 +1,5 @@
 import 'package:Birb/core_types/core_types.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/utils/AST.dart';
 import 'package:Birb/utils/scope.dart';
@@ -19,26 +20,26 @@ Runtime initRuntime() {
     ..listMethods = []
     ..mapMethods = [];
 
-  INITIALIZED_NOOP = initAST(ASTType.AST_NOOP);
+  INITIALIZED_NOOP = NoopNode();
 
   initStandards(runtime);
 
-  var LIST_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  var LIST_ADD_FUNCTION_DEFINITION = FuncDefNode();
   LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
   LIST_ADD_FUNCTION_DEFINITION.funcPointer = listAddFuncPointer;
   runtime.listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
 
-  var LIST_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  var LIST_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
   LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
   LIST_REMOVE_FUNCTION_DEFINITION.funcPointer = listRemoveFuncPointer;
   runtime.listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
 
-  var MAP_ADD_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  var MAP_ADD_FUNCTION_DEFINITION = FuncDefNode();
   MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
   MAP_ADD_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
   runtime.mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
 
-  var MAP_REMOVE_FUNCTION_DEFINITION = initAST(ASTType.AST_FUNC_DEFINITION);
+  var MAP_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
   MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
   MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
   runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
@@ -138,7 +139,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
     AST astFDefArg = fDef.funcDefArgs[x];
     var argName = astFDefArg.variableName;
 
-    var newVariableDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
+    var newVariableDef = VarDefNode();
     newVariableDef.variableType = astFDefArg.variableType;
 
     if (astArg.type == ASTType.AST_VARIABLE) {
@@ -159,7 +160,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fCall, AST fDef) async {
 
 AST registerGlobalFunction(
     Runtime runtime, String fName, AstFuncPointer funcPointer) {
-  var fDef = initAST(ASTType.AST_FUNC_DEFINITION);
+  var fDef = FuncDefNode();
   fDef.funcName = fName;
   fDef.funcPointer = funcPointer;
   runtime.scope.functionDefinitions.add(fDef);
@@ -168,7 +169,7 @@ AST registerGlobalFunction(
 
 AST registerGlobalFutureFunction(
     Runtime runtime, String fName, AstFutureFuncPointer funcPointer) {
-  var fDef = initAST(ASTType.AST_FUNC_DEFINITION)
+  var fDef = FuncDefNode()
     ..funcName = fName
     ..futureFuncPointer = funcPointer;
   runtime.scope.functionDefinitions.add(fDef);
@@ -176,17 +177,17 @@ AST registerGlobalFutureFunction(
 }
 
 AST registerGlobalVariable(Runtime runtime, String varName, String varVal) {
-  AST varDef = initAST(ASTType.AST_VARIABLE_DEFINITION)
+  AST varDef = VarDefNode()
     ..variableName = varName
-    ..variableType = initAST(ASTType.AST_STRING)
-    ..variableValue = initAST(ASTType.AST_STRING)
+    ..variableType = StringNode()
+    ..variableValue = StringNode()
     ..variableValue.stringValue = varVal;
   runtime.scope.variableDefinitions.add(varDef);
   return varDef;
 }
 
 AST registerFunction(Scope scope, String fName, AstFuncPointer funcPointer) {
-  AST fDef = initAST(ASTType.AST_FUNC_DEFINITION);
+  AST fDef = FuncDefNode();
   fDef.funcName = fName;
   fDef.funcPointer = funcPointer;
   scope.functionDefinitions.add(fDef);
@@ -347,7 +348,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
         if (variable.ast != null) {
           return variable.ast;
         } else {
-          var intAST = initAST(ASTType.AST_INT);
+          var intAST = IntNode();
           intAST.intVal = i;
           variable.ast = intAST;
 
@@ -434,7 +435,7 @@ Future<AST> visitVarDef(Runtime runtime, AST node) async {
 
       node.variableValue = await visit(runtime, node.variableValue);
     } else {
-      node.variableValue = initAST(ASTType.AST_NULL);
+      node.variableValue = NullNode();
     }
   }
   getScope(runtime, node).variableDefinitions.add(node);
@@ -769,7 +770,7 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
   if (funcDef.funcDefBody != null)
     return await runtimeFuncCall(runtime, node, funcDef);
   else if (funcDef.compChildren != null) {
-    var finalRes = initAST(ASTType.AST_NULL);
+    var finalRes = NullNode();
     var dataType = funcDef.funcDefType.typeValue.type;
 
     if (dataType == DATATYPE.DATA_TYPE_INT) {
@@ -802,7 +803,7 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
 
         res = await runtimeFuncCall(runtime, node, compChild);
       } else {
-        var fCall = initAST(ASTType.AST_FUNC_CALL);
+        var fCall = FuncCallNode();
         fCall.funcCallExpression = compChild;
 
         if (i == 0)
@@ -1030,7 +1031,7 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
 
     if (left.map.containsKey(key)) {
       if (left.map[key] is String) {
-        AST mapValAST = initAST(ASTType.AST_STRING)
+        AST mapValAST = StringNode()
           ..stringValue = left.map[key];
         return mapValAST;
       }
@@ -1043,7 +1044,7 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
         index < left.listElements.length) {
       if (left.listElements[index] is Map) {
         var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
-        AST mapAst = initAST(ASTType.AST_MAP)
+        AST mapAst = MapNode()
           ..typeValue = type
           ..scope = left.scope
           ..map = left.listElements[index];
@@ -1051,7 +1052,7 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
         return mapAst;
       } else if (left.listElements[index] is String) {
         var type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-        AST stringAst = initAST(ASTType.AST_STRING)
+        AST stringAst = StringNode()
           ..typeValue = type
           ..scope = left.scope
           ..stringValue = left.listElements[index];
@@ -1111,7 +1112,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
               AST astFDefArg = child.funcDefArgs[j];
               String argName = astFDefArg.variableName;
 
-              var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
+              var newVarDef = VarDefNode();
               newVarDef.variableValue = await visit(runtime, astArg);
               newVarDef.variableName = argName;
 
@@ -1133,7 +1134,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_PLUS:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_INT);
+          retVal = IntNode();
 
           retVal.intVal = left.intVal + right.intVal;
 
@@ -1141,21 +1142,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal + right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.intVal + right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal + right.intVal;
 
@@ -1163,7 +1164,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_STRING &&
             right.type == ASTType.AST_STRING) {
-          retVal = initAST(ASTType.AST_STRING);
+          retVal = StringNode();
 
           retVal.stringValue = left.stringValue + right.stringValue;
 
@@ -1171,14 +1172,14 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_STRING && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_STRING);
+          retVal = StringNode();
 
           retVal.stringValue = left.stringValue + right.intVal.toString();
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_STRING) {
-          retVal = initAST(ASTType.AST_STRING);
+          retVal = StringNode();
 
           retVal.stringValue = left.intVal.toString() + right.stringValue;
 
@@ -1186,7 +1187,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_STRING &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_STRING);
+          retVal = StringNode();
 
           retVal.stringValue = left.stringValue + right.doubleVal.toString();
 
@@ -1194,7 +1195,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_STRING) {
-          retVal = initAST(ASTType.AST_STRING);
+          retVal = StringNode();
 
           retVal.stringValue = left.doubleVal.toString() + right.stringValue;
 
@@ -1207,7 +1208,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_SUB:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_INT);
+          retVal = IntNode();
 
           retVal.intVal = left.intVal - right.intVal;
 
@@ -1215,21 +1216,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal - right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.intVal - right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal - right.intVal;
 
@@ -1241,7 +1242,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_MUL:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_INT);
+          retVal = IntNode();
 
           retVal.intVal = left.intVal * right.intVal;
 
@@ -1249,21 +1250,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal * right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.intVal * right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal * right.intVal;
 
@@ -1275,7 +1276,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_DIV:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.intVal / right.intVal;
 
@@ -1283,21 +1284,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal / right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.intVal / right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_DOUBLE);
+          retVal = DoubleNode();
 
           retVal.doubleVal = left.doubleVal / right.intVal;
 
@@ -1309,7 +1310,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_AND:
       {
         if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.boolVal && right.boolVal;
 
@@ -1321,7 +1322,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_OR:
       {
         if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.boolVal || right.boolVal;
 
@@ -1333,7 +1334,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_LESS_THAN:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal < right.intVal;
 
@@ -1341,21 +1342,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal < right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal < right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal < right.intVal;
 
@@ -1367,7 +1368,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_GREATER_THAN:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal > right.intVal;
 
@@ -1375,21 +1376,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal > right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal > right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal > right.intVal;
 
@@ -1401,7 +1402,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_EQUALITY:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal == right.intVal;
 
@@ -1409,35 +1410,35 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal == right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal == 0 || left.intVal == null;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == right.intVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == 0 || left.doubleVal == null;
 
@@ -1445,7 +1446,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_STRING &&
             right.type == ASTType.AST_STRING) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.stringValue == right.stringValue;
 
@@ -1453,14 +1454,14 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_STRING && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.stringValue == null;
 
           return retVal;
         }
         if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_CLASS) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.classChildren == right.classChildren;
 
@@ -1468,7 +1469,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.classChildren.isEmpty;
 
@@ -1476,7 +1477,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_NULL && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = true;
 
@@ -1487,7 +1488,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_NOT_EQUAL:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal != right.intVal;
 
@@ -1495,35 +1496,35 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_DOUBLE &&
             right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal != right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal != right.doubleVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.intVal != 0 || left.intVal != null;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal != right.intVal;
 
           return retVal;
         }
         if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal != 0 || left.doubleVal != null;
 
@@ -1531,7 +1532,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
         if (left.type == ASTType.AST_STRING &&
             right.type == ASTType.AST_STRING) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.stringValue != right.stringValue;
 
@@ -1539,14 +1540,14 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_STRING && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.stringValue != null;
 
           return retVal;
         }
         if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_CLASS) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.classChildren != right.classChildren;
 
@@ -1554,7 +1555,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = left.classChildren.isNotEmpty;
 
@@ -1562,7 +1563,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left.type == ASTType.AST_NULL && right.type == ASTType.AST_NULL) {
-          retVal = initAST(ASTType.AST_BOOL);
+          retVal = BoolNode();
 
           retVal.boolVal = false;
 
@@ -1588,10 +1589,10 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_SUB:
       {
         if (right.type == ASTType.AST_INT) {
-          returnValue = initAST(ASTType.AST_INT);
+          returnValue = IntNode();
           returnValue.intVal = -right.intVal;
         } else if (right.type == ASTType.AST_DOUBLE) {
-          returnValue = initAST(ASTType.AST_DOUBLE);
+          returnValue = DoubleNode();
           returnValue.doubleVal = -right.doubleVal;
         }
       }
@@ -1600,10 +1601,10 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_PLUS:
       {
         if (right.type == ASTType.AST_INT) {
-          returnValue = initAST(ASTType.AST_INT);
+          returnValue = IntNode();
           returnValue.intVal = right.intVal.abs();
         } else if (right.type == ASTType.AST_DOUBLE) {
-          returnValue = initAST(ASTType.AST_DOUBLE);
+          returnValue = DoubleNode();
           returnValue.doubleVal = right.doubleVal.abs();
         }
       }
@@ -1639,7 +1640,7 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
       break;
     case TokenType.TOKEN_NOT:
       {
-        AST boolAST = initAST(ASTType.AST_BOOL);
+        AST boolAST = BoolNode();
         switch (node.unaryOpRight.type) {
           case ASTType.AST_VARIABLE:
             {
@@ -1810,8 +1811,8 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
   AST indexVar;
 
   if (fDef.funcDefArgs.length > 1) {
-    indexVar = initAST(ASTType.AST_VARIABLE_DEFINITION);
-    indexVar.variableValue = initAST(ASTType.AST_INT);
+    indexVar = VarDefNode();
+    indexVar.variableValue = IntNode();
     indexVar.variableValue.intVal = i;
     indexVar.variableName = (fDef.funcDefArgs[0] as AST).variableName;
 
@@ -1819,8 +1820,8 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
   }
 
   if (astIterable.type == ASTType.AST_STRING) {
-    var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
-    newVarDef.variableValue = initAST(ASTType.AST_STRING);
+    var newVarDef = VarDefNode();
+    newVarDef.variableValue = StringNode();
     newVarDef.variableValue.stringValue = astIterable.stringValue[i];
     newVarDef.variableName = iterableVarName;
 
@@ -1834,7 +1835,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
       await visit(runtime, fDef.funcDefBody);
     }
   } else if (astIterable.type == ASTType.AST_LIST) {
-    var newVarDef = initAST(ASTType.AST_VARIABLE_DEFINITION);
+    var newVarDef = VarDefNode();
     newVarDef.variableValue = await visit(runtime, astIterable.listElements[i]);
     newVarDef.variableName = iterableVarName;
 

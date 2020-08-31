@@ -1,3 +1,4 @@
+import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart' as types;
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
@@ -145,14 +146,9 @@ class AST {
   AstFutureFuncPointer futureFuncPointer;
 }
 
-/// Initializes the Abstract Syntax tree with default values
-AST initAST(ASTType type) {
-  return types.initAST(type);
-}
 
-AST initASTWithLine(ASTType type, int line) {
-  var node = initAST(type)..lineNum = line;
-
+AST initASTWithLine(ASTNode node, int line) {
+  node.lineNum = line;
   return node;
 }
 
