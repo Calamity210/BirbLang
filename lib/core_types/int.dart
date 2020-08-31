@@ -7,18 +7,25 @@ AST visitIntProperties(AST node, AST left) {
   switch (node.binaryOpRight.variableName) {
     case 'bitLength':
       {
+        /// Returns the minimum number of bits required to store this integer.
+        /// The number of bits excludes the sign bit, which gives the natural length for non-negative (unsigned) values. 
+        /// Negative values are complemented to return the bit position of the first bit that differs from the sign bit.
+
         AST intAST = initAST(ASTType.AST_INT)..intVal = left.intVal.bitLength;
         return intAST;
       }
 
     case 'isEven':
       {
+        /// Returns true if and only if this integer is even.
         AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isEven;
         return boolAST;
       }
 
     case 'isFinite':
       {
+        /// True if the number is finite; otherwise, false.
+        /// The only non-finite numbers are NaN, positive infinity, and negative infinity.
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.intVal.isFinite;
         return boolAST;
@@ -26,6 +33,7 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isInfinite':
       {
+        /// True if the number is positive infinity or negative infinity; otherwise, false.
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.intVal.isInfinite;
         return boolAST;
@@ -33,12 +41,15 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isNaN':
       {
+        /// True if the number is the double Not-a-Number value; otherwise, false.
         AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
+        /// True if the number is negative; otherwise, false.
+        /// Negative numbers are those less than zero, and the double -0.0.
         AST boolAST = initAST(ASTType.AST_BOOL)
           ..boolValue = left.intVal.isNegative;
         return boolAST;
@@ -46,18 +57,22 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isOdd':
       {
+        /// Returns true if and only if this integer is odd.
         AST boolAST = initAST(ASTType.AST_BOOL)..boolValue = left.intVal.isOdd;
         return boolAST;
       }
 
     case 'sign':
       {
+        /// Returns the sign of this integer.
+        /// Returns 0 for zero, -1 for values less than zero and +1 for values greater than zero.
         AST intAST = initAST(ASTType.AST_BOOL)..intVal = left.intVal.sign;
         return intAST;
       }
 
     case 'runtimeType':
       {
+        /// A representation of the runtime type of the object.
         AST stringAST = initAST(ASTType.AST_STRING)
           ..stringValue = left.intVal.runtimeType.toString();
         return stringAST;
