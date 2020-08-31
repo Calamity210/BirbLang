@@ -8,7 +8,7 @@ class ASTNode implements AST {
   AST parent;
 
   @override
-  bool isClassChild;
+  bool isClassChild = false;
 
   @override
   ASTType type;

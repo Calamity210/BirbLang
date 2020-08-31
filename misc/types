@@ -1,19 +1,20 @@
 // type class_name ..field=init
 COMPOUND CompoundNode compoundValue=[]
-FUNC_CALL FuncCallNode funcName funcCallArgs=[]
+FUNC_CALL FuncCallNode funcName funcCallExpression funcCallArgs=[]
 FUNC_DEFINITION FuncDefNode funcName funcDefBody funcDefType funcDefArgs=[] funcPointer futureFuncPointer compChildren=[]
-CLASS ClassNode classChildren=[]
+CLASS ClassNode classChildren=[] funcDefinitions=[] variableType
 ENUM EnumNode enumElements=[]
-LIST ListNode listElements=[]
-MAP MapNode map={}
-VARIABLE VariableNode variableName variableValue variableType isFinal
+LIST ListNode listElements=[] funcDefinitions=[]
+MAP MapNode map={} funcDefinitions=[]
+VARIABLE VariableNode variableName variableValue variableType isFinal classChildren=[] enumElements=[]
+VARIABLE VarModNode variableName variableValue variableType isFinal binaryOperator binaryOpLeft classChildren=[] enumElements=[]
 VARIABLE_DEFINITION VarDefNode variableName variableValue variableType variableAssignmentLeft isFinal savedFuncCall
-VARIABLE_ASSIGNMENT VarAssignmentNode variableName variableValue variableType variableAssignmentLeft isFinal
+VARIABLE_ASSIGNMENT VarAssignmentNode variableName variableValue variableType variableAssignmentLeft isFinal classChildren=[]
 NULL NullNode
-STRING StringNode stringValue
-STRING_BUFFER StrBufferNode strBuffer
-INT IntNode intVal=0 doubleVal=0
-DOUBLE DoubleNode doubleVal=0 intVal=0
+STRING StringNode stringValue='';
+STRING_BUFFER StrBufferNode strBuffer=StringBuffer() isFinal
+INT IntNode intVal=0 doubleVal=0 stringValue='0'
+DOUBLE DoubleNode doubleVal=0 intVal=0 stringValue='0.0'
 BOOL BoolNode boolVal=false
 ANY AnyNode
 TYPE TypeNode
@@ -30,6 +31,6 @@ SWITCH SwitchNode switchExpression switchCases switchDefault
 WHILE WhileNode whileExpression whileBody
 FOR ForNode forInitStatement forConditionStatement forChangeStatement forBody
 ATTRIBUTE_ACCESS AttributeAccessNode classChildren binaryOpRight binaryOpLeft enumElements
-LIST_ACCESS ListAccessNode listAccessPointer
+LIST_ACCESS ListAccessNode listAccessPointer binaryOpLeft
 ITERATE IterateNode iterateIterable iterateFunction
 ASSERT AssertNode assertExpression

@@ -1,5 +1,4 @@
 import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart' as types;
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/lexer/token.dart';

@@ -1,4 +1,5 @@
 import 'package:Birb/core_types/core_types.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/utils/AST.dart';
@@ -770,21 +771,17 @@ Future<AST> runtimeFuncLookup(Runtime runtime, Scope scope, AST node) async {
   if (funcDef.funcDefBody != null)
     return await runtimeFuncCall(runtime, node, funcDef);
   else if (funcDef.compChildren != null) {
-    var finalRes = NullNode();
+    var finalRes = ASTNode();
     var dataType = funcDef.funcDefType.typeValue.type;
 
     if (dataType == DATATYPE.DATA_TYPE_INT) {
-      finalRes.type = ASTType.AST_INT;
-      finalRes.intVal = 0;
+      finalRes = IntNode();
     } else if (dataType == DATATYPE.DATA_TYPE_DOUBLE) {
-      finalRes.type = ASTType.AST_DOUBLE;
-      finalRes.doubleVal = 0;
+      finalRes = DoubleNode();
     } else if (dataType == DATATYPE.DATA_TYPE_STRING) {
-      finalRes.type = ASTType.AST_STRING;
-      finalRes.stringValue = '';
+      finalRes = StringNode();
     } else if (dataType == DATATYPE.DATA_TYPE_STRING_BUFFER) {
-      finalRes.type = ASTType.AST_STRING_BUFFER;
-      finalRes.strBuffer = StringBuffer();
+      finalRes = StrBufferNode();
     }
 
     var callArgs = [];

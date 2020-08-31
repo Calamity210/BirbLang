@@ -86,8 +86,6 @@ AST funcExit(Runtime runtime, AST self, List args) {
  */
 AST funcDate(Runtime runtime, AST self, List args) {
   var astObj = ClassNode();
-  astObj.variableType = TypeNode();
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD YEAR TO DATE OBJECT
   var astVarYear = VarDefNode();
@@ -133,7 +131,7 @@ AST funcDate(Runtime runtime, AST self, List args) {
 
   var astIntWeekDay = IntNode();
   astIntWeekDay.intVal = DateTime.now().weekday;
-  astIntWeekDay.variableValue = astIntWeekDay;
+  astVarWeekDay.variableValue = astIntWeekDay;
 
   astObj.classChildren.add(astVarWeekDay);
 
@@ -219,7 +217,6 @@ Future<AST> funcGet(Runtime runtime, AST self, List args) async {
 
     funCall = FuncCallNode();
     funCall.funcName = funcDef.funcName;
-    funCall.type = ASTType.AST_FUNC_CALL;
     funCall.funcCallExpression = funcCalExpr;
   }
 
@@ -334,7 +331,6 @@ Future<AST> funcPost(Runtime runtime, AST self, List args) async {
 
     funCall = FuncCallNode();
     funCall.funcName = funcDef.funcName;
-    funCall.type = ASTType.AST_FUNC_CALL;
     funCall.funcCallExpression = funcCalExpr;
   }
 

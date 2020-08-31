@@ -20,6 +20,9 @@ class FuncCallNode extends ASTNode {
   String funcName;
 
   @override
+  AST funcCallExpression;
+
+  @override
   List funcCallArgs = [];
 
 }
@@ -58,6 +61,12 @@ class ClassNode extends ASTNode {
   @override
   List classChildren = [];
 
+  @override
+  List funcDefinitions = [];
+
+  @override
+  AST variableType;
+
 }
 
 class EnumNode extends ASTNode {
@@ -76,6 +85,9 @@ class ListNode extends ASTNode {
   @override
   List listElements = [];
 
+  @override
+  List funcDefinitions = [];
+
 }
 
 class MapNode extends ASTNode {
@@ -84,6 +96,9 @@ class MapNode extends ASTNode {
 
   @override
   Map<String, dynamic> map = {};
+
+  @override
+  List funcDefinitions = [];
 
 }
 
@@ -102,6 +117,42 @@ class VariableNode extends ASTNode {
 
   @override
   bool isFinal;
+
+  @override
+  List classChildren = [];
+
+  @override
+  List enumElements = [];
+
+}
+
+class VarModNode extends ASTNode {
+  @override
+  ASTType type = ASTType.AST_VARIABLE;
+
+  @override
+  String variableName;
+
+  @override
+  AST variableValue;
+
+  @override
+  AST variableType;
+
+  @override
+  bool isFinal;
+
+  @override
+  Token binaryOperator;
+
+  @override
+  AST binaryOpLeft;
+
+  @override
+  List classChildren = [];
+
+  @override
+  List enumElements = [];
 
 }
 
@@ -148,6 +199,9 @@ class VarAssignmentNode extends ASTNode {
   @override
   bool isFinal;
 
+  @override
+  List classChildren = [];
+
 }
 
 class NullNode extends ASTNode {
@@ -172,6 +226,9 @@ class StrBufferNode extends ASTNode {
   @override
   StringBuffer strBuffer;
 
+  @override
+  bool isFinal;
+
 }
 
 class IntNode extends ASTNode {
@@ -183,6 +240,9 @@ class IntNode extends ASTNode {
 
   @override
   double doubleVal = 0;
+
+  @override
+  String stringValue = '0';
 
 }
 
@@ -382,6 +442,9 @@ class ListAccessNode extends ASTNode {
   @override
   AST listAccessPointer;
 
+  @override
+  AST binaryOpLeft;
+
 }
 
 class IterateNode extends ASTNode {
@@ -414,6 +477,7 @@ AST initAST(ASTType type) {
   if (type == ASTType.AST_LIST) return ListNode();
   if (type == ASTType.AST_MAP) return MapNode();
   if (type == ASTType.AST_VARIABLE) return VariableNode();
+  if (type == ASTType.AST_VARIABLE) return VarModNode();
   if (type == ASTType.AST_VARIABLE_DEFINITION) return VarDefNode();
   if (type == ASTType.AST_VARIABLE_ASSIGNMENT) return VarAssignmentNode();
   if (type == ASTType.AST_NULL) return NullNode();
