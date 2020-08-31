@@ -1,5 +1,4 @@
-class date = Date();
-int year = date.year;
+int year = Date.year;
 
 if (year == 2020)
 screm("2020");
