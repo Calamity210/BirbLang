@@ -15,3 +15,5 @@ screm(i.clamp(1, 10));
 screm(i.compareTo(6));
 screm(i.toStringAsExponential());
 screm(i.toUnsigned(1));
+
+screm(i + 0xFFAAA);

@@ -383,6 +383,27 @@ Token collectSingleQuoteString(Lexer lexer) {
 Token collectNumber(Lexer lexer) {
   TokenType type = TokenType.TOKEN_INT_VALUE;
   String value = '';
+  
+  if (lexer.currentChar == '0') {
+    value += lexer.currentChar;
+    advance(lexer);
+    
+    // 0x | 0X
+    if (lexer.currentChar == 'x' || lexer.currentChar == 'X') {
+      value += lexer.currentChar;
+      advance(lexer);
+      
+      while(RegExp('[0-9a-fA-F]').hasMatch(lexer.currentChar)) {
+        value += lexer.currentChar;
+        advance(lexer);
+      }
+
+      if (value.length >= 16)
+        throw UnexpectedTokenException("The integer literal `$value` can't be represented");
+
+      return initToken(TokenType.TOKEN_INT_VALUE, value);
+    }
+  }
 
   while (isNumeric(lexer.currentChar)) {
     value += lexer.currentChar;

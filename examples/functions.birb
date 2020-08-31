@@ -2,4 +2,4 @@ int add(int a, int b) {
     return a + b;
 }
 
-screm(add(10, 6));
+screm(add(0xA, 6));
