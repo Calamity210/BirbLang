@@ -1396,6 +1396,61 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
       }
       break;
 
+    case TokenType.TOKEN_BITWISE_AND:
+      {
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = IntNode()..intVal = left.intVal & right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
+    case TokenType.TOKEN_BITWISE_OR:
+      {
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = IntNode()..intVal = left.intVal | right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
+    case TokenType.TOKEN_BITWISE_XOR:
+      {
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = IntNode()..intVal = left.intVal ^ right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
+    case TokenType.TOKEN_LSHIFT:
+      {
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = IntNode()..intVal = left.intVal << right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
+    case TokenType.TOKEN_RSHIFT:
+      {
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = IntNode()..intVal = left.intVal >> right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
     case TokenType.TOKEN_EQUALITY:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
@@ -1583,6 +1638,14 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
   AST returnValue = INITIALIZED_NOOP;
 
   switch (node.unaryOperator.type) {
+    case TokenType.TOKEN_ONES_COMPLEMENT:
+      {
+        if (right.type == ASTType.AST_INT) {
+          returnValue = IntNode();
+          returnValue.intVal = ~right.intVal;
+        }
+      }
+      break;
     case TokenType.TOKEN_SUB:
       {
         if (right.type == ASTType.AST_INT) {

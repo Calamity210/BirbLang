@@ -1,0 +1,9 @@
+int a = 101;
+int b = 202;
+
+screm(a & b);
+screm(a | b);
+screm(a ^ b);
+screm(a << b);
+screm(a >> b);
+screm(~a);

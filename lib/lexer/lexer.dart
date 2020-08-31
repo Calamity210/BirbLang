@@ -40,10 +40,6 @@ Token getNextToken(Lexer lexer) {
     }
 
     switch(lexer.currentChar) {
-      case '@':
-        String curChar = lexer.currentChar;
-        advance(lexer);
-        return initToken(TokenType.TOKEN_AT, curChar);
       case '+':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_PLUS;
@@ -120,10 +116,11 @@ Token getNextToken(Lexer lexer) {
 
           return initToken(TokenType.TOKEN_AND, value);
         }
+
+        return initToken(TokenType.TOKEN_BITWISE_AND, value);
         break;
       case '|':
         String value = lexer.currentChar;
-
         advance(lexer);
 
         // ||
@@ -132,7 +129,33 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
           return initToken(TokenType.TOKEN_OR, value);
         }
-        break;
+
+        return initToken(TokenType.TOKEN_BITWISE_OR, value);
+
+      case '<':
+        String value = lexer.currentChar;
+        advance(lexer);
+
+        // <<
+        if (lexer.currentChar == '<') {
+          value += lexer.currentChar;
+          advance(lexer);
+          return initToken(TokenType.TOKEN_LSHIFT, value);
+        }
+
+        return initToken(TokenType.TOKEN_LESS_THAN, value);
+      case '>':
+        String value = lexer.currentChar;
+        advance(lexer);
+
+        // >>
+        if (lexer.currentChar == '>') {
+          value += lexer.currentChar;
+          advance(lexer);
+          return initToken(TokenType.TOKEN_RSHIFT, value);
+        }
+
+        return initToken(TokenType.TOKEN_GREATER_THAN, value);
       case '=':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_EQUAL;
@@ -217,10 +240,10 @@ Token getNextToken(Lexer lexer) {
         return advanceWithToken(lexer, TokenType.TOKEN_DOT);
       case '%':
         return advanceWithToken(lexer, TokenType.TOKEN_MOD);
-      case '<':
-        return advanceWithToken(lexer, TokenType.TOKEN_LESS_THAN);
-      case '>':
-        return advanceWithToken(lexer, TokenType.TOKEN_GREATER_THAN);
+      case '~':
+        return advanceWithToken(lexer, TokenType.TOKEN_ONES_COMPLEMENT);
+      case '^':
+        return advanceWithToken(lexer, TokenType.TOKEN_BITWISE_XOR);
       case '@':
         return advanceWithToken(lexer, TokenType.TOKEN_ANON_ID);
       case '?':
