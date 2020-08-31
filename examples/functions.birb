@@ -1,2 +1,5 @@
-StrBuffer buf = StrBuffer("henlo");
-screm(buf.toString());
+int add(int a, int b) {
+    return a + b;
+}
+
+screm(add(10, 6));
