@@ -36,9 +36,3 @@ import 'package:Birb/utils/AST.dart';
             else:
                 f.write(f'  {fieldsTypes[field]} {field};\n\n')
         f.write('}\n\n')
-
-    f.write('AST initAST(ASTType type) {\n')
-    for type, kls in classes:
-        f.write(f'''  if (type == ASTType.AST_{type}) return {kls}();\n''')
-    f.write('  return AST();\n')
-    f.write('}')
