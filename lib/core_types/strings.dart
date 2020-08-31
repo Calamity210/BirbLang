@@ -45,7 +45,7 @@ AST visitStringProperties(AST node, AST left) {
     case 'length':
       {
         /// The length of the string.
-        ASR intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
+        AST intAST = initAST(ASTType.AST_INT)..intVal = left.stringValue.length;
 
         return intAST;
       }
