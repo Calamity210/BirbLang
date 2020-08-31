@@ -15,12 +15,22 @@ import 'package:Birb/runtime/runtime.dart';
 AST INITIALIZED_NOOP;
 
 void initStandards(Runtime runtime) async {
-  registerGlobalVariable(runtime, 'birbVer', '0.0.1');
+  registerGlobalVariable(
+      runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
+
+  // Date class
+  registerGlobalVariable(runtime, 'Date', dateClass(runtime));
+
+  // Double class
+  registerGlobalVariable(runtime, 'Double', doubleClass(runtime));
+
+  // Time class
+  registerGlobalVariable(runtime, 'Time', timeClass(runtime));
+
+  // functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'mock', funcMock);
-  registerGlobalFunction(runtime, 'Date', funcDate);
-  registerGlobalFunction(runtime, 'Time', funcTime);
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
   registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
 
@@ -39,7 +49,7 @@ Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   Parser parser = initParser(lexer);
   AST node = parse(parser);
   await visit(runtime, node);
-  
+
   return AnyNode();
 }
 
@@ -84,7 +94,7 @@ AST funcExit(Runtime runtime, AST self, List args) {
 /**
  * DATE AND TIME
  */
-AST funcDate(Runtime runtime, AST self, List args) {
+AST dateClass(Runtime runtime) {
   var astObj = ClassNode();
 
   // ADD YEAR TO DATE OBJECT
@@ -138,7 +148,7 @@ AST funcDate(Runtime runtime, AST self, List args) {
   return astObj;
 }
 
-AST funcTime(Runtime runtime, AST self, List args) {
+AST timeClass(Runtime runtime) {
   var astObj = ClassNode();
   astObj.variableType = TypeNode();
   astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
@@ -191,6 +201,75 @@ AST funcTime(Runtime runtime, AST self, List args) {
   astVarMilliSeconds.variableValue = astIntMilliSeconds;
 
   astObj.classChildren.add(astVarMilliSeconds);
+
+  return astObj;
+}
+
+AST doubleClass(Runtime runtime) {
+  var astObj = ClassNode();
+
+  // INFINITY
+  var astVarInfinity = VarDefNode()
+    ..variableName = 'infinity'
+    ..variableType = TypeNode()
+    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+
+  var astInfinity = DoubleNode();
+  astInfinity.doubleVal = 1 / 0;
+  astVarInfinity.variableValue = astInfinity;
+
+  astObj.classChildren.add(astVarInfinity);
+
+  // -INFINITY
+  var astVarNegInfinity = VarDefNode()
+    ..variableName = 'negInfinity'
+    ..variableType = TypeNode()
+    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+
+  var astNegInfinity = DoubleNode();
+  astNegInfinity.doubleVal = -1 / 0;
+  astVarNegInfinity.variableValue = astNegInfinity;
+
+  astObj.classChildren.add(astVarNegInfinity);
+
+  // NaN
+  var astVarNaN = VarDefNode()
+    ..variableName = 'nan'
+    ..variableType = TypeNode()
+    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+
+  var astNaN = DoubleNode();
+  astNaN.doubleVal = 0 / 0;
+
+  astVarNaN.variableValue = astNaN;
+
+  astObj.classChildren.add(astVarNaN);
+
+  // MAXFINITE
+  var astVarMaxFinite = VarDefNode()
+    ..variableName = 'maxFinite'
+    ..variableType = TypeNode()
+    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+
+  var astMaxFinite = DoubleNode();
+  astMaxFinite.doubleVal = 1.7976931348623157e+308;
+
+  astVarMaxFinite.variableValue = astMaxFinite;
+
+  astObj.classChildren.add(astVarMaxFinite);
+
+  // MINPOSITIVE
+  var astVarMinPositive = VarDefNode()
+    ..variableName = 'minPositive'
+    ..variableType = TypeNode()
+    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+
+  var astMinPositive = DoubleNode();
+  astMinPositive.doubleVal = 5e-324;
+
+  astVarMinPositive.variableValue = astMinPositive;
+
+  astObj.classChildren.add(astVarMinPositive);
 
   return astObj;
 }
@@ -432,8 +511,7 @@ AST funcDecodeJson(Runtime runtime, AST self, List args) {
   if (decoded is List)
     jsonAST = ListNode()..listElements = decoded;
   else
-    jsonAST = MapNode()
-      ..map = jsonDecode(jsonString) as Map<String, dynamic>;
+    jsonAST = MapNode()..map = jsonDecode(jsonString) as Map<String, dynamic>;
 
   return jsonAST;
 }

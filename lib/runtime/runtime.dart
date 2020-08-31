@@ -177,23 +177,23 @@ AST registerGlobalFutureFunction(
   return fDef;
 }
 
-AST registerGlobalVariable(Runtime runtime, String varName, String varVal) {
+AST registerGlobalVariable(Runtime runtime, String varName, AST varVal) {
   AST varDef = VarDefNode()
     ..variableName = varName
     ..variableType = StringNode()
-    ..variableValue = StringNode()
-    ..variableValue.stringValue = varVal;
+    ..variableValue = varVal;
   runtime.scope.variableDefinitions.add(varDef);
   return varDef;
 }
 
-AST registerFunction(Scope scope, String fName, AstFuncPointer funcPointer) {
-  AST fDef = FuncDefNode();
-  fDef.funcName = fName;
-  fDef.funcPointer = funcPointer;
-  scope.functionDefinitions.add(fDef);
-
-  return fDef;
+AST registerGlobaClass(Runtime runtime, String className, String classVal) {
+  AST classDef = ClassNode()
+    ..variableName = className
+    ..variableType = StringNode()
+    ..variableValue = StringNode()
+    ..variableValue.stringValue = classVal;
+  runtime.scope.variableDefinitions.add(classDef);
+  return classDef;
 }
 
 Future<AST> visit(Runtime runtime, AST node) async {

@@ -39,7 +39,7 @@ Token getNextToken(Lexer lexer) {
       return collectId(lexer);
     }
 
-    switch(lexer.currentChar) {
+    switch (lexer.currentChar) {
       case '+':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_PLUS;
@@ -61,7 +61,6 @@ Token getNextToken(Lexer lexer) {
 
         return initToken(type, value);
       case '-':
-
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_SUB;
 
@@ -209,7 +208,6 @@ Token getNextToken(Lexer lexer) {
           return initToken(TokenType.TOKEN_DIV, '/');
         }
     }
-
 
     // END OF FILE
     if (lexer.currentChar == '' || lexer.currentChar == null)
@@ -383,23 +381,20 @@ Token collectSingleQuoteString(Lexer lexer) {
 Token collectNumber(Lexer lexer) {
   TokenType type = TokenType.TOKEN_INT_VALUE;
   String value = '';
-  
+
   if (lexer.currentChar == '0') {
     value += lexer.currentChar;
     advance(lexer);
-    
+
     // 0x | 0X
     if (lexer.currentChar == 'x' || lexer.currentChar == 'X') {
       value += lexer.currentChar;
       advance(lexer);
-      
-      while(RegExp('[0-9a-fA-F]').hasMatch(lexer.currentChar)) {
+
+      while (RegExp('[0-9a-fA-F]').hasMatch(lexer.currentChar)) {
         value += lexer.currentChar;
         advance(lexer);
       }
-
-      if (value.length >= 16)
-        throw UnexpectedTokenException("The integer literal `$value` can't be represented");
 
       return initToken(TokenType.TOKEN_INT_VALUE, value);
     }
@@ -422,6 +417,24 @@ Token collectNumber(Lexer lexer) {
         value += lexer.currentChar;
         advance(lexer);
       }
+    }
+  }
+
+  if (lexer.currentChar == 'e') {
+    type = TokenType.TOKEN_DOUBLE_VALUE;
+    value += lexer.currentChar;
+
+    advance(lexer);
+
+    if (lexer.currentChar == '+' || lexer.currentChar == '-') {
+      value += lexer.currentChar;
+
+      advance(lexer);
+    }
+
+    while (isNumeric(lexer.currentChar)) {
+      value += lexer.currentChar;
+      advance(lexer);
     }
   }
 

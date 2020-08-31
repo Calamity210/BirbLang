@@ -169,7 +169,7 @@ String astToString(AST ast) {
     case ASTType.AST_STRING_BUFFER:
       return '[ StrBuffer ]';
     case ASTType.AST_DOUBLE:
-      return ast.doubleVal.toStringAsPrecision(6).padRight(12);
+      return ast.doubleVal.toString();
     case ASTType.AST_LIST:
       return ast.listElements.toString();
     case ASTType.AST_MAP:

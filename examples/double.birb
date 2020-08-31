@@ -27,3 +27,9 @@ screm(price.toStringAsFixed(1));
 screm(price.toStringAsPrecision(1));
 screm(price.truncate());
 screm(price.truncateToDouble());
+
+screm(Double.infinity);
+screm(Double.negInfinity);
+screm(Double.nan);
+screm(Double.maxFinite);
+screm(Double.minPositive);
