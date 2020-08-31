@@ -1,5 +1,5 @@
-export 'doubles.dart';
+export 'double.dart';
 export 'int.dart';
 export 'list.dart';
 export 'strbuffer.dart';
-export 'strings.dart';
+export 'string.dart';

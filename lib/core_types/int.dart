@@ -20,15 +20,13 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isFinite':
       {
-        AST boolAST = BoolNode()
-          ..boolVal = left.intVal.isFinite;
+        AST boolAST = BoolNode()..boolVal = left.intVal.isFinite;
         return boolAST;
       }
 
     case 'isInfinite':
       {
-        AST boolAST = BoolNode()
-          ..boolVal = left.intVal.isInfinite;
+        AST boolAST = BoolNode()..boolVal = left.intVal.isInfinite;
         return boolAST;
       }
 
@@ -40,8 +38,7 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'isNegative':
       {
-        AST boolAST = BoolNode()
-          ..boolVal = left.intVal.isNegative;
+        AST boolAST = BoolNode()..boolVal = left.intVal.isNegative;
         return boolAST;
       }
 
@@ -135,8 +132,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toDouble':
       {
-        AST doubleAST = DoubleNode()
-          ..doubleVal = left.intVal.toDouble();
+        AST doubleAST = DoubleNode()..doubleVal = left.intVal.toDouble();
         return doubleAST;
       }
 
@@ -160,8 +156,7 @@ AST visitIntMethods(AST node, AST left) {
 
     case 'toString':
       {
-        AST stringAST = StringNode()
-          ..stringValue = left.intVal.toString();
+        AST stringAST = StringNode()..stringValue = left.intVal.toString();
         return stringAST;
       }
 

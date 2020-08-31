@@ -1,6 +1,6 @@
 // type class_name ..field=init
 COMPOUND CompoundNode compoundValue=[]
-FUNC_CALL FuncCallNode funcName funcCallExpression funcCallArgs=[]
+FUNC_CALL FuncCallNode funcName funcCallExpression funcCallArgs=[] variableName
 FUNC_DEFINITION FuncDefNode funcName funcDefBody funcDefType funcDefArgs=[] funcPointer futureFuncPointer compChildren=[]
 CLASS ClassNode classChildren=[] funcDefinitions=[] variableType
 ENUM EnumNode enumElements=[]

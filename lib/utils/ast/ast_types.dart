@@ -17,6 +17,9 @@ class FuncCallNode extends ASTNode {
   ASTType type = ASTType.AST_FUNC_CALL;
 
   @override
+  String variableName;
+
+  @override
   String funcName;
 
   @override
