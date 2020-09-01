@@ -5,4 +5,5 @@ String json = '
 ';
 Map map = decodeJson(json);
 
+assert(map["content"] == "foo");
 screm(map["content"]);

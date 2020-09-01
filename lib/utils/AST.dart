@@ -197,7 +197,7 @@ String astToString(AST ast) {
     case ASTType.AST_ENUM:
       return ast.variableName;
     default:
-      print('Could no convert ast of type ${ast.type} to String');
+      print('Could not convert ast of type ${ast.type} to String');
       return null;
   }
 }

@@ -1,2 +1,4 @@
 const String henlo = "Henlo Birbo";
+
+assert(henlo == "Henlo Birbo");
 screm(henlo);

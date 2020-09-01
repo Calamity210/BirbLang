@@ -25,7 +25,7 @@ BREAK BreakNode
 RETURN ReturnNode returnValue
 CONTINUE ContinueNode
 TERNARY TernaryNode ternaryExpression ternaryBody ternaryElseBody
-IF IfNode ifExpression ifBody ifElse
+IF IfNode ifExpression ifBody ifElse elseBody
 ELSE ElseNode elseBody
 SWITCH SwitchNode switchExpression switchCases switchDefault
 WHILE WhileNode whileExpression whileBody

@@ -461,10 +461,10 @@ AST parseVariable(Parser parser, Scope scope) {
 
     return astVarMod;
   } else if (parser.curToken.type == TokenType.TOKEN_PLUS_EQUAL ||
-             parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
-             parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
-             parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
-             parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
+      parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
     Token operator = parser.curToken;
 
     eat(parser, operator.type);
@@ -630,12 +630,12 @@ AST parseList(Parser parser, Scope scope) {
 }
 
 AST parseFactor(Parser parser, Scope scope, bool isMap) {
-  while (parser.curToken.type == TokenType.TOKEN_PLUS
-        || parser.curToken.type == TokenType.TOKEN_SUB
-        || parser.curToken.type == TokenType.TOKEN_PLUS_PLUS
-        || parser.curToken.type == TokenType.TOKEN_SUB_SUB
-        || parser.curToken.type == TokenType.TOKEN_NOT
-        || parser.curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
+  while (parser.curToken.type == TokenType.TOKEN_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB ||
+      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_NOT ||
+      parser.curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
     var unOpOperator = parser.curToken;
     eat(parser, unOpOperator.type);
 
@@ -655,16 +655,16 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseNull(parser, scope);
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_PLUS
-      || parser.curToken.type == TokenType.TOKEN_SUB
-      || parser.curToken.type == TokenType.TOKEN_PLUS_PLUS
-      || parser.curToken.type == TokenType.TOKEN_SUB_SUB
-      || parser.curToken.type == TokenType.TOKEN_NOT
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_AND
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_OR
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_XOR
-      || parser.curToken.type == TokenType.TOKEN_LSHIFT
-      || parser.curToken.type == TokenType.TOKEN_RSHIFT) {
+  if (parser.curToken.type == TokenType.TOKEN_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB ||
+      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_NOT ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
+      parser.curToken.type == TokenType.TOKEN_LSHIFT ||
+      parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     eat(parser, parser.curToken.type);
 
     var a = parseVariable(parser, scope).binaryOpRight;
@@ -797,17 +797,16 @@ AST parseExpression(Parser parser, Scope scope) {
   var node = parseTerm(parser, scope);
   AST astBinaryOp;
 
-  while (parser.curToken.type == TokenType.TOKEN_PLUS
-      || parser.curToken.type == TokenType.TOKEN_SUB
-      || parser.curToken.type == TokenType.TOKEN_PLUS_PLUS
-      || parser.curToken.type == TokenType.TOKEN_SUB_SUB
-      || parser.curToken.type == TokenType.TOKEN_NOT
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_AND
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_OR
-      || parser.curToken.type == TokenType.TOKEN_BITWISE_XOR
-      || parser.curToken.type == TokenType.TOKEN_LSHIFT
-      || parser.curToken.type == TokenType.TOKEN_RSHIFT
-      || parser.curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
+  while (parser.curToken.type == TokenType.TOKEN_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB ||
+      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
+      parser.curToken.type == TokenType.TOKEN_NOT ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
+      parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
+      parser.curToken.type == TokenType.TOKEN_LSHIFT ||
+      parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
         parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
       var binaryOp = parser.curToken;

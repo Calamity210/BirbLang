@@ -1,4 +1,7 @@
 int length = "foo".length;
+
+assert(length == 3);
 screm(length);
 
+assert(length.isEven == false);
 screm(length.isEven);

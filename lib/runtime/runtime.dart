@@ -1453,6 +1453,37 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
     case TokenType.TOKEN_EQUALITY:
       {
+        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.boolVal == right.boolVal;
+
+          return retVal;
+        }
+
+        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          if (right.intVal != 1 && right.intVal != 0)
+            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+
+          retVal.boolVal = left.boolVal == (right.intVal == 1);
+
+          return retVal;
+        }
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_BOOL) {
+
+          if (left.intVal != 1 && left.intVal != 0)
+            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+
+          retVal = BoolNode();
+
+          retVal.boolVal = (left.intVal == 1) == right.boolVal;
+
+          return retVal;
+        }
+
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = BoolNode();
 
@@ -1535,10 +1566,43 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
           return retVal;
         }
+
+
       }
       break;
     case TokenType.TOKEN_NOT_EQUAL:
       {
+        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.boolVal != right.boolVal;
+
+          return retVal;
+        }
+
+        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          if (right.intVal != 1 && right.intVal != 0)
+            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+
+          retVal.boolVal = left.boolVal != (right.intVal == 1);
+
+          return retVal;
+        }
+
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_BOOL) {
+
+          if (left.intVal != 1 && left.intVal != 0)
+            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+
+          retVal = BoolNode();
+
+          retVal.boolVal = (left.intVal == 1) != right.boolVal;
+
+          return retVal;
+        }
+
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = BoolNode();
 
@@ -1641,19 +1705,16 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
     case TokenType.TOKEN_ONES_COMPLEMENT:
       {
         if (right.type == ASTType.AST_INT) {
-          returnValue = IntNode();
-          returnValue.intVal = ~right.intVal;
+          returnValue = IntNode()..intVal = ~right.intVal;
         }
       }
       break;
     case TokenType.TOKEN_SUB:
       {
         if (right.type == ASTType.AST_INT) {
-          returnValue = IntNode();
-          returnValue.intVal = -right.intVal;
+          returnValue = IntNode()..intVal = -right.intVal;
         } else if (right.type == ASTType.AST_DOUBLE) {
-          returnValue = DoubleNode();
-          returnValue.doubleVal = -right.doubleVal;
+          returnValue = DoubleNode()..doubleVal = -right.doubleVal;
         }
       }
       break;
@@ -1915,17 +1976,18 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
 }
 
 Future<AST> visitAssert(Runtime runtime, AST node) async {
-  if (!boolEval(await visit(runtime, node.assertExpression))) {
+  ASTNode boolAST = await visit(runtime, node.assertExpression);
+  if (!boolEval(boolAST)) {
     String str;
 
     if (node.assertExpression.type == ASTType.AST_BINARYOP) {
-      var left = astToString(node.assertExpression.binaryOpLeft);
-      var right = astToString(node.assertExpression.binaryOpRight);
+      var left = astToString(await visit(runtime, node.assertExpression.binaryOpLeft));
+      var right = astToString(await visit(runtime, node.assertExpression.binaryOpRight));
       str = 'ASSERT($left, $right)';
 
       print(str);
     } else {
-      var val = astToString(node.assertExpression);
+      var val = astToString(await visit(runtime, node.assertExpression));
       str = val;
       print(val);
     }

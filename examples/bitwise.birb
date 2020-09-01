@@ -1,9 +1,20 @@
 int a = 101;
 int b = 202;
 
+assert((a & b) == 64);
 screm(a & b);
+
+assert((a | b) == 239);
 screm(a | b);
+
+assert((a ^ b) == 175);
 screm(a ^ b);
+
+assert((a << b) == 0);
 screm(a << b);
+
+assert((a >> b) == 0);
 screm(a >> b);
+
+assert((~a) == -102);
 screm(~a);

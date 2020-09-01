@@ -1,3 +1,4 @@
+
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/utils/AST.dart';
@@ -372,6 +373,9 @@ class IfNode extends ASTNode {
   @override
   AST ifElse;
 
+  @override
+  AST elseBody;
+
 }
 
 class ElseNode extends ASTNode {
@@ -478,3 +482,4 @@ class AssertNode extends ASTNode {
   AST assertExpression;
 
 }
+

@@ -8,5 +8,6 @@
      }
 }
 
+assert(foo.strMethod() == "bar");
 screm(foo.strMethod());
 
