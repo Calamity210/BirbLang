@@ -8,3 +8,12 @@ henlo.toUpperCase(); // "HENLO BIRB"
 
 // "HENLO"
 screm(henlo.substring(0, 5));
+
+List colors = ['c', 'o', 'l', 'o', 'r', 's'];
+String colorStr = '';
+
+for (int i = 0; i < colors.length; i++) {
+colorStr += '\$' + (30 + i) + 'm' + colors[i];
+}
+
+screm(colorStr);

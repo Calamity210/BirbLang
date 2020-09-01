@@ -641,6 +641,10 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
                   value.doubleVal ?? value.intVal;
               astVarDef.variableValue.intVal +=
                   astVarDef.variableValue.doubleVal.toInt();
+            } else if (astVarDef.variableType.typeValue.type ==
+                DATATYPE.DATA_TYPE_STRING) {
+              astVarDef.variableValue.stringValue +=
+                  value.stringValue;
             }
             return astVarDef.variableValue;
           }

@@ -347,7 +347,7 @@ Token collectString(Lexer lexer) {
   }
 
   String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value);
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value.escape());
 
   advance(lexer);
 
@@ -370,7 +370,7 @@ Token collectSingleQuoteString(Lexer lexer) {
   }
 
   String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value);
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value.escape());
 
   advance(lexer);
 
@@ -460,4 +460,21 @@ bool isNumeric(String s) {
   return s == null
       ? false
       : double.tryParse(s) != null || int.tryParse(s) != null;
+}
+
+extension on String {
+  String escape() {
+    String escapedString = this
+      .replaceAll(r'\f', String.fromCharCode(0xC))
+      .replaceAll(r'\n', String.fromCharCode(0xA))
+      .replaceAll(r'\r', String.fromCharCode(0xD))
+      .replaceAll(r'\t', String.fromCharCode(0x9))
+      .replaceAll(r'\v', String.fromCharCode(0xB))
+      .replaceAll(r'\\', String.fromCharCode(0x5C))
+      .replaceAll(r"\'", String.fromCharCode(0x27))
+      .replaceAll(r'\"', String.fromCharCode(0x22))
+      .replaceAll(r'\$', '\x1B[');
+
+    return escapedString;
+  }
 }
