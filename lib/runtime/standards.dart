@@ -29,6 +29,8 @@ void initStandards(Runtime runtime) async {
 
   // functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
+  registerGlobalFunction(runtime, 'beep', funcBeep);
+  registerGlobalFunction(runtime, 'throw', funcThrow);
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'mock', funcMock);
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
@@ -53,18 +55,80 @@ Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   return AnyNode();
 }
 
+AST funcThrow(Runtime runtime, AST self, List args) {
+  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_CLASS]);
+
+  AST nameArg = args[0];
+  AST msgArg = args[1];
+
+  String classToString = '';
+
+  msgArg.classChildren.where((child) => (child as AST) is VarDefNode).forEach((varDef) {
+    classToString += '\t${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+  });
+
+  if (nameArg == null || msgArg == null)
+    throw UnexpectedTokenException('throw arguments must be non-null');
+
+  stderr.write('${nameArg.stringValue}:\n$classToString');
+  exit(1);
+
+  return INITIALIZED_NOOP;
+}
+
 /// STDOUT
 AST funcScrem(Runtime runtime, AST self, List args) {
   for (int i = 0; i < args.length; i++) {
     AST astArg = args[i];
-    if (astArg.type == ASTType.AST_BINARYOP)
+    if (astArg is BinaryOpNode)
       visitBinaryOp(initRuntime(), astArg).then((value) => astArg = value);
+
+    if (astArg is ClassNode) {
+      String classToString = '';
+
+      astArg.classChildren.where((child) => (child as AST) is VarDefNode).forEach((varDef) {
+        classToString += '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      });
+
+      print(classToString);
+      return INITIALIZED_NOOP;
+    }
+
     var str = astToString(astArg);
 
     if (str == null)
       throw UnexpectedTokenException('Screm must contain non-null arguments');
 
     print(str);
+  }
+
+  return INITIALIZED_NOOP;
+}
+
+// STDERR
+AST funcBeep(Runtime runtime, AST self, List args) {
+  for (int i = 0; i < args.length; i++) {
+    AST astArg = args[i];
+    if (astArg is BinaryOpNode)
+      visitBinaryOp(initRuntime(), astArg).then((value) => astArg = value);
+
+    if (astArg is ClassNode) {
+      String classToString = '';
+
+      astArg.classChildren.where((child) => (child as AST) is VarDefNode).forEach((varDef) {
+        classToString += '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      });
+
+      stderr.write(classToString);
+      return INITIALIZED_NOOP;
+    }
+
+    var str = astToString(astArg);
+
+    if (str == null)
+      throw UnexpectedTokenException('Screm must contain non-null arguments');
+
+    stderr.write(str);
   }
 
   return INITIALIZED_NOOP;

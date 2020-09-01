@@ -259,10 +259,6 @@ AST parseStatement(Parser parser, Scope scope) {
         return astVarMod;
       }
       break;
-    case TokenType.TOKEN_ANON_ID:
-      throw UnexpectedTokenException(
-          '[Line ${parser.lexer.lineNum}] Expected token `${parser.curToken.value}`');
-      break;
     case TokenType.TOKEN_LBRACE:
       int lineNum = parser.lexer.lineNum;
       while (parser.curToken.type != TokenType.TOKEN_RBRACE) {

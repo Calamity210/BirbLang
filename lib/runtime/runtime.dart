@@ -278,18 +278,18 @@ Future<AST> visit(Runtime runtime, AST node) async {
 }
 
 bool boolEval(AST node) {
-  switch (node.type) {
-    case ASTType.AST_INT:
+  switch (node.runtimeType) {
+    case IntNode:
       return node.intVal > 0;
-    case ASTType.AST_DOUBLE:
+    case DoubleNode:
       return node.doubleVal > 0;
-    case ASTType.AST_BOOL:
+    case BoolNode:
       return node.boolVal;
-    case ASTType.AST_STRING:
+    case StringNode:
       return node.stringValue.isNotEmpty;
-    case ASTType.AST_MAP:
+    case MapNode:
       return node.map.isNotEmpty;
-    case ASTType.AST_LIST:
+    case ListNode:
       return node.listElements.isNotEmpty;
     default:
       return false;
@@ -1453,15 +1453,13 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
     case TokenType.TOKEN_EQUALITY:
       {
-        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
-          retVal = BoolNode();
-
-          retVal.boolVal = left.boolVal == right.boolVal;
+        if (left is BoolNode && right is BoolNode) {
+          retVal = BoolNode()..boolVal = left.boolVal == right.boolVal;
 
           return retVal;
         }
 
-        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_INT) {
+        if (left is BoolNode && right is IntNode) {
           retVal = BoolNode();
 
           if (right.intVal != 1 && right.intVal != 0)
@@ -1472,7 +1470,15 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_BOOL) {
+        if (left is BoolNode && right is NullNode) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.boolVal == null;
+
+          return retVal;
+        }
+
+        if (left is IntNode && right is BoolNode) {
 
           if (left.intVal != 1 && left.intVal != 0)
             throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
@@ -1484,51 +1490,50 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal == right.intVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE &&
-            right.type == ASTType.AST_DOUBLE) {
+        if (left is DoubleNode &&
+            right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
+        if (left is IntNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal == right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_NULL) {
+        if (left is IntNode && right is NullNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal == 0 || left.intVal == null;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
+        if (left is DoubleNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == right.intVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_NULL) {
+        if (left is DoubleNode && right is NullNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == 0 || left.doubleVal == null;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_STRING &&
-            right.type == ASTType.AST_STRING) {
+        if (left is StringNode && right is StringNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.stringValue == right.stringValue;
@@ -1536,22 +1541,21 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_STRING && right.type == ASTType.AST_NULL) {
+        if (left is StringNode && right is NullNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.stringValue == null;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_CLASS) {
-          retVal = BoolNode();
 
-          retVal.boolVal = left.classChildren == right.classChildren;
+        if (left is ClassNode && right is ClassNode) {
+          retVal = BoolNode()..boolVal = left.classChildren == right.classChildren;
 
           return retVal;
         }
 
-        if (left.type == ASTType.AST_CLASS && right.type == ASTType.AST_NULL) {
+        if (left is ClassNode && right is NullNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.classChildren.isEmpty;
@@ -1559,7 +1563,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_NULL && right.type == ASTType.AST_NULL) {
+        if (left is NullNode && right is NullNode) {
           retVal = BoolNode();
 
           retVal.boolVal = true;
@@ -1572,7 +1576,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
       break;
     case TokenType.TOKEN_NOT_EQUAL:
       {
-        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_BOOL) {
+        if (left is BoolNode && right is BoolNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.boolVal != right.boolVal;
@@ -1580,7 +1584,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_BOOL && right.type == ASTType.AST_INT) {
+        if (left is BoolNode && right.type == ASTType.AST_INT) {
           retVal = BoolNode();
 
           if (right.intVal != 1 && right.intVal != 0)
@@ -1591,7 +1595,15 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
           return retVal;
         }
 
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_BOOL) {
+        if (left is BoolNode && right is NullNode) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.boolVal == null;
+
+          return retVal;
+        }
+
+        if (left.type == ASTType.AST_INT && right is BoolNode) {
 
           if (left.intVal != 1 && left.intVal != 0)
             throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
