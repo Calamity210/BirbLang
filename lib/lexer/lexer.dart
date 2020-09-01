@@ -473,7 +473,8 @@ extension on String {
       .replaceAll(r'\\', String.fromCharCode(0x5C))
       .replaceAll(r"\'", String.fromCharCode(0x27))
       .replaceAll(r'\"', String.fromCharCode(0x22))
-      .replaceAll(r'\$', '\x1B[');
+      .replaceAll(r'\$', '\$')
+      .replaceAll(r'$', '\x1B[');
 
     return escapedString;
   }
