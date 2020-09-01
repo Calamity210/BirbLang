@@ -30,7 +30,6 @@ void initStandards(Runtime runtime) async {
   // functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'beep', funcBeep);
-  registerGlobalFunction(runtime, 'throw', funcThrow);
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'mock', funcMock);
   registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
@@ -53,27 +52,6 @@ Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   await visit(runtime, node);
 
   return AnyNode();
-}
-
-AST funcThrow(Runtime runtime, AST self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_CLASS]);
-
-  AST nameArg = args[0];
-  AST msgArg = args[1];
-
-  String classToString = '';
-
-  msgArg.classChildren.where((child) => (child as AST) is VarDefNode).forEach((varDef) {
-    classToString += '\t${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
-  });
-
-  if (nameArg == null || msgArg == null)
-    throw UnexpectedTokenException('throw arguments must be non-null');
-
-  stderr.write('${nameArg.stringValue}:\n$classToString');
-  exit(1);
-
-  return INITIALIZED_NOOP;
 }
 
 /// STDOUT

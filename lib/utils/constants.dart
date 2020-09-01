@@ -14,5 +14,6 @@ const String NULL = 'null';
 const String RETURN = 'return';
 const String SWITCH = 'switch';
 const String STATIC = 'static'; // TODO: implement
+const String THROW = 'throw';
 const String TRUE = 'true';
 const String WHILE = 'while';

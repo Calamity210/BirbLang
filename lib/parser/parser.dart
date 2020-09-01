@@ -130,6 +130,8 @@ AST parseStatement(Parser parser, Scope scope) {
             return parseNull(parser, scope);
           case RETURN:
             return parseReturn(parser, scope);
+          case THROW:
+            return parseThrow(parser, scope);
           case BREAK:
             return parseBreak(parser, scope);
           case CONTINUE:
@@ -485,10 +487,10 @@ AST parseBrace(Parser parser, Scope scope) {
 }
 
 AST parseClass(Parser parser, Scope scope) {
-  AST ast = initASTWithLine(ClassNode(), parser.lexer.lineNum);
-
-  ast.scope = scope;
-  ast.classChildren = [];
+  AST ast = initASTWithLine(ClassNode(), parser.lexer.lineNum)
+    ..scope = scope
+    ..className = parser.prevToken.value
+    ..classChildren = [];
 
   var newScope = initScope(false);
 
@@ -868,6 +870,15 @@ AST parseReturn(Parser parser, Scope scope) {
   var ast = initASTWithLine(ReturnNode(), parser.lexer.lineNum)
     ..scope = scope
     ..returnValue = parseExpression(parser, scope) ?? NullNode();
+
+  return ast;
+}
+
+AST parseThrow(Parser parser, Scope scope) {
+  eat(parser, TokenType.TOKEN_ID);
+  var ast = initASTWithLine(ThrowNode(), parser.lexer.lineNum)
+    ..scope = scope
+    ..throwValue = parseExpression(parser, scope) ?? NullNode();
 
   return ast;
 }

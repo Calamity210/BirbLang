@@ -1,6 +1,7 @@
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/scope.dart';
 
 class ASTNode implements AST {
@@ -51,6 +52,11 @@ class ASTNode implements AST {
   bool get boolVal => throw Exception('Not part of $runtimeType => $type');
   @override
   set boolVal(_) => throw Exception('Not part of $runtimeType => $type');
+
+  @override
+  String get className => throw Exception('Not part of $runtimeType => $type');
+  @override
+  set className(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   List get classChildren => throw Exception('Not part of $runtimeType => $type');
@@ -201,6 +207,11 @@ class ASTNode implements AST {
   AST get returnValue => throw Exception('Not part of $runtimeType => $type');
   @override
   set returnValue(_) => throw Exception('Not part of $runtimeType => $type');
+
+  @override
+  VariableNode get throwValue => throw Exception('Not part of $runtimeType => $type');
+  @override
+  set throwValue(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   AST get savedFuncCall => throw Exception('Not part of $runtimeType => $type');

@@ -62,6 +62,9 @@ class ClassNode extends ASTNode {
   ASTType type = ASTType.AST_CLASS;
 
   @override
+  String className;
+
+  @override
   List classChildren = [];
 
   @override
@@ -336,6 +339,15 @@ class ReturnNode extends ASTNode {
 
   @override
   AST returnValue;
+
+}
+
+class ThrowNode extends ASTNode {
+  @override
+  ASTType type = ASTType.AST_THROW;
+
+  @override
+  VariableNode throwValue;
 
 }
 

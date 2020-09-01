@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:Birb/core_types/core_types.dart';
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
@@ -250,6 +252,19 @@ Future<AST> visit(Runtime runtime, AST node) async {
       return node;
     case ASTType.AST_RETURN:
       return node;
+    case ASTType.AST_THROW:
+      ClassNode throwArg = await visit(runtime, node.throwValue);
+
+      String classToString = '';
+
+      throwArg.classChildren.where((child) => (child as AST) is VarDefNode).forEach((varDef) {
+        classToString += '\t${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      });
+
+      stderr.write('${throwArg.className}:\n$classToString');
+      exit(1);
+
+      return INITIALIZED_NOOP;
     case ASTType.AST_CONTINUE:
       return node;
     case ASTType.AST_TERNARY:
@@ -1550,7 +1565,19 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
         }
 
         if (left is ClassNode && right is ClassNode) {
-          retVal = BoolNode()..boolVal = left.classChildren == right.classChildren;
+          retVal = BoolNode()..boolVal = left.className == right.className;
+
+          var leftChildren = left.classChildren.whereType<VarDefNode>().toList();
+          var rightChildren = right.classChildren.whereType<VarDefNode>().toList();
+
+          if (leftChildren.length != rightChildren.length) {
+            retVal.boolVal = false;
+            return retVal;
+          }
+
+          for (int i = 0; i < leftChildren.length; i++) {
+            retVal.boolVal = retVal.boolVal && (leftChildren[i] == rightChildren[i]);
+          }
 
           return retVal;
         }

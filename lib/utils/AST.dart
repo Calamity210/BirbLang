@@ -2,6 +2,7 @@ import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/lexer/token.dart';
+import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/scope.dart';
 
 typedef AstFuncPointer = AST Function(Runtime runtime, AST self, List args);
@@ -33,6 +34,7 @@ enum ASTType {
   AST_NOOP,
   AST_BREAK,
   AST_RETURN,
+  AST_THROW,
   AST_CONTINUE,
   AST_TERNARY,
   AST_IF,
@@ -105,7 +107,9 @@ class AST {
   AST funcDefBody;
   AST funcDefType;
 
+  String className;
   List classChildren;
+
   List enumElements;
   List listElements;
   Map<String, dynamic> map;
@@ -129,7 +133,11 @@ class AST {
 
   AST whileExpression;
   AST whileBody;
+
   AST returnValue;
+
+  VariableNode throwValue;
+
   AST listAccessPointer;
   AST savedFuncCall;
   AST iterateIterable;
