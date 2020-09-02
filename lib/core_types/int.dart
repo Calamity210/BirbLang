@@ -50,7 +50,7 @@ AST visitIntProperties(AST node, AST left) {
 
     case 'sign':
       {
-        AST intAST = BoolNode()..intVal = left.intVal.sign;
+        AST intAST = IntNode()..intVal = left.intVal.sign;
         return intAST;
       }
 
