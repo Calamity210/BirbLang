@@ -1,7 +1,7 @@
 var foo = 15;
 switch (foo) {
     case 15: {
-        screm(15);
+        screm(15); // output 15
     }
     default: {
         screm("default");

@@ -2,34 +2,34 @@ double price = 11.101010;
 
 
 //PROPERTIES
-screm(price.isFinite);
-screm(price.isInfinite);
-screm(price.isNaN);
-screm(price.isNegative);
-screm(price.sign);
-screm(price.runtimeType);
+screm(price.isFinite); // output true
+screm(price.isInfinite); // output false
+screm(price.isNaN); // output false
+screm(price.isNegative); // output false
+screm(price.sign); // output 1.0
+screm(price.runtimeType); // output double
 
 //METHODS
-screm(price.abs());
-screm(price.ceil());
-screm(price.ceilToDouble());
-screm(price.clamp(1.0, 10.0));
-screm(price.compareTo(5.0));
-screm(price.floor());
-screm(price.floorToDouble());
-screm(price.remainder(5.0));
-screm(price.round());
-screm(price.roundToDouble());
-screm(price.toInt());
-screm(price.toString());
-screm(price.toStringAsExponential());
-screm(price.toStringAsFixed(1));
-screm(price.toStringAsPrecision(1));
-screm(price.truncate());
-screm(price.truncateToDouble());
+screm(price.abs()); // output 11.10101
+screm(price.ceil()); // output 12
+screm(price.ceilToDouble()); // output 12.0
+screm(price.clamp(1.0, 10.0)); // output 10.0
+screm(price.compareTo(5.0)); // output 1
+screm(price.floor()); // output 11
+screm(price.floorToDouble()); // output 11.0
+screm(price.remainder(5.0)); // output 1.1010100000000005
+screm(price.round()); // output 11
+screm(price.roundToDouble()); // output 11.0
+screm(price.toInt()); // output 11
+screm(price.toString()); // output 11.10101
+screm(price.toStringAsExponential()); // output 1e+1
+screm(price.toStringAsFixed(1)); // output 11.1
+screm(price.toStringAsPrecision(1)); // output 1e+1
+screm(price.truncate()); // output 11
+screm(price.truncateToDouble()); // output 11.0
 
-screm(Double.infinity);
-screm(Double.negInfinity);
-screm(Double.nan);
-screm(Double.maxFinite);
-screm(Double.minPositive);
+screm(Double.infinity); // output Infinity
+screm(Double.negInfinity); // output -Infinity
+screm(Double.nan); // output NaN
+screm(Double.maxFinite); // output 1.7976931348623157e+308
+screm(Double.minPositive); // output 5e-324
