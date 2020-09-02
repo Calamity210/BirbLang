@@ -464,17 +464,19 @@ bool isNumeric(String s) {
 
 extension on String {
   String escape() {
-    String escapedString = this
-      .replaceAll(r'\f', '\x0C')
-      .replaceAll(r'\n', '\x0A')
-      .replaceAll(r'\r', '\x0D')
-      .replaceAll(r'\t', '\x09')
-      .replaceAll(r'\v', '\x0B')
-      .replaceAll(r'\\', '\x5C')
-      .replaceAll(r"\'", '\x27')
-      .replaceAll(r'\"', '\x22')
-      .replaceAll(r'\$', '\$')
-      .replaceAll(r'$', '\x1B[');
+    String escapedString = this;
+
+    escapedString = escapedString
+    .replaceAll(r'\f', '\x0C')
+    .replaceAll(r'\n', '\x0A')
+    .replaceAll(r'\r', '\x0D')
+    .replaceAll(r'\t', '\x09')
+    .replaceAll(r'\v', '\x0B')
+    .replaceAll(r'\\', '\x5C')
+    .replaceAll(r"\'", '\x27')
+    .replaceAll(r'\"', '\x22')
+    .replaceAll(r'\$', '\$')
+    .replaceAll(r'$', '\x1B[');
 
     return escapedString;
   }

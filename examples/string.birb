@@ -11,9 +11,14 @@ screm(henlo.substring(0, 5));
 
 List colors = ['c', 'o', 'l', 'o', 'r', 's'];
 String colorStr = '';
+String colorBlocks = '';
 
 for (int i = 0; i < colors.length; i++) {
-colorStr += '$' + (30 + i) + 'm' + colors[i];
+colorStr += '$' + (90 + i) + 'm' + colors[i];
+colorBlocks += '$' + (40 + i) + 'm' + '\n' * 2;
 }
 
 screm(colorStr);
+
+colorBlocks += '$49m ';
+screm(colorBlocks);
