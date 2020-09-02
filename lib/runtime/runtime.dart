@@ -1286,6 +1286,15 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
 
           return retVal;
         }
+
+        if (left.type == ASTType.AST_STRING && right.type == ASTType.AST_INT) {
+          retVal = StringNode();
+
+          retVal.stringValue = left.stringValue * right.intVal;
+
+          return retVal;
+        }
+
       }
       break;
 
