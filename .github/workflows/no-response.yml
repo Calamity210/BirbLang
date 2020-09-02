@@ -1,8 +1,0 @@
-daysUntilClose: 14
-
-responseRequiredLabel: Waiting for response
-
-closeComment: >
-  This issue has been automatically closed as there has been no response from the original author. As it currently stands, we don't have enough information
-  to take action. Please reach out if you have or found the answers we need so
-  that we can investigate further.
