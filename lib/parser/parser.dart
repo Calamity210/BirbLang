@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
@@ -175,71 +176,20 @@ AST parseStatement(Parser parser, Scope scope) {
         if (a != null) return a;
       }
       break;
-    case TokenType.TOKEN_ANON_ID:
-      // TODO(Calamity210): correct implementation to make it more scalable
+    case TokenType.TOKEN_LESS_THAN:
+      eat(parser, TokenType.TOKEN_LESS_THAN);
 
-      // @dart(alias) {}
-      eat(parser, TokenType.TOKEN_ANON_ID);
+      String annotation = parser.curToken.value;
       eat(parser, TokenType.TOKEN_ID);
-      eat(parser, TokenType.TOKEN_LPAREN);
 
-      AST astType = initASTWithLine(TypeNode(), parser.lexer.lineNum)
-        ..scope = scope
-        ..typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+      eat(parser, TokenType.TOKEN_GREATER_THAN);
 
-      AST astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
-        ..scope = scope
-        ..variableName = parser.curToken.value
-        ..variableType = astType
-        ..isFinal = true;
-
-      AST classAST = initASTWithLine(ClassNode(), parser.lexer.lineNum)
-        ..scope = scope
-        ..classChildren = [];
-
-      Scope newScope = initScope(false);
-
-      if (scope != null && scope.owner != null) newScope.owner = scope.owner;
-
-      eat(parser, TokenType.TOKEN_ID);
-      eat(parser, TokenType.TOKEN_RPAREN);
-
-      int dartProgramStartIndex = parser.lexer.currentIndex;
-
-      eat(parser, TokenType.TOKEN_LBRACE);
-
-      if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-        if (parser.curToken.type == TokenType.TOKEN_ID)
-          classAST.classChildren
-              .add(asClassChild(parseDefinition(parser, newScope), classAST));
-
-        while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-            (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
-                parser.curToken.type != TokenType.TOKEN_RBRACE)) {
-          if (parser.curToken.type == TokenType.TOKEN_SEMI)
-            eat(parser, TokenType.TOKEN_SEMI);
-
-          if (parser.curToken.type == TokenType.TOKEN_ID)
-            classAST.classChildren
-                .add(asClassChild(parseDefinition(parser, newScope), classAST));
-        }
+      switch(annotation) {
+        case SUPERSEDE:
+          return parseDefinition(parser, scope, parser.curToken.value == 'const', parser.curToken.value == 'final', true);
+        default:
+          throw UnexpectedTokenException('No annotation ${parser.curToken.value} found!');
       }
-      String dartProgram = parser.lexer.program
-          .substring(dartProgramStartIndex, parser.lexer.currentIndex)
-          .trim();
-
-      dartProgram = dartProgram.substring(0, dartProgram.length - 1);
-
-      Uri dartProgramUri =
-          Uri.dataFromString(dartProgram, mimeType: 'application/dart');
-
-      Isolate.spawnUri(dartProgramUri, [], null);
-
-      eat(parser, TokenType.TOKEN_RBRACE);
-
-      astVarDef.variableValue = classAST;
-
-      return astVarDef;
       break;
     case TokenType.TOKEN_NUMBER_VALUE:
     case TokenType.TOKEN_STRING_VALUE:
@@ -499,10 +449,11 @@ AST parseClass(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_LBRACE);
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-    if (parser.curToken.type == TokenType.TOKEN_ID) {
+    if (parser.curToken.type == TokenType.TOKEN_ID || parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
       ast.classChildren
           .add(asClassChild(parseDefinition(parser, newScope), ast));
     }
+
 
     while (parser.curToken.type == TokenType.TOKEN_SEMI ||
         (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
@@ -1130,7 +1081,25 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
 }
 
 AST parseDefinition(Parser parser, Scope scope,
-    [bool isConst = false, bool isFinal = false]) {
+    [bool isConst = false, bool isFinal = false, bool isSuperseding = false]) {
+  if (parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
+    eat(parser, TokenType.TOKEN_LESS_THAN);
+
+    String annotation = parser.curToken.value;
+    eat(parser, TokenType.TOKEN_ID);
+
+    eat(parser, TokenType.TOKEN_GREATER_THAN);
+
+    switch(annotation) {
+      case SUPERSEDE:
+        isConst = parser.curToken.value == 'const';
+        isFinal = parser.curToken.value == 'final';
+        isSuperseding = true;
+        break;
+      default:
+        throw UnexpectedTokenException('No annotation ${parser.curToken.value} found!');
+    }
+  }
   AST astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
@@ -1154,10 +1123,11 @@ AST parseDefinition(Parser parser, Scope scope,
 
   // Function Definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
+    // TODO: handle superseding
     return parseFunctionDefinition(parser, scope, name, astType);
   } else {
     return parseVariableDefinition(
-        parser, scope, name, astType, isEnum, isConst, isFinal);
+        parser, scope, name, astType, isEnum, isConst, isFinal, isSuperseding);
   }
 }
 
@@ -1290,12 +1260,13 @@ AST parseFunctionDefinition(
 
 AST parseVariableDefinition(
     Parser parser, Scope scope, String name, AST astType,
-    [bool isEnum = false, bool isConst = false, bool isFinal = false]) {
+    [bool isEnum = false, bool isConst = false, bool isFinal = false, bool isSuperseding = false]) {
   var astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
     ..scope = scope
     ..variableName = name
     ..variableType = astType
-    ..isFinal = isFinal;
+    ..isFinal = isFinal
+    ..isSuperseding = isSuperseding;
 
   if (isEnum) {
     var astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
@@ -1308,6 +1279,21 @@ AST parseVariableDefinition(
     astVarDef.variableValue = parseEnum(parser, scope);
     astVarDef.variableName = parser.curToken.value;
     eat(parser, TokenType.TOKEN_ID);
+  }
+
+  if (parser.curToken.value == 'follows') {
+    eat(parser, TokenType.TOKEN_ID);
+
+    VariableNode superClass = initASTWithLine(VariableNode(), parser.lexer.lineNum)
+      ..scope = scope
+      ..variableName = parser.curToken.value;
+
+    eat(parser, TokenType.TOKEN_ID);
+
+    astVarDef.variableValue = parseClass(parser, scope);
+    astVarDef.variableValue.superClass = superClass;
+
+    return astVarDef;
   }
 
   // Class

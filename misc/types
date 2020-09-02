@@ -1,14 +1,14 @@
 // type class_name ..field=init
 COMPOUND CompoundNode compoundValue=[]
 FUNC_CALL FuncCallNode funcName funcCallExpression funcCallArgs=[] variableName
-FUNC_DEFINITION FuncDefNode funcName funcDefBody funcDefType funcDefArgs=[] funcPointer futureFuncPointer compChildren=[]
-CLASS ClassNode className classChildren=[] funcDefinitions=[] variableType
+FUNC_DEFINITION FuncDefNode funcName funcDefBody funcDefType funcDefArgs=[] funcPointer futureFuncPointer compChildren=[] isSuperseding
+CLASS ClassNode className classChildren=[] superClass funcDefinitions=[] variableType
 ENUM EnumNode enumElements=[]
 LIST ListNode listElements=[] funcDefinitions=[]
 MAP MapNode map={} funcDefinitions=[]
 VARIABLE VariableNode variableName variableValue variableType isFinal classChildren=[] enumElements=[]
 VARIABLE_MODIFIER VarModNode variableName variableValue variableType isFinal binaryOperator binaryOpLeft binaryOpRight classChildren=[] enumElements=[]
-VARIABLE_DEFINITION VarDefNode variableName variableValue variableType variableAssignmentLeft isFinal savedFuncCall
+VARIABLE_DEFINITION VarDefNode variableName variableValue variableType variableAssignmentLeft isFinal savedFuncCall isSuperseding
 VARIABLE_ASSIGNMENT VarAssignmentNode variableName variableValue variableType variableAssignmentLeft isFinal classChildren=[]
 NULL NullNode
 STRING StringNode stringValue=''

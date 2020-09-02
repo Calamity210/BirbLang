@@ -55,6 +55,9 @@ class FuncDefNode extends ASTNode {
   @override
   List compChildren = [];
 
+  @override
+  bool isSuperseding;
+
 }
 
 class ClassNode extends ASTNode {
@@ -66,6 +69,9 @@ class ClassNode extends ASTNode {
 
   @override
   List classChildren = [];
+
+  @override
+  AST superClass;
 
   @override
   List funcDefinitions = [];
@@ -186,6 +192,9 @@ class VarDefNode extends ASTNode {
 
   @override
   AST savedFuncCall;
+
+  @override
+  bool isSuperseding;
 
 }
 

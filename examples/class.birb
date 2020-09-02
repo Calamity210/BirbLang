@@ -1,5 +1,5 @@
 class Test {
-    String name = "";
+    String name = "Test";
     int age = 0;
 
     void Test(String name, int age) {
@@ -16,8 +16,19 @@ class Test {
     }
 }
 
+class FollowsTest follows Test {
+    <Supersede>
+    String name;
+
+    int age;
+}
+
 class test = Test;
 test.Test("Birb", 10);
 
 assert(test.getName() == "Birb" && test.getAge() == 10);
 screm(test.getName() + " : " + test.getAge()); // output Birb : 10
+
+screm(FollowsTest.name); // output Test
+
+screm(FollowsTest.age); // output null

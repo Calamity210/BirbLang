@@ -179,6 +179,11 @@ class ASTNode implements AST {
   set isFinal(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
+  bool get isSuperseding => throw Exception('Not part of $runtimeType => $type');
+  @override
+  set isSuperseding(_) => throw Exception('Not part of $runtimeType => $type');
+
+  @override
   AST get iterateFunction => throw Exception('Not part of $runtimeType => $type');
   @override
   set iterateFunction(_) => throw Exception('Not part of $runtimeType => $type');
@@ -227,6 +232,11 @@ class ASTNode implements AST {
   String get stringValue => throw Exception('Not part of $runtimeType => $type');
   @override
   set stringValue(_) => throw Exception('Not part of $runtimeType => $type');
+
+  @override
+  AST get superClass => throw Exception('Not part of $runtimeType => $type');
+  @override
+  set superClass(_) => throw Exception('Not part of $runtimeType => $type');
 
   @override
   Map<AST, AST> get switchCases => throw Exception('Not part of $runtimeType => $type');

@@ -205,6 +205,15 @@ Future<AST> visit(Runtime runtime, AST node) async {
 
   switch (node.type) {
     case ASTType.AST_CLASS:
+      if (node.superClass != null) {
+        ClassNode superClass = await visit(runtime, node.superClass);
+        List nullVars = node.classChildren.where((child) => (child as AST).variableValue == null && (child as AST).isSuperseding).toList();
+
+        nullVars.forEach((child) {
+          AST superVariable = superClass.classChildren.firstWhere((superChild) => (superChild as AST).variableName == (child as AST).variableName);
+          (child as AST).variableValue = superVariable.variableValue;
+        });
+      }
       return node;
     case ASTType.AST_ENUM:
       return node;

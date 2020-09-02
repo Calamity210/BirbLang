@@ -80,6 +80,7 @@ class AST {
   AST variableType;
   AST variableAssignmentLeft;
   bool isFinal = false;
+  bool isSuperseding = false;
 
   String funcName;
 
@@ -109,6 +110,7 @@ class AST {
 
   String className;
   List classChildren;
+  AST superClass;
 
   List enumElements;
   List listElements;
