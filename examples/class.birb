@@ -20,6 +20,8 @@ class FollowsTest follows Test {
     <Supersede>
     String name;
 
+
+    <Supersede>
     int age;
 }
 
@@ -31,4 +33,4 @@ screm(test.getName() + " : " + test.getAge()); // output Birb : 10
 
 screm(FollowsTest.name); // output Test
 
-screm(FollowsTest.age); // output null
+screm(FollowsTest.age); // output 0

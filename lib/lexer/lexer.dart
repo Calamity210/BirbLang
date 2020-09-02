@@ -475,6 +475,7 @@ extension on String {
     .replaceAll(r'\\', '\x5C')
     .replaceAll(r"\'", '\x27')
     .replaceAll(r'\"', '\x22')
+    .replaceAllMapped(RegExp(r'\\x(.){2}'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
     .replaceAll(r'\$', '\$')
     .replaceAll(r'$', '\x1B[');
 

@@ -461,7 +461,7 @@ AST parseClass(Parser parser, Scope scope) {
       if (parser.curToken.type == TokenType.TOKEN_SEMI)
         eat(parser, TokenType.TOKEN_SEMI);
 
-      if (parser.curToken.type == TokenType.TOKEN_ID) {
+      if (parser.curToken.type == TokenType.TOKEN_ID || parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
         ast.classChildren
             .add(asClassChild(parseDefinition(parser, newScope), ast));
       }
@@ -1123,7 +1123,6 @@ AST parseDefinition(Parser parser, Scope scope,
 
   // Function Definition
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    // TODO: handle superseding
     return parseFunctionDefinition(parser, scope, name, astType);
   } else {
     return parseVariableDefinition(
