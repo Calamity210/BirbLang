@@ -2,19 +2,19 @@ int a = 101;
 int b = 202;
 
 assert((a & b) == 64);
-screm(a & b);
+screm(a & b); // output 64
 
 assert((a | b) == 239);
-screm(a | b);
+screm(a | b); // output 239
 
 assert((a ^ b) == 175);
-screm(a ^ b);
+screm(a ^ b); // output 175
 
 assert((a << b) == 0);
-screm(a << b);
+screm(a << b); // output 0
 
 assert((a >> b) == 0);
-screm(a >> b);
+screm(a >> b); // output 0
 
 assert((~a) == -102);
-screm(~a);
+screm(~a); // output -102

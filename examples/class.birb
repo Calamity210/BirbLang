@@ -20,4 +20,4 @@ class test = Test;
 test.Test("Birb", 10);
 
 assert(test.getName() == "Birb" && test.getAge() == 10);
-screm(test.getName() + " : " + test.getAge());
+screm(test.getName() + " : " + test.getAge()); // output Birb : 10

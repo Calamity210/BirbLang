@@ -9,5 +9,5 @@
 }
 
 assert(foo.strMethod() == "bar");
-screm(foo.strMethod());
-
+screm(foo.strMethod()); // output bar
+// output foo

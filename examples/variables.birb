@@ -11,4 +11,4 @@ class Birb {
 }
 
 var i = 10;
-screm(i);
+screm(i); // output 10

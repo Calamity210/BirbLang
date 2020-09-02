@@ -7,9 +7,10 @@ henlo.trim(); // "Henlo Birb"
 henlo.toUpperCase(); // "HENLO BIRB"
 
 // "HENLO"
-screm(henlo.substring(0, 5));
+screm(henlo.substring(0, 5)); // output HENLO
 
 List colors = ['c', 'o', 'l', 'o', 'r', 's'];
+
 String colorStr = '';
 String colorBlocks = '';
 

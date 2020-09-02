@@ -2,4 +2,4 @@ Map map = {
     "content": "This is a message"
 };
 
-screm(map["content"]);
+screm(map["content"]); // output This is a message
