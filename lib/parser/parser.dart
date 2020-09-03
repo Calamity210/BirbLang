@@ -153,12 +153,11 @@ AST parseStatement(Parser parser, Scope scope) {
 
         while (parser.curToken.type == TokenType.TOKEN_DOT) {
           eat(parser, TokenType.TOKEN_DOT);
-
-          var ast =
-              initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+          var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
           ast.binaryOpLeft = a;
-          ast.binaryOpRight = parseExpression(parser, scope);
-
+          eat(parser, TokenType.TOKEN_ID);
+          var varAST = parseVariable(parser, scope);
+          ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
           a = ast;
         }
 
@@ -618,14 +617,26 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
 
     var a = parseVariable(parser, scope).binaryOpRight;
 
-    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+    while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
       var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = a;
-      ast.binaryOpRight = parseFactor(parser, scope, false);
-
+      eat(parser, TokenType.TOKEN_ID);
+      var varAST = parseVariable(parser, scope);
+      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
       a = ast;
     }
+
+    while (parser.curToken.type == TokenType.TOKEN_DOT) {
+      eat(parser, TokenType.TOKEN_DOT);
+      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      ast.binaryOpLeft = a;
+      eat(parser, TokenType.TOKEN_ID);
+      var varAST = parseVariable(parser, scope);
+      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
+      a = ast;
+    }
+
 
     while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
       var astListAccess =
@@ -650,12 +661,13 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
 
     var a = parseVariable(parser, scope);
 
-    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+    while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
       var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = a;
-      ast.binaryOpRight = parseFactor(parser, scope, false);
-
+      eat(parser, TokenType.TOKEN_ID);
+      var varAST = parseVariable(parser, scope);
+      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
       a = ast;
     }
 
@@ -1047,14 +1059,14 @@ AST parseFuncCall(Parser parser, Scope scope, AST expr) {
   if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
     var astExpr = parseExpression(parser, scope);
 
-    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+    while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var astAttAccess =
-          initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      astAttAccess.binaryOpLeft = astExpr;
-      astAttAccess.binaryOpRight = parseFactor(parser, scope, false);
-
-      astExpr = astAttAccess;
+      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      ast.binaryOpLeft = astExpr;
+      eat(parser, TokenType.TOKEN_ID);
+      var varAST = parseVariable(parser, scope);
+      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
+      astExpr = ast;
     }
 
     if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
@@ -1324,14 +1336,14 @@ AST parseVariableDefinition(
 
     astVarDef.variableValue = parseExpression(parser, scope);
 
-    if (parser.curToken.type == TokenType.TOKEN_DOT) {
+    while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var astAttAccess =
-          initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      astAttAccess.binaryOpLeft = astVarDef.variableValue;
-      astAttAccess.binaryOpRight = parseFactor(parser, scope, false);
-
-      astVarDef.variableValue = astAttAccess;
+      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      ast.binaryOpLeft = astVarDef.variableValue;
+      eat(parser, TokenType.TOKEN_ID);
+      var varAST = parseVariable(parser, scope);
+      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN ? parseFuncCall(parser, scope, varAST) : varAST;
+      astVarDef.variableValue = ast;
     }
 
     switch (astVarDef.variableValue.type) {
