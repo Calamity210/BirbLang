@@ -13,7 +13,7 @@ Future<void> main(List<String> arguments) async {
   bool isInteractive = false;
 
   /// Runtime visitor
-  Runtime runtime = initRuntime();
+  Runtime runtime = initRuntime(arguments[0]);
 
   Lexer lexer;
 

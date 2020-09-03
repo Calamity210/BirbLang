@@ -13,8 +13,10 @@ import 'package:Birb/parser/parser.dart';
 import 'package:Birb/runtime/runtime.dart';
 
 AST INITIALIZED_NOOP;
+String filePath = '';
 
-void initStandards(Runtime runtime) async {
+void initStandards(Runtime runtime, String path) async {
+  filePath = path ?? '';
   registerGlobalVariable(
       runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
 
@@ -44,7 +46,20 @@ Future<AST> funcGrab(Runtime runtime, AST self, List args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   AST astStr = args[0];
-  String filename = astStr.stringValue;
+  if (astStr.stringValue.startsWith('birb:')) {
+    String fileName = astStr.stringValue.split(':')[1];
+    String scriptParentPath = Platform.script.path.replaceFirst('birb.dart', '');
+    if (scriptParentPath.startsWith('/'))
+      scriptParentPath = scriptParentPath.replaceFirst('/', '');
+
+    Lexer lexer = initLexer(File('$scriptParentPath../core/$fileName/$fileName.birb').readAsStringSync());
+    Parser parser = initParser(lexer);
+    AST node = parse(parser);
+    await visit(runtime, node);
+
+    return AnyNode();
+  }
+  String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
 
   Lexer lexer = initLexer(File(filename).readAsStringSync());
   Parser parser = initParser(lexer);
@@ -59,7 +74,7 @@ AST funcScrem(Runtime runtime, AST self, List args) {
   for (int i = 0; i < args.length; i++) {
     AST astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(), astArg).then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -88,7 +103,7 @@ AST funcBeep(Runtime runtime, AST self, List args) {
   for (int i = 0; i < args.length; i++) {
     AST astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(), astArg).then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';

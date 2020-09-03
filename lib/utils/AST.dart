@@ -196,7 +196,7 @@ String astToString(AST ast) {
       return 'list[access]';
     case ASTType.AST_BINARYOP:
       AST visitedBiOp;
-      visitBinaryOp(initRuntime(), ast).then((value) => visitedBiOp = value);
+      visitBinaryOp(initRuntime(null), ast).then((value) => visitedBiOp = value);
       return astToString(visitedBiOp);
     case ASTType.AST_NOOP:
       return '{{NO-OP}}';

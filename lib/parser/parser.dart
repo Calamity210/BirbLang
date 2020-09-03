@@ -341,8 +341,7 @@ AST parseString(Parser parser, Scope scope) {
 AST parseInt(Parser parser, Scope scope) {
   var ast = initASTWithLine(IntNode(), parser.lexer.lineNum)
     ..scope = scope
-    ..stringValue = parser.curToken.value
-    ..intVal = int.parse(parser.curToken.value);
+    ..intVal = int.tryParse(parser.curToken.value);
 
   eat(parser, TokenType.TOKEN_INT_VALUE);
 

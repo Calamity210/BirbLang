@@ -259,9 +259,6 @@ class IntNode extends ASTNode {
   @override
   double doubleVal = 0;
 
-  @override
-  String stringValue = '0';
-
 }
 
 class DoubleNode extends ASTNode {
@@ -273,9 +270,6 @@ class DoubleNode extends ASTNode {
 
   @override
   int intVal = 0;
-
-  @override
-  String stringValue = '0.0';
 
 }
 

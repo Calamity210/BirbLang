@@ -17,7 +17,7 @@ class Runtime {
   String stdoutBuffer;
 }
 
-Runtime initRuntime() {
+Runtime initRuntime(String path) {
   var runtime = Runtime()
     ..scope = initScope(true)
     ..listMethods = []
@@ -25,7 +25,7 @@ Runtime initRuntime() {
 
   INITIALIZED_NOOP = NoopNode();
 
-  initStandards(runtime);
+  initStandards(runtime, path);
 
   var LIST_ADD_FUNCTION_DEFINITION = FuncDefNode();
   LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';

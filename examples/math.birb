@@ -1,0 +1,5 @@
+grab('birb:math');
+
+screm(min(10, 5.5).runtimeType); // assert double
+
+screm(pi);
