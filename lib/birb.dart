@@ -10,10 +10,10 @@ import 'package:Birb/runtime/runtime.dart';
 Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will
   /// start up allowing developers to write programs directly from their terminal
-  bool isInteractive = false;
+  final isInteractive = arguments.isEmpty;
 
   /// Runtime visitor
-  Runtime runtime = initRuntime(arguments[0]);
+  Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
 
   Lexer lexer;
 
@@ -23,12 +23,10 @@ Future<void> main(List<String> arguments) async {
   ASTNode node;
 
   // No file path is specified, Initiate the birb shell
-  if (arguments.isEmpty) {
-    isInteractive = true;
-
+  if (isInteractive) {
     print('<<<<< Birb Shell Initiated >>>>>');
 
-    while (isInteractive) {
+    while (true) {
       stdout.write('> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
@@ -41,22 +39,26 @@ Future<void> main(List<String> arguments) async {
         }
       }
 
-      if (RegExp('{').allMatches(str).length <
-          RegExp('}').allMatches(str).length) {
-        throw UnexpectedTokenException('Unexpected token `}`');
-      }
+      try {
+        if (RegExp('{').allMatches(str).length <
+            RegExp('}').allMatches(str).length) {
+          throw UnexpectedTokenException('Unexpected token `}`');
+        }
 
-      // Exit shell
-      if (str == 'quit()') {
-        isInteractive = false;
-        break;
-      }
+        // Exit shell
+        if (str == 'quit()') {
+          break;
+        }
 
-      // Initialize and run program
-      lexer = initLexer(str);
-      parser = initParser(lexer);
-      node = parse(parser);
-      await visit(runtime, node);
+        // Initialize and run program
+        lexer = initLexer(str);
+        parser = initParser(lexer);
+        node = parse(parser);
+        await visit(runtime, node);
+      } catch (e) {
+        if (e is! BirbException) rethrow;
+        print(e);
+      }
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
@@ -66,29 +68,34 @@ Future<void> main(List<String> arguments) async {
   // Initialize and run program
   String program = File(arguments[0]).readAsStringSync();
 
-  if (RegExp('{').allMatches(program).length !=
-      RegExp('}').allMatches(program).length) {
-    int lParenCount = RegExp('{').allMatches(program).length;
-    Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
-    int rParenCount = rParenMatches.length;
+  try {
+    if (RegExp('{').allMatches(program).length !=
+        RegExp('}').allMatches(program).length) {
+      int lParenCount = RegExp('{').allMatches(program).length;
+      Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
+      int rParenCount = rParenMatches.length;
 
-    if (lParenCount > rParenCount) {
-      throw UnexpectedTokenException(
-          '[Line ${program.split('\n').length}] Expected `}`, but got EOF');
-    } else if (lParenCount < rParenCount) {
-      int parenCount = 0;
-      rParenMatches.forEach((e) {
-        parenCount += 1;
-        if (parenCount > lParenCount) {
-          throw UnexpectedTokenException(
-              '[Line ${program.substring(0, e.start).split('\n').length}]');
-        }
-      });
+      if (lParenCount > rParenCount) {
+        throw UnexpectedTokenException(
+            '[Line ${program.split('\n').length}] Expected `}`, but got EOF');
+      } else if (lParenCount < rParenCount) {
+        int parenCount = 0;
+        rParenMatches.forEach((e) {
+          parenCount += 1;
+          if (parenCount > lParenCount) {
+            throw UnexpectedTokenException(
+                '[Line ${program.substring(0, e.start).split('\n').length}]');
+          }
+        });
+      }
     }
-  }
 
-  lexer = initLexer(program);
-  parser = initParser(lexer);
-  node = parse(parser);
-  await visit(runtime, node);
+    lexer = initLexer(program);
+    parser = initParser(lexer);
+    node = parse(parser);
+    await visit(runtime, node);
+  } catch (e) {
+    if (e is! BirbException) rethrow;
+    print(e);
+  }
 }
