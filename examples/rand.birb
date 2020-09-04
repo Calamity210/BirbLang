@@ -1,0 +1,7 @@
+screm(rand(10));
+
+screm(rand(1.5));
+
+screm(rand(true));
+
+screm(rand('zzzzA'));
