@@ -70,7 +70,7 @@ class ClassNode extends ASTNode {
   List classChildren = [];
 
   @override
-  AST superClass;
+  ASTNode superClass;
 
   @override
   List funcDefinitions = [];
