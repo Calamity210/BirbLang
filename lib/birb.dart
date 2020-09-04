@@ -57,7 +57,7 @@ Future<void> main(List<String> arguments) async {
         await visit(runtime, node);
       } catch (e) {
         if (e is! BirbException) rethrow;
-        print(e);
+        stderr.write(e);
       }
     }
 
@@ -96,6 +96,6 @@ Future<void> main(List<String> arguments) async {
     await visit(runtime, node);
   } catch (e) {
     if (e is! BirbException) rethrow;
-    print(e);
+    stderr.write(e);
   }
 }

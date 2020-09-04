@@ -4,7 +4,6 @@ import 'package:Birb/core_types/core_types.dart';
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/scope.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/standards.dart';
@@ -15,10 +14,14 @@ class Runtime {
   List listMethods;
   List mapMethods;
   String stdoutBuffer;
+  String path;
+
+  List<Map> stack = [];
 }
 
 Runtime initRuntime(String path) {
   var runtime = Runtime()
+    ..path = path
     ..scope = initScope(true)
     ..listMethods = []
     ..mapMethods = [];
@@ -100,30 +103,18 @@ ASTNode mapRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
 }
 
 void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
-  if (scope == runtime.scope) {
-    return;
-  }
+  if (scope == runtime.scope) return;
 
   var garbage = [];
 
-  for (int i = 0; i < scope.variableDefinitions.length; i++) {
-    ASTNode newDef = scope.variableDefinitions[i];
-    var exists = false;
+  for (ASTNode newDef in scope.variableDefinitions)
+    if (!oldDefList.contains(newDef)) garbage.add(newDef);
 
-    for (int j = 0; j < oldDefList.length; j++) {
-      ASTNode oldDef = oldDefList[j];
-
-      if (oldDef == newDef) exists = true;
-    }
-
-    if (!exists) garbage.add(newDef);
-  }
-
-  for (int i = 0; i < garbage.length; i++)
-    scope.variableDefinitions.remove(garbage[i]);
+  for (var garb in garbage) scope.variableDefinitions.remove(garb);
 }
 
-Future<ASTNode> runtimeFuncCall(Runtime runtime, ASTNode fCall, ASTNode fDef) async {
+Future<ASTNode> runtimeFuncCall(
+    Runtime runtime, ASTNode fCall, ASTNode fDef) async {
   if (fCall.funcCallArgs.length != fDef.funcDefArgs.length)
     throw InvalidArgumentsException(
         'Error: [Line ${fCall.lineNum}] ${fDef.funcName} Expected ${fDef.funcDefArgs.length} arguments but found ${fCall.funcCallArgs.length} arguments\n');
@@ -179,7 +170,8 @@ ASTNode registerGlobalFutureFunction(
   return fDef;
 }
 
-ASTNode registerGlobalVariable(Runtime runtime, String varName, ASTNode varVal) {
+ASTNode registerGlobalVariable(
+    Runtime runtime, String varName, ASTNode varVal) {
   ASTNode varDef = VarDefNode()
     ..variableName = varName
     ..variableType = StringNode()
@@ -188,32 +180,29 @@ ASTNode registerGlobalVariable(Runtime runtime, String varName, ASTNode varVal) 
   return varDef;
 }
 
-ASTNode registerGlobaClass(Runtime runtime, String className, String classVal) {
-  ASTNode classDef = ClassNode()
-    ..variableName = className
-    ..variableType = StringNode()
-    ..variableValue = StringNode()
-    ..variableValue.stringValue = classVal;
-  runtime.scope.variableDefinitions.add(classDef);
-  return classDef;
-}
-
 Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
-  if (node == null) {
-    return null;
-  }
+  if (node == null) return null;
 
   switch (node.type) {
     case ASTType.AST_CLASS:
+      runtime.stack.add({'line': node.lineNum, 'function': node.className});
+
       if (node.superClass != null) {
         ClassNode superClass = await visit(runtime, node.superClass);
-        List nullVars = node.classChildren.where((child) => child is VarDefNode && child.variableValue == null && child.isSuperseding).toList();
+        List nullVars = node.classChildren
+            .where((child) =>
+                child is VarDefNode &&
+                child.variableValue == null &&
+                child.isSuperseding)
+            .toList();
 
         nullVars.forEach((child) {
-          ASTNode superVariable = superClass.classChildren.firstWhere((superChild) => (superChild as ASTNode).variableName == (child as ASTNode).variableName);
+          ASTNode superVariable = superClass.classChildren.firstWhere(
+              (superChild) =>
+                  (superChild as ASTNode).variableName ==
+                  (child as ASTNode).variableName);
           (child as ASTNode).variableValue = superVariable.variableValue;
         });
-
       }
       return node;
     case ASTType.AST_ENUM:
@@ -267,8 +256,11 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
 
       String classToString = '';
 
-      throwArg.classChildren.where((child) => (child as ASTNode) is VarDefNode).forEach((varDef) {
-        classToString += '\t${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      throwArg.classChildren
+          .where((child) => (child as ASTNode) is VarDefNode)
+          .forEach((varDef) {
+        classToString +=
+            '\t${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
       });
 
       stderr.write('${throwArg.className}:\n$classToString');
@@ -344,6 +336,7 @@ Future<ASTNode> getVarDefByName(
 }
 
 Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
+  
   var localScope = node.scope;
   var globalScope = runtime.scope;
 
@@ -428,11 +421,17 @@ Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
     }
   }
 
+  String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+  for (Map item in runtime.stack.reversed.take(5))
+    stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
   throw UndefinedVariableException(
-      'Error: [Line ${node.lineNum}] Undefined variable `${node.variableName}`.');
+      'Error: [Line ${node.lineNum}] Undefined variable `${node.variableName}`.$stacktrace');
 }
 
 Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
+  
   if (node.scope == runtime.scope) {
     var varDefGlobal =
         await getVarDefByName(runtime, runtime.scope, node.variableName);
@@ -488,10 +487,17 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
         if (value.type == ASTType.AST_DOUBLE) {
           value.intVal = value.doubleVal.toInt();
         }
-        if (objectVarDef.isFinal)
-          throw ReassigningFinalVariableException(
-              'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+        if (objectVarDef.isFinal) {
+          String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 
+          for (Map item in runtime.stack.reversed.take(5))
+            stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+          throw ReassigningFinalVariableException(
+              'Error [Line ${node
+                  .lineNum}] Cannot reassign final variable `${node
+                  .variableAssignmentLeft.variableName}`$stacktrace');
+        }
         objectVarDef.variableValue = value;
         return value;
       }
@@ -506,9 +512,15 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleVal.toInt();
       }
-      if (varDef.isFinal)
+      if (varDef.isFinal) {
+        String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+        for (Map item in runtime.stack.reversed.take(5))
+          stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
         throw ReassigningFinalVariableException(
-            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`$stacktrace');
+      }
 
       varDef.variableValue = value;
       return value;
@@ -525,21 +537,31 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleVal.toInt();
       }
-      if (varDef.isFinal)
+      if (varDef.isFinal) {
+        String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+        for (Map item in runtime.stack.reversed.take(5))
+          stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
         throw ReassigningFinalVariableException(
-            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`');
+            'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`$stacktrace');
+      }
 
       varDef.variableValue = value;
 
       return value;
     }
   }
+  String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+  for (Map item in runtime.stack.reversed.take(5))
+    stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
 
   throw AssigningUndefinedVariableException(
-      "Error: [Line ${left.lineNum}] Can't set undefined variable ${left.variableName}");
+      "Error: [Line ${left.lineNum}] Can't set undefined variable ${left.variableName}$stacktrace");
 }
 
 Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
+
   ASTNode value;
 
   var left = node.binaryOpLeft;
@@ -592,8 +614,13 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           }
           break;
         default:
+          String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+          for (Map item in runtime.stack.reversed.take(5))
+            stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
           throw NoLeftValueException(
-              'Error: [Line ${node.lineNum}] No left value provided');
+              'Error: [Line ${node.lineNum}] No left value provided$stacktrace');
       }
     }
     if (astVarDef.variableName == left.variableName) {
@@ -653,8 +680,7 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
                   astVarDef.variableValue.doubleVal.toInt();
             } else if (astVarDef.variableType.typeValue.type ==
                 DATATYPE.DATA_TYPE_STRING) {
-              astVarDef.variableValue.stringValue +=
-                  value.stringValue;
+              astVarDef.variableValue.stringValue += value.stringValue;
             }
             return astVarDef.variableValue;
           }
@@ -721,13 +747,23 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           break;
 
         default:
+          String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+          for (Map item in runtime.stack.reversed.take(5))
+            stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
           throw InvalidOperatorException(
-              'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
+              'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator$stacktrace');
       }
     }
   }
+  String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+  for (Map item in runtime.stack.reversed.take(5))
+    stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
   throw AssigningUndefinedVariableException(
-      "Error: [Line ${node.lineNum}] Can't set undefined variable `${node.variableName}`");
+      "Error: [Line ${node.lineNum}] Can't set undefined variable `${node.variableName}`$stacktrace");
 }
 
 Future<ASTNode> visitFuncDef(Runtime runtime, ASTNode node) async {
@@ -737,7 +773,9 @@ Future<ASTNode> visitFuncDef(Runtime runtime, ASTNode node) async {
   return node;
 }
 
-Future<ASTNode> runtimeFuncLookup(Runtime runtime, Scope scope, ASTNode node) async {
+Future<ASTNode> runtimeFuncLookup(
+    Runtime runtime, Scope scope, ASTNode node) async {
+  
   ASTNode funcDef;
 
   var visitedExpr = await visit(runtime, node.funcCallExpression);
@@ -860,6 +898,8 @@ Future<ASTNode> runtimeFuncLookup(Runtime runtime, Scope scope, ASTNode node) as
 }
 
 Future<ASTNode> visitFuncCall(Runtime runtime, ASTNode node) async {
+  runtime.stack.add({'line': node.lineNum, 'function': node.funcCallExpression.variableName});
+
   if (node.scope != null) {
     var localScopeFuncDef = await runtimeFuncLookup(runtime, node.scope, node);
 
@@ -870,11 +910,17 @@ Future<ASTNode> visitFuncCall(Runtime runtime, ASTNode node) async {
       await runtimeFuncLookup(runtime, runtime.scope, node);
   if (globalScopeFuncDef != null) return globalScopeFuncDef;
 
+  String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+  for (Map item in runtime.stack.reversed.take(5))
+    stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
   throw UndefinedVariableException(
-      'Error: [Line ${node.lineNum}] Undefined method `?`');
+      'Error: [Line ${node.lineNum}] Undefined method `?`$stacktrace');
 }
 
 Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
+
   var scope = getScope(runtime, node);
   var oldDefList = [];
 
@@ -912,6 +958,7 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
+  
   if (node.classChildren != null)
     node.binaryOpLeft.classChildren = node.classChildren;
 
@@ -989,8 +1036,13 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
         }
         break;
       default:
+        String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+        for (Map item in runtime.stack.reversed.take(5))
+          stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
         throw UnexpectedTokenException(
-            'Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`');
+            'Error [Line ${node.lineNum}]: Cannot access attribute for Type `${node.type.toString()}`$stacktrace');
         break;
     }
 
@@ -1046,19 +1098,25 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
+  
   var left = await visit(runtime, node.binaryOpLeft);
   ASTNode ast = await visit(runtime, node.listAccessPointer);
 
   if (ast.type == ASTType.AST_STRING) {
     var key = ast.stringValue;
-    if (left.type != ASTType.AST_MAP)
+    if (left.type != ASTType.AST_MAP) {
+      String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+      for (Map item in runtime.stack.reversed.take(5))
+        stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
       throw UnexpectedTypeException(
-          'Error: [Line ${node.lineNum}] Expected a Map');
+          'Error: [Line ${node.lineNum}] Expected a Map$stacktrace');
+    }
 
     if (left.map.containsKey(key)) {
       if (left.map[key] is String) {
-        ASTNode mapValAST = StringNode()
-          ..stringValue = left.map[key];
+        ASTNode mapValAST = StringNode()..stringValue = left.map[key];
         return mapValAST;
       }
       return left.map[key];
@@ -1087,15 +1145,26 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
       }
       return left.listElements[index];
     } else {
+      String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+      for (Map item in runtime.stack.reversed.take(5))
+        stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
       throw RangeException(
-          'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}');
+          'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}$stacktrace');
     }
 
-    throw UnexpectedTypeException('List Access left value is not iterable.');
+    String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+    for (Map item in runtime.stack.reversed.take(5))
+      stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+    throw UnexpectedTypeException('List Access left value is not iterable.$stacktrace');
   }
 }
 
 Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
+  
   ASTNode retVal;
   var left = await visit(runtime, node.binaryOpLeft);
   var right = node.binaryOpRight;
@@ -1304,7 +1373,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
           return retVal;
         }
-
       }
       break;
 
@@ -1436,7 +1504,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_AND:
       {
-
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = IntNode()..intVal = left.intVal & right.intVal;
 
@@ -1447,7 +1514,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_OR:
       {
-
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = IntNode()..intVal = left.intVal | right.intVal;
 
@@ -1458,7 +1524,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_XOR:
       {
-
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = IntNode()..intVal = left.intVal ^ right.intVal;
 
@@ -1469,7 +1534,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_LSHIFT:
       {
-
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = IntNode()..intVal = left.intVal << right.intVal;
 
@@ -1480,7 +1544,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_RSHIFT:
       {
-
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
           retVal = IntNode()..intVal = left.intVal >> right.intVal;
 
@@ -1500,8 +1563,15 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         if (left is BoolNode && right is IntNode) {
           retVal = BoolNode();
 
-          if (right.intVal != 1 && right.intVal != 0)
-            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+          if (right.intVal != 1 && right.intVal != 0) {
+            String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+            for (Map item in runtime.stack.reversed.take(5))
+              stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+            throw UnexpectedTokenException(
+                'Only integer literals `0` and `1` can be compared with a bool$stacktrace');
+          }
 
           retVal.boolVal = left.boolVal == (right.intVal == 1);
 
@@ -1517,9 +1587,15 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         }
 
         if (left is IntNode && right is BoolNode) {
+          if (left.intVal != 1 && left.intVal != 0) {
+            String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 
-          if (left.intVal != 1 && left.intVal != 0)
-            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+            for (Map item in runtime.stack.reversed.take(5))
+              stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+            throw UnexpectedTokenException(
+                'Only integer literals `0` and `1` can be compared with a bool$stacktrace');
+          }
 
           retVal = BoolNode();
 
@@ -1535,8 +1611,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
           return retVal;
         }
-        if (left is DoubleNode &&
-            right is DoubleNode) {
+        if (left is DoubleNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == right.doubleVal;
@@ -1590,8 +1665,10 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         if (left is ClassNode && right is ClassNode) {
           retVal = BoolNode()..boolVal = left.className == right.className;
 
-          var leftChildren = left.classChildren.whereType<VarDefNode>().toList();
-          var rightChildren = right.classChildren.whereType<VarDefNode>().toList();
+          var leftChildren =
+              left.classChildren.whereType<VarDefNode>().toList();
+          var rightChildren =
+              right.classChildren.whereType<VarDefNode>().toList();
 
           if (leftChildren.length != rightChildren.length) {
             retVal.boolVal = false;
@@ -1599,7 +1676,8 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           }
 
           for (int i = 0; i < leftChildren.length; i++) {
-            retVal.boolVal = retVal.boolVal && (leftChildren[i] == rightChildren[i]);
+            retVal.boolVal =
+                retVal.boolVal && (leftChildren[i] == rightChildren[i]);
           }
 
           return retVal;
@@ -1620,8 +1698,6 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
           return retVal;
         }
-
-
       }
       break;
     case TokenType.TOKEN_NOT_EQUAL:
@@ -1637,8 +1713,15 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         if (left is BoolNode && right.type == ASTType.AST_INT) {
           retVal = BoolNode();
 
-          if (right.intVal != 1 && right.intVal != 0)
-            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+          if (right.intVal != 1 && right.intVal != 0) {
+            String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+            for (Map item in runtime.stack.reversed.take(5))
+              stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+            throw UnexpectedTokenException(
+                'Only integer literals `0` and `1` can be compared with a bool$stacktrace');
+          }
 
           retVal.boolVal = left.boolVal != (right.intVal == 1);
 
@@ -1654,9 +1737,15 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         }
 
         if (left.type == ASTType.AST_INT && right is BoolNode) {
+          if (left.intVal != 1 && left.intVal != 0) {
+            String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 
-          if (left.intVal != 1 && left.intVal != 0)
-            throw UnexpectedTokenException('Only integer literals `0` and `1` can be compared with a bool');
+            for (Map item in runtime.stack.reversed.take(5))
+              stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+            throw UnexpectedTokenException(
+                'Only integer literals `0` and `1` can be compared with a bool.$stacktrace');
+          }
 
           retVal = BoolNode();
 
@@ -1751,14 +1840,20 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
       break;
 
     default:
+      String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+      for (Map item in runtime.stack.reversed.take(5))
+        stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
       throw InvalidOperatorException(
-          'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
+          'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator.$stacktrace');
   }
 
   return node;
 }
 
 Future<ASTNode> visitUnaryOp(Runtime runtime, ASTNode node) async {
+  
   ASTNode right = await visit(runtime, node.unaryOpRight);
 
   ASTNode returnValue = INITIALIZED_NOOP;
@@ -1841,17 +1936,29 @@ Future<ASTNode> visitUnaryOp(Runtime runtime, ASTNode node) async {
       break;
 
     default:
+      String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+      for (Map item in runtime.stack.reversed.take(5))
+        stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
       throw InvalidOperatorException(
-          'Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator');
+          'Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator.$stacktrace');
   }
 
   return returnValue;
 }
 
 Future<ASTNode> visitIf(Runtime runtime, ASTNode node) async {
-  if (node.ifExpression == null)
+
+  if (node.ifExpression == null) {
+    String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+    for (Map item in runtime.stack.reversed.take(5))
+      stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
     throw UnexpectedTypeException(
-        'Error: [Line ${node.lineNum}] If expression can\'t be empty');
+        'Error: [Line ${node.lineNum}] If expression can\'t be empty.$stacktrace');
+  }
 
   if (node.ifExpression.type == ASTType.AST_UNARYOP) {
     if (boolEval(await visit(runtime, node.ifExpression.unaryOpRight)) ==
@@ -1875,9 +1982,16 @@ Future<ASTNode> visitIf(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitSwitch(Runtime runtime, ASTNode node) async {
-  if (node.switchExpression == null)
+  
+  if (node.switchExpression == null) {
+    String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+    for (Map item in runtime.stack.reversed.take(5))
+      stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
     throw UnexpectedTypeException(
-        'Error: [Line ${node.lineNum}] If expression can\'t be empty');
+        'Error: [Line ${node.lineNum}] Switch expression can\'t be empty$stacktrace');
+  }
 
   ASTNode caseAST = await visit(runtime, node.switchExpression);
 
@@ -1928,12 +2042,14 @@ Future<ASTNode> visitSwitch(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitTernary(Runtime runtime, ASTNode node) async {
+
   return boolEval(await visit(runtime, node.ternaryExpression))
       ? await visit(runtime, node.ternaryBody)
       : await visit(runtime, node.ternaryElseBody);
 }
 
 Future<ASTNode> visitWhile(Runtime runtime, ASTNode node) async {
+
   while (boolEval(await visit(runtime, node.whileExpression))) {
     var visited = await visit(runtime, node.whileBody);
 
@@ -1945,6 +2061,7 @@ Future<ASTNode> visitWhile(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
+
   await visit(runtime, node.forInitStatement);
 
   while (boolEval(await visit(runtime, node.forConditionStatement))) {
@@ -1960,6 +2077,7 @@ Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
+
   var scope = getScope(runtime, node);
   ASTNode astIterable = await visit(runtime, node.iterateIterable);
 
@@ -1973,9 +2091,15 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
       fDef = scope.functionDefinitions[i];
 
       if (fDef.funcName == node.iterateFunction.variableName) {
-        if (fDef.funcPointer != null)
+        if (fDef.funcPointer != null) {
+          String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+          for (Map item in runtime.stack.reversed.take(5))
+            stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
           throw UnexpectedTypeException(
-              'Error: Can not iterate with native method');
+              'Error: Can not iterate with native method.$stacktrace');
+        }
         break;
       }
     }
@@ -2038,13 +2162,16 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
+  
   ASTNode boolAST = await visit(runtime, node.assertExpression);
   if (!boolEval(boolAST)) {
     String str;
 
     if (node.assertExpression.type == ASTType.AST_BINARYOP) {
-      var left = astToString(await visit(runtime, node.assertExpression.binaryOpLeft));
-      var right = astToString(await visit(runtime, node.assertExpression.binaryOpRight));
+      var left =
+          astToString(await visit(runtime, node.assertExpression.binaryOpLeft));
+      var right = astToString(
+          await visit(runtime, node.assertExpression.binaryOpRight));
       str = 'ASSERT($left, $right)';
 
       print(str);
@@ -2053,7 +2180,12 @@ Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
       str = val;
       print(val);
     }
-    throw AssertionException('Assert failed');
+    String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+    for (Map item in runtime.stack.reversed.take(5))
+      stacktrace += ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+    throw AssertionException('Assert failed.$stacktrace');
   }
 
   return INITIALIZED_NOOP;
@@ -2061,9 +2193,10 @@ Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
 
 /// Expect arguments for a function
 void runtimeExpectArgs(List inArgs, List<ASTType> args) {
-  if (inArgs.length < args.length)
+  if (inArgs.length < args.length) {
     throw InvalidArgumentsException(
         '${inArgs.length} argument(s) were provided, while ${args.length} were expected');
+  }
 
   for (int i = 0; i < args.length; i++) {
     if (args[i] == ASTType.AST_ANY) continue;
