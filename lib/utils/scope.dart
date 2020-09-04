@@ -1,7 +1,7 @@
-import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
 
 class Scope {
-  AST owner;
+  ASTNode owner;
   List variableDefinitions;
   List functionDefinitions;
   bool global;

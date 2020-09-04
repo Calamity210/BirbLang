@@ -1,7 +1,7 @@
 fieldsTypes = {}
 with open('lib/utils/ast/ast_node.dart') as f:
     lines = list(map(lambda l: l.strip(), f.readlines()))
-    lines = lines[lines.index('class ASTNode implements AST {') : ]
+    lines = lines[lines.index('class ASTNode implements ASTNode {') : ]
     for line in lines:
         if ' get ' in line: # getter
             field = line.split(' get ')
@@ -18,7 +18,7 @@ with open('lib/utils/ast/ast_types.dart', 'w') as f:
     f.write('''
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
-import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
 
 '''
     )

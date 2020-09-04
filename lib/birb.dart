@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';
@@ -20,7 +20,7 @@ Future<void> main(List<String> arguments) async {
   Parser parser;
 
   /// Parsed program
-  AST node;
+  ASTNode node;
 
   // No file path is specified, Initiate the birb shell
   if (arguments.isEmpty) {

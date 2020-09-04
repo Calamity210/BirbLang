@@ -1,4 +1,4 @@
-import 'package:Birb/utils/AST.dart';
+import 'package:Birb/utils/ast/ast_node.dart';
 
 /// Thrown when trying to access a non-existent function
 class UndefinedFunctionException implements Exception {
