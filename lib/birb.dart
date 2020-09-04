@@ -39,21 +39,26 @@ Future<void> main(List<String> arguments) async {
         }
       }
 
-      if (RegExp('{').allMatches(str).length <
-          RegExp('}').allMatches(str).length) {
-        throw UnexpectedTokenException('Unexpected token `}`');
-      }
+      try {
+        if (RegExp('{').allMatches(str).length <
+            RegExp('}').allMatches(str).length) {
+          throw UnexpectedTokenException('Unexpected token `}`');
+        }
 
-      // Exit shell
-      if (str == 'quit()') {
-        break;
-      }
+        // Exit shell
+        if (str == 'quit()') {
+          break;
+        }
 
-      // Initialize and run program
-      lexer = initLexer(str);
-      parser = initParser(lexer);
-      node = parse(parser);
-      await visit(runtime, node);
+        // Initialize and run program
+        lexer = initLexer(str);
+        parser = initParser(lexer);
+        node = parse(parser);
+        await visit(runtime, node);
+      } catch (e) {
+        if (e is! BirbException) rethrow;
+        print(e);
+      }
     }
 
     print('<<<<< Birb Shell Terminated >>>>>');
@@ -63,29 +68,34 @@ Future<void> main(List<String> arguments) async {
   // Initialize and run program
   String program = File(arguments[0]).readAsStringSync();
 
-  if (RegExp('{').allMatches(program).length !=
-      RegExp('}').allMatches(program).length) {
-    int lParenCount = RegExp('{').allMatches(program).length;
-    Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
-    int rParenCount = rParenMatches.length;
+  try {
+    if (RegExp('{').allMatches(program).length !=
+        RegExp('}').allMatches(program).length) {
+      int lParenCount = RegExp('{').allMatches(program).length;
+      Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
+      int rParenCount = rParenMatches.length;
 
-    if (lParenCount > rParenCount) {
-      throw UnexpectedTokenException(
-          '[Line ${program.split('\n').length}] Expected `}`, but got EOF');
-    } else if (lParenCount < rParenCount) {
-      int parenCount = 0;
-      rParenMatches.forEach((e) {
-        parenCount += 1;
-        if (parenCount > lParenCount) {
-          throw UnexpectedTokenException(
-              '[Line ${program.substring(0, e.start).split('\n').length}]');
-        }
-      });
+      if (lParenCount > rParenCount) {
+        throw UnexpectedTokenException(
+            '[Line ${program.split('\n').length}] Expected `}`, but got EOF');
+      } else if (lParenCount < rParenCount) {
+        int parenCount = 0;
+        rParenMatches.forEach((e) {
+          parenCount += 1;
+          if (parenCount > lParenCount) {
+            throw UnexpectedTokenException(
+                '[Line ${program.substring(0, e.start).split('\n').length}]');
+          }
+        });
+      }
     }
-  }
 
-  lexer = initLexer(program);
-  parser = initParser(lexer);
-  node = parse(parser);
-  await visit(runtime, node);
+    lexer = initLexer(program);
+    parser = initParser(lexer);
+    node = parse(parser);
+    await visit(runtime, node);
+  } catch (e) {
+    if (e is! BirbException) rethrow;
+    print(e);
+  }
 }

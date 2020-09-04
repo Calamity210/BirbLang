@@ -1,7 +1,9 @@
 import 'package:Birb/utils/ast/ast_node.dart';
 
+abstract class BirbException implements Exception {}
+
 /// Thrown when trying to access a non-existent function
-class UndefinedFunctionException implements Exception {
+class UndefinedFunctionException implements BirbException {
   final String message;
   const UndefinedFunctionException(this.message);
 
@@ -10,7 +12,7 @@ class UndefinedFunctionException implements Exception {
 }
 
 /// Thrown when trying to access a non-existent variable
-class UndefinedVariableException implements Exception {
+class UndefinedVariableException implements BirbException {
   final String message;
   const UndefinedVariableException(this.message);
 
@@ -19,7 +21,7 @@ class UndefinedVariableException implements Exception {
 }
 
 /// Thrown when attempting to assign a value to a non-existent variable
-class AssigningUndefinedVariableException implements Exception {
+class AssigningUndefinedVariableException implements BirbException {
   final String message;
   const AssigningUndefinedVariableException(this.message);
 
@@ -29,7 +31,7 @@ class AssigningUndefinedVariableException implements Exception {
 
 /// Thrown when attempting to redefine an existing variable.
 /// Different from reassigning a value
-class MultipleVariableDefinitionsException implements Exception {
+class MultipleVariableDefinitionsException implements BirbException {
   final String message;
   const MultipleVariableDefinitionsException(this.message);
 
@@ -38,7 +40,7 @@ class MultipleVariableDefinitionsException implements Exception {
 }
 
 /// Thrown when reassigning a value to a variable declared as `final`
-class ReassigningFinalVariableException implements Exception {
+class ReassigningFinalVariableException implements BirbException {
   final String message;
   const ReassigningFinalVariableException(this.message);
 
@@ -47,7 +49,7 @@ class ReassigningFinalVariableException implements Exception {
 }
 
 /// Thrown when passing a wrong data type
-class UnexpectedTypeException implements Exception {
+class UnexpectedTypeException implements BirbException {
   final String message;
   const UnexpectedTypeException(this.message);
 
@@ -56,7 +58,7 @@ class UnexpectedTypeException implements Exception {
 }
 
 /// Thrown when trying to access a non-existing map entry
-class MapEntryNotFoundException implements Exception {
+class MapEntryNotFoundException implements BirbException {
   final String message;
   const MapEntryNotFoundException(this.message);
 
@@ -65,7 +67,7 @@ class MapEntryNotFoundException implements Exception {
 }
 
 /// Thrown when passing an index not within range
-class RangeException implements Exception {
+class RangeException implements BirbException {
   final String message;
   const RangeException(this.message);
 
@@ -74,7 +76,7 @@ class RangeException implements Exception {
 }
 
 /// Thrown when passing invalid arguments
-class InvalidArgumentsException implements Exception {
+class InvalidArgumentsException implements BirbException {
   final String message;
   const InvalidArgumentsException(this.message);
 
@@ -83,7 +85,7 @@ class InvalidArgumentsException implements Exception {
 }
 
 /// Thrown when a case/clause is uncaught
-class UncaughtStatementException implements Exception {
+class UncaughtStatementException implements BirbException {
   final String message;
   const UncaughtStatementException(this.message);
 
@@ -92,7 +94,7 @@ class UncaughtStatementException implements Exception {
 }
 
 /// Thrown when no left value is provided
-class NoLeftValueException implements Exception {
+class NoLeftValueException implements BirbException {
   final String message;
   const NoLeftValueException(this.message);
 
@@ -101,7 +103,7 @@ class NoLeftValueException implements Exception {
 }
 
 /// Thrown when attempting to use an invalid operator
-class InvalidOperatorException implements Exception {
+class InvalidOperatorException implements BirbException {
   final String message;
   const InvalidOperatorException(this.message);
 
@@ -110,7 +112,7 @@ class InvalidOperatorException implements Exception {
 }
 
 /// Thrown when an `assert` fails
-class AssertionException implements Exception {
+class AssertionException implements BirbException {
   final String message;
   const AssertionException(this.message);
 
@@ -119,7 +121,7 @@ class AssertionException implements Exception {
 }
 
 /// Thrown when an unexpected token is encountered by the lexer or parser
-class UnexpectedTokenException implements Exception {
+class UnexpectedTokenException implements BirbException {
   final String message;
   const UnexpectedTokenException(this.message);
 
@@ -128,7 +130,7 @@ class UnexpectedTokenException implements Exception {
 }
 
 /// Thrown when the syntax is invalid
-class SyntaxException implements Exception {
+class SyntaxException implements BirbException {
   final String message;
   const SyntaxException(this.message);
 
@@ -137,7 +139,7 @@ class SyntaxException implements Exception {
 }
 
 /// Thrown when an unsupported datatype is placed in a map
-class JsonValueTypeException implements Exception {
+class JsonValueTypeException implements BirbException {
   // Birb only supports String keys as of yet
   final String key;
   final ASTType type;
@@ -151,7 +153,7 @@ class JsonValueTypeException implements Exception {
 }
 
 /// Thrown to indicate that a property was not found for the specified datatype
-class NoSuchPropertyException implements Exception {
+class NoSuchPropertyException implements BirbException {
   final String propertyName;
   final String typeName;
 
@@ -162,7 +164,7 @@ class NoSuchPropertyException implements Exception {
 }
 
 /// Thrown to indicate that a method was not found for the specified datatype
-class NoSuchMethodException implements Exception {
+class NoSuchMethodException implements BirbException {
   final String methodName;
   final String typeName;
 
