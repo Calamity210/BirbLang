@@ -10,10 +10,10 @@ import 'package:Birb/runtime/runtime.dart';
 Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will
   /// start up allowing developers to write programs directly from their terminal
-  bool isInteractive = false;
+  final isInteractive = arguments.isEmpty;
 
   /// Runtime visitor
-  Runtime runtime = initRuntime(arguments[0]);
+  Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
 
   Lexer lexer;
 
@@ -23,12 +23,10 @@ Future<void> main(List<String> arguments) async {
   ASTNode node;
 
   // No file path is specified, Initiate the birb shell
-  if (arguments.isEmpty) {
-    isInteractive = true;
-
+  if (isInteractive) {
     print('<<<<< Birb Shell Initiated >>>>>');
 
-    while (isInteractive) {
+    while (true) {
       stdout.write('> ');
       String str = stdin.readLineSync(encoding: Encoding.getByName('utf-8'));
 
@@ -48,7 +46,6 @@ Future<void> main(List<String> arguments) async {
 
       // Exit shell
       if (str == 'quit()') {
-        isInteractive = false;
         break;
       }
 
