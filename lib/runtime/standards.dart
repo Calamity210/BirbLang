@@ -25,7 +25,7 @@ void initStandards(Runtime runtime, String path) async {
   registerGlobalVariable(runtime, 'Date', dateClass(runtime));
 
   // Double class
-  registerGlobalVariable(runtime, 'Double', doubleClass(runtime));
+  registerGlobalVariable(runtime, 'double', doubleClass(runtime));
 
   // Time class
   registerGlobalVariable(runtime, 'Time', timeClass(runtime));

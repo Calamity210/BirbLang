@@ -1,6 +1,5 @@
 double price = 11.101010;
 
-
 //PROPERTIES
 screm(price.isFinite); // output true
 screm(price.isInfinite); // output false
@@ -28,8 +27,8 @@ screm(price.toStringAsPrecision(1)); // output 1e+1
 screm(price.truncate()); // output 11
 screm(price.truncateToDouble()); // output 11.0
 
-screm(Double.infinity); // output Infinity
-screm(Double.negInfinity); // output -Infinity
-screm(Double.nan); // output NaN
-screm(Double.maxFinite); // output 1.7976931348623157e+308
-screm(Double.minPositive); // output 5e-324
+screm(double.infinity); // output Infinity
+screm(double.negInfinity); // output -Infinity
+screm(double.nan); // output NaN
+screm(double.maxFinite); // output 1.7976931348623157e+308
+screm(double.minPositive); // output 5e-324
