@@ -1,7 +1,7 @@
 import 'package:test/test.dart' as test;
 import 'package:test_process/test_process.dart';
 
-void main(List<String> args) {
+void main() {
   test.test(
     'Starts and exits interactive mode succefully',
     () async {
