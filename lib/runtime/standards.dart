@@ -13,6 +13,8 @@ import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';
 import 'package:Birb/runtime/runtime.dart';
 
+import '../utils/ast/ast_types.dart';
+
 String filePath = '';
 ASTNode INITIALIZED_NOOP;
 
@@ -63,7 +65,30 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List args) async {
     await visit(runtime, node);
 
     return AnyNode();
+  } else if (astStr.stringValue.startsWith('git:')) {
+    String path = astStr.stringValue.split(':')[1];
+    String username = path.split('/')[0];
+    String repo = path.split('/')[1];
+    String branch = 'master';
+    String file;
+
+    if (path.split('/')[2].endsWith('.birb')) {
+      file = path.split('/')[2];
+    } else {
+      branch = path.split('/')[2];
+      file = path.split('/')[3];
+    }
+
+    Response resp = await get(
+        'https://raw.githubusercontent.com/$username/$repo/$branch/$file');
+    Lexer lexer = initLexer(resp.body);
+    Parser parser = initParser(lexer);
+    ASTNode node = parse(parser);
+    await visit(runtime, node);
+
+    return AnyNode();
   }
+
   String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
 
   Lexer lexer = initLexer(File(filename).readAsStringSync());

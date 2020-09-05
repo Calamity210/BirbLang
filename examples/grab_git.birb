@@ -1,0 +1,6 @@
+grab("git:Andy-Python-Programmer/example.birb/main.birb"); // Default branch is master! This will screm "Henlo World"
+grab("git:Andy-Python-Programmer/example.birb/dev/test.birb"); // Look on the branch dev!
+
+class test = Test;
+screm(test.getAge());
+screm(test.getName());
