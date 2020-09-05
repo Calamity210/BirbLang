@@ -28,6 +28,8 @@ class ExpectationsParser {
         _outputs.add(comment.substring('output '.length));
       } else if (comment.startsWith('error ')) {
         _errors.add(comment.substring('error '.length));
+      } else if (comment.startsWith('ignore')) {
+        _outputs.add(null);
       }
     });
   }
@@ -105,9 +107,15 @@ Future _testBirbScriptWithExpectations(FileSystemEntity file) async {
     test.fail('expected ${expectations.nextError()} error next');
   }
 
+  final ignored = <String>[];
   await for (final line in process.stdoutStream()) {
     if (expectations.doesExpectOutput()) {
-      test.expect(line, test.equals(expectations.nextOutput()));
+      final expected = expectations.nextOutput();
+      if (expected == null) {
+        ignored.add(line);
+      } else {
+        test.expect(line, test.equals(expected));
+      }
     } else {
       test.fail('Too many outputs: unexpected $line');
     }
@@ -116,4 +124,9 @@ Future _testBirbScriptWithExpectations(FileSystemEntity file) async {
     test.fail('Too few outputs: expected ${expectations.nextOutput()} next');
   }
   await process.shouldExit();
+  
+  if (ignored.isNotEmpty) {
+    print('Warning: ignoring output lines:');
+    print(ignored);
+  }
 }
