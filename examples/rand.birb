@@ -1,7 +1,11 @@
-screm(rand(10));
+var x = rand(10);
+screm(x > 0 && x < 10); // output true
 
-screm(rand(1.5));
+var y = rand(1.5);
+screm(y > 0 && y < 1.5); // output true
 
-screm(rand(true));
+var z = rand(true);
+screm(z == true || z == false); // output true
 
-screm(rand('zzzzA'));
+var s = rand('zzzzA');
+screm(s) // ignore
