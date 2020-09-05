@@ -50,11 +50,14 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List args) async {
   ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
     String fileName = astStr.stringValue.split(':')[1];
-    String scriptParentPath = Platform.script.path.replaceFirst('birb.dart', '');
+    String scriptParentPath =
+        Platform.script.path.replaceFirst('birb.dart', '');
     if (scriptParentPath.startsWith('/'))
       scriptParentPath = scriptParentPath.replaceFirst('/', '');
 
-    Lexer lexer = initLexer(File('$scriptParentPath../core/$fileName/$fileName.birb').readAsStringSync());
+    Lexer lexer = initLexer(
+        File('$scriptParentPath../core/$fileName/$fileName.birb')
+            .readAsStringSync());
     Parser parser = initParser(lexer);
     ASTNode node = parse(parser);
     await visit(runtime, node);
@@ -76,13 +79,17 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg)
+          .then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
-      astArg.classChildren.where((child) => (child as ASTNode) is VarDefNode).forEach((varDef) {
-        classToString += '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      astArg.classChildren
+          .where((child) => (child as ASTNode) is VarDefNode)
+          .forEach((varDef) {
+        classToString +=
+            '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
       });
 
       print(classToString);
@@ -105,13 +112,17 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg)
+          .then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
-      astArg.classChildren.where((child) => (child as ASTNode) is VarDefNode).forEach((varDef) {
-        classToString += '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
+      astArg.classChildren
+          .where((child) => (child as ASTNode) is VarDefNode)
+          .forEach((varDef) {
+        classToString +=
+            '${(varDef as VarDefNode).variableName}: ${astToString((varDef as VarDefNode).variableValue)}\n';
       });
 
       stderr.write(classToString);
@@ -157,11 +168,15 @@ ASTNode funcRand(Runtime runtime, ASTNode self, List args) {
 
   if (max is IntNode) {
     int randVal = Random().nextInt(max.intVal);
-    IntNode intNode = IntNode()..intVal = randVal..doubleVal = randVal.toDouble();
+    IntNode intNode = IntNode()
+      ..intVal = randVal
+      ..doubleVal = randVal.toDouble();
     return intNode;
   } else if (max is DoubleNode) {
     double randVal = Random().nextDouble() * max.doubleVal;
-    DoubleNode doubleNode = DoubleNode()..doubleVal = randVal..intVal = randVal.toInt();
+    DoubleNode doubleNode = DoubleNode()
+      ..doubleVal = randVal
+      ..intVal = randVal.toInt();
 
     return doubleNode;
   } else if (max is StringNode) {
@@ -181,7 +196,8 @@ ASTNode funcRand(Runtime runtime, ASTNode self, List args) {
     return boolNode;
   }
 
-  throw UnexpectedTypeException('The rand method only takes [String, double, int, and bool] arugment types');
+  throw UnexpectedTypeException(
+      'The rand method only takes [String, double, int, and bool] arugment types');
 }
 
 /**
