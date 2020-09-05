@@ -19,7 +19,20 @@ colorStr += '$' + (90 + i) + 'm' + colors[i];
 colorBlocks += '$' + (40 + i) + 'm' + '\n' * 2;
 }
 
-screm(colorStr);
+screm(colorStr); // output [90mc[91mo[92ml[93mo[94mr[95ms
 
 colorBlocks += '$49m ';
 screm(colorBlocks);
+// output [40m
+// output 
+// output [41m
+// output 
+// output [42m
+// output 
+// output [43m
+// output 
+// output [44m
+// output 
+// output [45m
+// output 
+// output [49m 
