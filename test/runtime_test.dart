@@ -18,7 +18,7 @@ class ExpectationsParser {
 
   void _parseExpectations() {
     final content = file.readAsStringSync();
-    final lines = content.split('\n');
+    final lines = content.split(RegExp(r'\n|(\r\n)'));
     lines.forEach((line) {
       final commentStart = line.indexOf('//');
       if (commentStart == -1) return;
