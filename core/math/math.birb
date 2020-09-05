@@ -16,3 +16,7 @@ var min(var a, var b) {
 var max(var a, var b) {
     return b > a ? b : a;
 }
+
+double remap(int value, int start1, int stop1, int start2, int stop2){
+    return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+}
