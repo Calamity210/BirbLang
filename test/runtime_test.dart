@@ -25,21 +25,21 @@ class ExpectationsParser {
       // skip the two forward slashes
       final comment = line.substring(commentStart+2).trimLeft();
       if (comment.startsWith('output ')) {
-        _outputs.add(comment.substring('output '.length).trim());
+        _outputs.add(comment.substring('output '.length));
       } else if (comment.startsWith('error ')) {
         _errors.add(comment.substring('error '.length));
       }
     });
   }
 
-  bool doesExpectOutput() => _matchedOutputs < _outputs.length;
+  bool doesExpectOutput() => _outputs.isNotEmpty && _matchedOutputs != _outputs.length;
 
   String nextOutput() {
     assert(_matchedOutputs < _outputs.length);
     return _outputs[_matchedOutputs++];
   }
 
-  bool doesExpectError() => _matchedErrors < _errors.length;
+  bool doesExpectError() => _errors.isNotEmpty && _matchedErrors != _errors.length;
 
   String nextError() {
     assert(_matchedErrors < _errors.length);
@@ -88,39 +88,32 @@ void main() {
 
 Future _testBirbScriptWithExpectations(FileSystemEntity file) async {
   final expectations = ExpectationsParser(file);
-
-  try {
-    var process =
-    await TestProcess.start('dart', ['./lib/birb.dart', file.path]).catchError((
-        e) {});
-
-    // skip dart Warning for interpreting ./lib/birb.dart as package URI
-    await for (final line in process.stderrStream().skip(1).where((l) =>
-        l.contains('Error: [Line '))) {
-      if (!expectations.doesExpectError())
-        test.fail('Unexpected error:\n $line');
-
-      if (expectations.doesExpectError() &&
-          line.contains(expectations.getError())) {
-        expectations.nextError();
-      } else if (expectations.doesExpectError()) {
-        test.fail('Unexpected ${expectations.getError()}');
-      }
+  var process =
+  await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+  
+  // skip dart Warning for interpreting ./lib/birb.dart as package URI
+  final shouldFailOnError = !expectations.doesExpectError();
+  await for (final line in process.stderrStream().skip(1)) {
+    if (shouldFailOnError) {
+      test.fail('Unexpected error');
     }
-
-
-    await for (final line in process.stdoutStream()) {
-      if (expectations.doesExpectOutput()) {
-        test.expect(line, test.equals(expectations.nextOutput()));
-      } else {
-        test.fail('Too many outputs: unexpected $line');
-      }
+    if (expectations.doesExpectError() && line.contains(expectations.getError())) {
+      expectations.nextError();
     }
-    if (expectations.doesExpectOutput()) {
-      test.fail('Too few outputs: expected ${expectations.nextOutput()} next');
-    }
-    await process.shouldExit();
-  } catch (e) {
-
   }
+  if (expectations.doesExpectError()) {
+    test.fail('expected ${expectations.nextError()} error next');
+  }
+
+  await for (final line in process.stdoutStream()) {
+    if (expectations.doesExpectOutput()) {
+      test.expect(line, test.equals(expectations.nextOutput()));
+    } else {
+      test.fail('Too many outputs: unexpected $line');
+    }
+  }
+  if (expectations.doesExpectOutput()) {
+    test.fail('Too few outputs: expected ${expectations.nextOutput()} next');
+  }
+  await process.shouldExit();
 }
