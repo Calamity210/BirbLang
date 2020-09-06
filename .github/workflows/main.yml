@@ -23,7 +23,7 @@ jobs:
         working-directory: ./docs
         run: |
           if [ -e yarn.lock ]; then
-          yarn install --frozen-lockfile
+          yarn install
           elif [ -e package-lock.json ]; then
           npm ci
           else
@@ -61,7 +61,7 @@ jobs:
           git config --global user.email "actions@gihub.com"
           git config --global user.name "gh-actions"
           if [ -e yarn.lock ]; then
-          yarn install --frozen-lockfile
+          yarn install
           elif [ -e package-lock.json ]; then
           npm ci
           else
