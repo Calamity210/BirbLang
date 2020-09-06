@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: '12.x'
       - name: Test Build
+        working-directory: ./docs
         run: |
-          cd docs
           if [ -e yarn.lock ]; then
           yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then
@@ -41,6 +41,7 @@ jobs:
       - name: Add key to allow access to repository
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        working-directory: ./docs
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -55,6 +56,7 @@ jobs:
         env:
           USE_SSH: true
           GIT_USER: git
+        working-directory: ./docs
         run: |
           git config --global user.email "actions@gihub.com"
           git config --global user.name "gh-actions"
