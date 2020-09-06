@@ -1390,7 +1390,7 @@
     fs-extra "^8.1.0"
     sitemap "^3.2.2"
 
-"@docusaurus/preset-bootstrap@^2.0.0":
+"@docusaurus/preset-bootstrap@2.0.0-alpha.63":
   version "2.0.0-alpha.63"
   resolved "https://registry.yarnpkg.com/@docusaurus/preset-bootstrap/-/preset-bootstrap-2.0.0-alpha.63.tgz#743dcc2e7733231eabb5d351bbf65713250b9ca3"
   integrity sha512-VYfYeARlkA7hKe6dBOa3Krlky4LDk3h3Q4DlS8HXz+WAnQE7gmAgnErhYm7e9G569jaDyKZLUpY6k51iHKLtiQ==
