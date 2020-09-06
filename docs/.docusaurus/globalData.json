@@ -26,23 +26,15 @@
           "label": "Next ('deploy preview')",
           "isLast": true,
           "path": "/docs",
-          "mainDocId": "doc1",
+          "mainDocId": "tour",
           "docs": [
             {
-              "id": "doc1",
+              "id": "string",
+              "path": "/docs/string"
+            },
+            {
+              "id": "tour",
               "path": "/docs/"
-            },
-            {
-              "id": "doc2",
-              "path": "/docs/doc2"
-            },
-            {
-              "id": "doc3",
-              "path": "/docs/doc3"
-            },
-            {
-              "id": "mdx",
-              "path": "/docs/mdx"
             }
           ]
         }

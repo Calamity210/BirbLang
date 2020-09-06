@@ -9,7 +9,7 @@ export default [
 },
 {
   path: '/search',
-  component: ComponentCreator('/search','9fa'),
+  component: ComponentCreator('/search','722'),
   exact: true,
 },
 {
@@ -26,27 +26,17 @@ export default [
 },
 {
   path: '/docs',
-  component: ComponentCreator('/docs','3d3'),
+  component: ComponentCreator('/docs','648'),
   
   routes: [
 {
   path: '/docs/',
-  component: ComponentCreator('/docs/','b73'),
+  component: ComponentCreator('/docs/','9a0'),
   exact: true,
 },
 {
-  path: '/docs/doc2',
-  component: ComponentCreator('/docs/doc2','7d1'),
-  exact: true,
-},
-{
-  path: '/docs/doc3',
-  component: ComponentCreator('/docs/doc3','6f8'),
-  exact: true,
-},
-{
-  path: '/docs/mdx',
-  component: ComponentCreator('/docs/mdx','155'),
+  path: '/docs/string',
+  component: ComponentCreator('/docs/string','51a'),
   exact: true,
 },
 ]

@@ -3,34 +3,43 @@
   "label": "Next ('deploy preview')",
   "isLast": true,
   "docsSidebars": {
-    "someSidebar": [
+    "BirbLang": [
       {
         "collapsed": true,
         "type": "category",
-        "label": "BirbLang",
+        "label": "BirbDocs",
         "items": [
           {
             "type": "link",
-            "label": "Style Guide",
+            "label": "Tour",
             "href": "/docs/"
           },
           {
-            "type": "link",
-            "label": "Document Number 2",
-            "href": "/docs/doc2"
-          },
-          {
-            "type": "link",
-            "label": "This is Document Number 3",
-            "href": "/docs/doc3"
+            "collapsed": true,
+            "type": "category",
+            "label": "Core",
+            "items": [
+              {
+                "type": "link",
+                "label": "String",
+                "href": "/docs/string"
+              }
+            ]
           }
         ]
+      }
+    ],
+    "Contribute": [
+      {
+        "collapsed": true,
+        "type": "category",
+        "label": "BirbDocs",
+        "items": []
       }
     ]
   },
   "permalinkToSidebar": {
-    "/docs/": "someSidebar",
-    "/docs/doc2": "someSidebar",
-    "/docs/doc3": "someSidebar"
+    "/docs/string": "BirbLang",
+    "/docs/": "BirbLang"
   }
 }

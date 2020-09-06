@@ -1,5 +1,21 @@
 module.exports = {
-  someSidebar: {
-    BirbLang: ['doc1', 'doc2', 'doc3']
-  },
+  BirbLang: [
+      {
+        type: 'category',
+        label: 'BirbDocs',
+        items: [
+        'tour',
+            {
+                Core: ['string'],
+            }
+        ],
+      },
+    ],
+    Contribute: [
+        {
+         type: 'category',
+         label: 'BirbDocs',
+         items: [],
+        }
+    ]
 };

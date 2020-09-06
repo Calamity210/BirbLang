@@ -1,0 +1,17 @@
+{
+  "unversionedId": "string",
+  "id": "string",
+  "isDocsHomePage": false,
+  "title": "String",
+  "description": "String type",
+  "source": "@site/docs\\string.md",
+  "slug": "/string",
+  "permalink": "/docs/string",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/string.md",
+  "version": "current",
+  "sidebar": "BirbLang",
+  "previous": {
+    "title": "Tour",
+    "permalink": "/docs/"
+  }
+}

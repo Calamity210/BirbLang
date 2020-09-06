@@ -1,0 +1,18 @@
+{
+  "unversionedId": "tour",
+  "id": "tour",
+  "isDocsHomePage": false,
+  "title": "Tour",
+  "description": "Basics",
+  "source": "@site/docs\\tour.md",
+  "slug": "/",
+  "permalink": "/docs/",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/tour.md",
+  "version": "current",
+  "sidebar_label": "Tour",
+  "sidebar": "BirbLang",
+  "next": {
+    "title": "String",
+    "permalink": "/docs/string"
+  }
+}

@@ -16,7 +16,7 @@ export default {
         "path": "community",
         "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/",
         "routeBasePath": "community",
-        "sidebarPath": "C:\\Users\\User\\Projects\\BirbDocs\\sidebarsCommunity.js",
+        "sidebarPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
         "showLastUpdateAuthor": true,
         "showLastUpdateTime": true
       }
@@ -114,7 +114,7 @@ export default {
       {
         "docs": {
           "path": "docs",
-          "sidebarPath": "C:\\Users\\User\\Projects\\BirbDocs\\sidebars.js",
+          "sidebarPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
           "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/",
           "showLastUpdateAuthor": true,
           "showLastUpdateTime": true,
@@ -130,7 +130,7 @@ export default {
           }
         },
         "theme": {
-          "customCss": "C:\\Users\\User\\Projects\\BirbDocs\\src\\css\\custom.css"
+          "customCss": "C:\\Users\\User\\Projects\\BirbLang\\docs\\src\\css\\custom.css"
         }
       }
     ]
