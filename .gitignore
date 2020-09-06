@@ -12,6 +12,10 @@ doc/api/
 .idea/
 .vscode/
 
+docs/node_modules/
+docs/.idea/
+
+
 # Executable
 **/birb
 **/birb.exe
