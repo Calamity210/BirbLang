@@ -23,10 +23,3 @@ jobs:
             git config --global user.name "Calamity210"
             echo "machine github.com login Calamity210 password $GITHUB_TOKEN" > ~/.netrc
             cd docs && yarn install && GIT_USER=>Calamity210 yarn run publish-gh-pages
-
-workflows:
-  version: 2
-  build_and_deploy:
-    jobs:
-      - deploy-website:
-#         filters: *filter-only-master
