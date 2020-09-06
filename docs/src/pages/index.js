@@ -16,7 +16,7 @@ function Home() {
       description="Smol Programming Language">
       <div className={styles.hero}>
         <header>
-          <img src={useBaseUrl('static/img/logo.svg')} />
+          <img src={useBaseUrl('img/logo.svg')} />
           <h1>{siteConfig.title}</h1>
           <p>{siteConfig.tagline}</p>
           <div className={styles.buttons}>
