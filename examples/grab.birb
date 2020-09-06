@@ -1,4 +1,7 @@
-grab("./examples/class.birb"); // output Birb : 10
+// output Birb : 10
+// output Test
+// output 0
+grab("class.birb");
 Test.Test("foo", 20);
 screm(Test.getName()); // output foo
 screm(Test.getAge()); // output 20

@@ -17,7 +17,9 @@ String filePath = '';
 ASTNode INITIALIZED_NOOP;
 
 void initStandards(Runtime runtime, String path) async {
-  filePath = path ?? '';
+  if (path != null) {
+    filePath = path.replaceAllMapped(RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
+  }
   registerGlobalVariable(
       runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
 

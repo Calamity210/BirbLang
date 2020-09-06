@@ -826,7 +826,7 @@ ASTNode parseExpression(Parser parser, Scope scope) {
     }
   }
 
-  while (parser.curToken.type == TokenType.TOKEN_AND) {
+  while (parser.curToken.type == TokenType.TOKEN_AND || parser.curToken.type == TokenType.TOKEN_OR) {
     var binaryOp = parser.curToken;
     eat(parser, binaryOp.type);
 

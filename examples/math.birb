@@ -1,6 +1,7 @@
 grab('birb:math');
 
-screm(min(10, 5.5).runtimeType); // assert double
+screm(min(10, 5.5).runtimeType); // output double
 
-screm(pi);
-screm(remap(8, 0, 10, 0, 100));
+screm(pi); // output 3.141592653589793
+
+screm(remap(8, 0, 10, 0, 100)); // output 80.0
