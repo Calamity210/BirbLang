@@ -22,24 +22,28 @@
               {
                 "type": "link",
                 "label": "String",
-                "href": "/docs/string"
+                "href": "/docs/Core/string"
               }
             ]
           }
         ]
-      }
-    ],
-    "Contribute": [
+      },
       {
         "collapsed": true,
         "type": "category",
-        "label": "BirbDocs",
-        "items": []
+        "label": "Contribute",
+        "items": [
+          {
+            "type": "link",
+            "label": "Contributing",
+            "href": "/docs/"
+          }
+        ]
       }
     ]
   },
   "permalinkToSidebar": {
-    "/docs/string": "BirbLang",
-    "/docs/": "BirbLang"
+    "/docs/": "BirbLang",
+    "/docs/Core/string": "BirbLang"
   }
 }

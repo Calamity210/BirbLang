@@ -61,17 +61,22 @@ export default [
 },
 {
   path: '/docs',
-  component: ComponentCreator('/docs','648'),
+  component: ComponentCreator('/docs','38b'),
   
   routes: [
+{
+  path: '/docs/',
+  component: ComponentCreator('/docs/','394'),
+  exact: true,
+},
 {
   path: '/docs/',
   component: ComponentCreator('/docs/','9a0'),
   exact: true,
 },
 {
-  path: '/docs/string',
-  component: ComponentCreator('/docs/string','51a'),
+  path: '/docs/Core/string',
+  component: ComponentCreator('/docs/Core/string','788'),
   exact: true,
 },
 ]

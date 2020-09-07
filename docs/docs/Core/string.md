@@ -343,7 +343,7 @@ String henlo = "   Henlo Birb   ";
 String trimmed = henlo.trim(); /*Henlo Birb*/
 ```
 
-### trim
+### trimLeft
 
 `String trimLeft()`
 
@@ -355,7 +355,7 @@ String henlo = "   Henlo Birb   ";
 String trimmed = henlo.trimLeft(); /*Henlo Birb   */
 ```
 
-### trim
+### trimRight
 
 `String trimRight()`
 

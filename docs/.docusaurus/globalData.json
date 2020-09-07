@@ -8,11 +8,15 @@
           "label": "Next ('deploy preview')",
           "isLast": true,
           "path": "/docs",
-          "mainDocId": "tour",
+          "mainDocId": "Contribute/contributing",
           "docs": [
             {
-              "id": "string",
-              "path": "/docs/string"
+              "id": "Contribute/contributing",
+              "path": "/docs/"
+            },
+            {
+              "id": "Core/string",
+              "path": "/docs/Core/string"
             },
             {
               "id": "tour",

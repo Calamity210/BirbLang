@@ -1,0 +1,20 @@
+{
+  "unversionedId": "Contribute/contributing",
+  "id": "Contribute/contributing",
+  "isDocsHomePage": false,
+  "title": "Contributing",
+  "description": "Want to contribute to birb? This document should help you get started!",
+  "source": "@site/docs\\Contribute\\contribute.md",
+  "slug": "/",
+  "permalink": "/docs/",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Contribute/contribute.md",
+  "version": "current",
+  "lastUpdatedBy": "Author",
+  "lastUpdatedAt": 1539502055,
+  "sidebar_label": "Contributing",
+  "sidebar": "BirbLang",
+  "previous": {
+    "title": "String",
+    "permalink": "/docs/Core/string"
+  }
+}

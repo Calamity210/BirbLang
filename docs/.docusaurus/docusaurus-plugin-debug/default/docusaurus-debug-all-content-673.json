@@ -10,7 +10,7 @@
           "routePriority": -1,
           "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
           "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\docs",
-          "mainDocId": "tour",
+          "mainDocId": "Contribute/contributing",
           "sidebars": {
             "BirbLang": [
               {
@@ -29,43 +29,70 @@
                     "items": [
                       {
                         "type": "doc",
-                        "id": "string"
+                        "id": "Core/string"
                       }
                     ]
                   }
                 ]
-              }
-            ],
-            "Contribute": [
+              },
               {
                 "collapsed": true,
                 "type": "category",
-                "label": "BirbDocs",
-                "items": []
+                "label": "Contribute",
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "Contribute/contributing"
+                  }
+                ]
               }
             ]
           },
           "permalinkToSidebar": {
-            "/docs/string": "BirbLang",
-            "/docs/": "BirbLang"
+            "/docs/": "BirbLang",
+            "/docs/Core/string": "BirbLang"
           },
           "docs": [
             {
-              "unversionedId": "string",
-              "id": "string",
+              "unversionedId": "Contribute/contributing",
+              "id": "Contribute/contributing",
+              "isDocsHomePage": false,
+              "title": "Contributing",
+              "description": "Want to contribute to birb? This document should help you get started!",
+              "source": "@site/docs\\Contribute\\contribute.md",
+              "slug": "/",
+              "permalink": "/docs/",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Contribute/contribute.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar_label": "Contributing",
+              "sidebar": "BirbLang",
+              "previous": {
+                "title": "String",
+                "permalink": "/docs/Core/string"
+              }
+            },
+            {
+              "unversionedId": "Core/string",
+              "id": "Core/string",
               "isDocsHomePage": false,
               "title": "String",
               "description": "An array of chars (UTF-16 code units).",
-              "source": "@site/docs\\string.md",
-              "slug": "/string",
-              "permalink": "/docs/string",
-              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/string.md",
+              "source": "@site/docs\\Core\\string.md",
+              "slug": "/Core/string",
+              "permalink": "/docs/Core/string",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/string.md",
               "version": "current",
               "lastUpdatedBy": "Author",
               "lastUpdatedAt": 1539502055,
               "sidebar": "BirbLang",
               "previous": {
                 "title": "Tour",
+                "permalink": "/docs/"
+              },
+              "next": {
+                "title": "Contributing",
                 "permalink": "/docs/"
               }
             },
@@ -86,7 +113,7 @@
               "sidebar": "BirbLang",
               "next": {
                 "title": "String",
-                "permalink": "/docs/string"
+                "permalink": "/docs/Core/string"
               }
             }
           ]

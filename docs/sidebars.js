@@ -6,16 +6,16 @@ module.exports = {
         items: [
         'tour',
             {
-                Core: ['string'],
+                Core: ['Core/string'],
             }
         ],
       },
-    ],
-    Contribute: [
         {
          type: 'category',
-         label: 'BirbDocs',
-         items: [],
-        }
+         label: 'Contribute',
+         items: [
+            'Contribute/contributing'
+         ],
+        },
     ]
 };
