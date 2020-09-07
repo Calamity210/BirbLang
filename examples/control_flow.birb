@@ -18,3 +18,8 @@ year += 1;
 
 assert(year == 2030);
 screm(year); // output 2030
+
+if (true)
+  screm('Single Statement Compound'); // output Single Statement Compound
+
+screm('just testing'); // output just testing

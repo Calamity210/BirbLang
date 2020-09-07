@@ -93,7 +93,6 @@ ASTNode parseOneStatementCompound(Parser parser, Scope scope) {
   compound.scope = scope;
 
   var statement = parseStatement(parser, scope);
-  eat(parser, TokenType.TOKEN_SEMI);
   compound.compoundValue.add(statement);
 
   return compound;
