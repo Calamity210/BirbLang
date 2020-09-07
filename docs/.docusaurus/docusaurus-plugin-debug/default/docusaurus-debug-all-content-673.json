@@ -10,7 +10,7 @@
           "routePriority": -1,
           "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
           "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\docs",
-          "mainDocId": "Contribute/contributing",
+          "mainDocId": "tour",
           "sidebars": {
             "BirbLang": [
               {
@@ -49,8 +49,9 @@
             ]
           },
           "permalinkToSidebar": {
-            "/docs/": "BirbLang",
-            "/docs/Core/string": "BirbLang"
+            "/docs/contributing": "BirbLang",
+            "/docs/Core/string": "BirbLang",
+            "/docs/": "BirbLang"
           },
           "docs": [
             {
@@ -60,8 +61,8 @@
               "title": "Contributing",
               "description": "Want to contribute to birb? This document should help you get started!",
               "source": "@site/docs\\Contribute\\contribute.md",
-              "slug": "/",
-              "permalink": "/docs/",
+              "slug": "/contributing",
+              "permalink": "/docs/contributing",
               "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Contribute/contribute.md",
               "version": "current",
               "lastUpdatedBy": "Author",
@@ -93,7 +94,7 @@
               },
               "next": {
                 "title": "Contributing",
-                "permalink": "/docs/"
+                "permalink": "/docs/contributing"
               }
             },
             {

@@ -36,14 +36,15 @@
           {
             "type": "link",
             "label": "Contributing",
-            "href": "/docs/"
+            "href": "/docs/contributing"
           }
         ]
       }
     ]
   },
   "permalinkToSidebar": {
-    "/docs/": "BirbLang",
-    "/docs/Core/string": "BirbLang"
+    "/docs/contributing": "BirbLang",
+    "/docs/Core/string": "BirbLang",
+    "/docs/": "BirbLang"
   }
 }

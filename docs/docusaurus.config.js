@@ -89,7 +89,7 @@ module.exports = {
     },
     algolia: {
      apiKey: '7a1c0622f793d186564c3bc2d235068e',
-     indexName: 'birb',
+     indexName: 'BIRB_DOCS',
      searchParameters: {
       facetFilters: [`version:latest`],
      },
