@@ -27,6 +27,13 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
         return astBool;
       }
 
+    case 'length':
+      {
+        var intAST = IntNode()..intVal = left.stringValue.length;
+
+        return intAST;
+      }
+
     case 'mock':
       {
         print(left.stringValue);
@@ -35,13 +42,6 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
               stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
         return astString;
-      }
-
-    case 'length':
-      {
-        var intAST = IntNode()..intVal = left.stringValue.length;
-
-        return intAST;
       }
     case 'toBinary':
       {
@@ -71,10 +71,12 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
         return astList;
       }
 
-    case 'toDec':
+    case 'runtimeType':
       {
-        ASTNode astList = ListNode()..listElements = left.stringValue.codeUnits;
-        return astList;
+        ASTNode stringAST = StringNode()
+          ..stringValue = left.stringValue.runtimeType.toString();
+        ;
+        return stringAST;
       }
 
     default:

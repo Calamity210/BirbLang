@@ -27,7 +27,7 @@ statements -> statement (";"? statement)*
 %expressed% -> statement@stmt (";"?[@stmt!=NOOP&&prev="}"] statement)*
 
 type -> "void" | "String" | "StrBuffer" | "var" | "int"
-        | "int" | "double" | "bool" | "class" | "enum"
+        | "double" | "bool" | "class" | "enum"
         | "List" | "Map" | "Source"
 %expressed% -> IDENTIFIER
 

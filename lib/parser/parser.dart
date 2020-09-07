@@ -147,7 +147,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
             return parseThrow(parser, scope);
           case BREAK:
             return parseBreak(parser, scope);
-          case CONTINUE:
+          case NEXT:
             return parseContinue(parser, scope);
           case ITERATE:
             return parseIterate(parser, scope);
@@ -852,7 +852,7 @@ ASTNode parseBreak(Parser parser, Scope scope) {
 ASTNode parseContinue(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
 
-  return initASTWithLine(ContinueNode(), parser.lexer.lineNum);
+  return initASTWithLine(NextNode(), parser.lexer.lineNum);
 }
 
 ASTNode parseReturn(Parser parser, Scope scope) {

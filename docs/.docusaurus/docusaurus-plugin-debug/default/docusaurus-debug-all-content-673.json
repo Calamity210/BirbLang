@@ -1,0 +1,163 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "loadedVersions": [
+        {
+          "versionName": "current",
+          "versionLabel": "Next ('deploy preview')",
+          "versionPath": "/docs",
+          "isLast": true,
+          "routePriority": -1,
+          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
+          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\docs",
+          "mainDocId": "tour",
+          "sidebars": {
+            "BirbLang": [
+              {
+                "collapsed": true,
+                "type": "category",
+                "label": "BirbDocs",
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "tour"
+                  },
+                  {
+                    "collapsed": true,
+                    "type": "category",
+                    "label": "Core",
+                    "items": [
+                      {
+                        "type": "doc",
+                        "id": "string"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "Contribute": [
+              {
+                "collapsed": true,
+                "type": "category",
+                "label": "BirbDocs",
+                "items": []
+              }
+            ]
+          },
+          "permalinkToSidebar": {
+            "/docs/string": "BirbLang",
+            "/docs/": "BirbLang"
+          },
+          "docs": [
+            {
+              "unversionedId": "string",
+              "id": "string",
+              "isDocsHomePage": false,
+              "title": "String",
+              "description": "An array of chars (UTF-16 code units).",
+              "source": "@site/docs\\string.md",
+              "slug": "/string",
+              "permalink": "/docs/string",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/string.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "BirbLang",
+              "previous": {
+                "title": "Tour",
+                "permalink": "/docs/"
+              }
+            },
+            {
+              "unversionedId": "tour",
+              "id": "tour",
+              "isDocsHomePage": false,
+              "title": "Tour",
+              "description": "Small program",
+              "source": "@site/docs\\tour.md",
+              "slug": "/",
+              "permalink": "/docs/",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/tour.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar_label": "Tour",
+              "sidebar": "BirbLang",
+              "next": {
+                "title": "String",
+                "permalink": "/docs/string"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "community": {
+      "loadedVersions": [
+        {
+          "versionName": "current",
+          "versionLabel": "Next",
+          "versionPath": "/community",
+          "isLast": true,
+          "routePriority": -1,
+          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
+          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\community",
+          "mainDocId": "support",
+          "sidebars": {
+            "community": [
+              {
+                "type": "doc",
+                "id": "support"
+              }
+            ]
+          },
+          "permalinkToSidebar": {
+            "/community/support": "community"
+          },
+          "docs": [
+            {
+              "unversionedId": "support",
+              "id": "support",
+              "isDocsHomePage": false,
+              "title": "Support",
+              "description": "On this page, we've listed some communities you can join to engage with other Birb developers",
+              "source": "@site/community\\support.md",
+              "slug": "/support",
+              "permalink": "/community/support",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/community/support.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "community"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "docusaurus-plugin-content-blog": {
+    "default": null
+  },
+  "docusaurus-plugin-content-pages": {
+    "default": [
+      {
+        "type": "jsx",
+        "permalink": "/",
+        "source": "@site/src\\pages\\index.js"
+      }
+    ]
+  },
+  "docusaurus-plugin-debug": {
+    "default": null
+  },
+  "docusaurus-theme-classic": {
+    "default": null
+  },
+  "docusaurus-theme-search-algolia": {
+    "default": null
+  },
+  "docusaurus-theme-live-codeblock": {
+    "default": null
+  }
+}

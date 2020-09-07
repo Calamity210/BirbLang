@@ -353,9 +353,9 @@ class ThrowNode extends ASTNode {
 
 }
 
-class ContinueNode extends ASTNode {
+class NextNode extends ASTNode {
   @override
-  ASTType type = ASTType.AST_CONTINUE;
+  ASTType type = ASTType.AST_NEXT;
 
 }
 

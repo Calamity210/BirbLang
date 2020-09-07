@@ -267,7 +267,7 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
       exit(1);
 
       return INITIALIZED_NOOP;
-    case ASTType.AST_CONTINUE:
+    case ASTType.AST_NEXT:
       return node;
     case ASTType.AST_TERNARY:
       return await visitTernary(runtime, node);
@@ -947,7 +947,7 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
           return null;
         }
       } else if (visited.type == ASTType.AST_BREAK ||
-          visited.type == ASTType.AST_CONTINUE) {
+          visited.type == ASTType.AST_NEXT) {
         return visited;
       }
     }
@@ -2054,7 +2054,7 @@ Future<ASTNode> visitWhile(Runtime runtime, ASTNode node) async {
     var visited = await visit(runtime, node.whileBody);
 
     if (visited.type == ASTType.AST_BREAK) break;
-    else if (visited.type == ASTType.AST_CONTINUE) continue;
+    else if (visited.type == ASTType.AST_NEXT) continue;
   }
 
   return node;
@@ -2068,7 +2068,7 @@ Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
     var visited = await visit(runtime, node.forBody);
 
     if (visited is BreakNode) break;
-    else if (visited is ContinueNode) {
+    else if (visited is NextNode) {
     await visit(runtime, node.forChangeStatement);
     continue;
     }

@@ -95,6 +95,9 @@ export default {
       "copyright": "Copyright © 2020 BirbLang, Inc. Built with Docusaurus."
     },
     "prism": {
+      "additionalLanguages": [
+        "dart"
+      ],
       "defaultLanguage": "dart"
     },
     "algolia": {

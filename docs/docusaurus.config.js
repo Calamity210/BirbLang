@@ -84,6 +84,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} BirbLang, Inc. Built with Docusaurus.`,
     },
     prism: {
+     additionalLanguages: ['dart'],
      defaultLanguage: 'dart',
     },
     algolia: {

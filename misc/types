@@ -24,7 +24,7 @@ NOOP NoopNode
 BREAK BreakNode
 RETURN ReturnNode returnValue
 THROW ThrowNode throwValue
-CONTINUE ContinueNode
+NEXT NextNode
 TERNARY TernaryNode ternaryExpression ternaryBody ternaryElseBody
 IF IfNode ifExpression ifBody ifElse elseBody
 ELSE ElseNode elseBody

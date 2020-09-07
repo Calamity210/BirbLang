@@ -5,93 +5,81 @@ sidebar_label: Tour
 slug: /
 ---
 
-# Basics
-
-
 ## Small program
 ```dart
-class Birb {
-  String favouriteGreeting = 'Henlo';
-  String name = 'Birb';
-  int age = 10;
-  List favouriteFood = ['Seeb', 'Seeb', 'Seeb'];
-  Map goodBadMap = {
-        'good': ['Seeb'],
-        'bad': 'rest',
-        'goodCount': 1,
-        'badCount': 'ERROR'
-  };
+void multiplyAndScrem(int a, int b) {
+  var product = a * b;
+  screm(a + ' * ' + b + ' = ' + product);
 }
 
-
-List favouriteFood = Birb.favouriteFood;
-Map goodBadMap = Birb.goodBadMap;
-
-void printDetails() {
-    screm(Birb.favouriteGreeting + " am " + Birb.name);
-    screm("I am " + Birb.age + " years old");
-    screm("I like " + favouriteFood[0]);
-    screm('There is only ' + goodBadMap['goodCount'] + " item in my good list");
-}
-
-printDetails();
-
+multiplyAndScrem(5, 2); // Should screm (5 * 2 = 10)
 ```
-## Modifiers
+Key things to note from this program are:
 
+- `void` is a data type that expects no return value.
+- `multiplyAndScrem` is the name of a function, a function is a way to reuse code without having to necessarily type it all again.
+- Everything with in the `()` after the functions name are parameters, `a and b` are the names `int` is the type.
+- `var` is a way to declare a variable without specifying a type.
+- `screm` is birb's way of writing to stdout.
+- Everything on a line after `//` is a comment (ignored by the program).
+
+## Modifiers
 - final - Can't reassign variable
 - const - compile time variable (can't reassign)
-- static - TODO
+- static
+
+:::caution
+Static modifiers are still a work in progress
+:::
 
 ## Data Types
 
 Supported data types yet are:
 
-- var - Allows birb to infer the type
-- int - Basic integer type, 64-bit 2's complement.
-- double - Birb doubles are 64-bit floating-point numbers as specified in the IEEE 754 standard. 1 bit for the sign, 11 for exponents and 52 for the value itself.
-- String - Literals (char array), surrounded by either `"` or `'`s.
-- bool - true or false.
-- Source - source code from an included file.
-- List - A collection of dynamic objects with a length.
-- Map - Key / Value pairs, key must be a String.
-- class - Encapsulates data for an object.
-- enum - Enumerated type, used to define constant values
+- `bool` - true or false.
+- `class` - Encapsulates data for an object.
+- `double` - Birb doubles are 64-bit floating-point numbers as specified in the IEEE 754 standard. 1 bit for the sign, 11 for exponents and 52 for the value itself.
+- `enum` - Enumerated type, used to define constant values
+- `int` - Basic integer type, 64-bit 2's complement.
+- `List` - A collection of dynamic objects with a length.
+- `Map` - Key / Value pairs, key must be a String.
+- `Source` - source code from an included file.
+- `String` - Literals (char array), surrounded by either `"` or `'`s.
+- `var` - Allows birb to infer the type
 
 ## Primitive Types example
  ```dart
 String str = "Henlo birb";
 
-int length = str.length;
+int length = str.length; // 10
 
-double d = length * 0.5;
+double d = length / 2; // 5.0
 
-bool isGreaterThanFive = d > 5;
+bool isGreaterThanFive = d > 5; // false
 ```
 
 ## Class example
-The `nest` keyword is birb's equivalent of `this`
 ```dart
 class Birb {
-
   String name = "Birb";
   int age = 5;
   bool isMale = true;
   
   void sayName() {
-    screm(nest.name);
+    screm(nest.name); // Birb
   } 
 }
 ```
+
+:::tip What is nest?
+Nest is a keyword used to refer to the current instance.
+:::
 
 ## List example
 ```dart
 List list = ["Seeb",10, false];
 
-list.add("More seeb");
-list.remove(2);
-
-int length = list.length;
+int length = list.length; // 3
 ```
 
 ## Map example
@@ -102,7 +90,7 @@ Map food = {
 
 List i = food["veg"];
 
-screm(i[0]);
+screm(i[0]); // carrot
 ```
 
 ## Variables
@@ -113,8 +101,10 @@ To define a variable, specify the type, followed by its name and value.
 ```dart
 String foo = "henlo";
 ```
-Birb is also lexically scoped, descendant scopes will access the most recent declared variable
-
+:::info What if I don't want to specify a type
+Use `var` to let birb imply the variables type
+:::
+Descendant scopes in birb will access the most recent declared variable.
 
 ## Loops
 
@@ -136,7 +126,9 @@ for (int i = 0; i < 9; i++) {
 }
 ```
 
+:::info 
 In both cases the braces `{}` are only required if you are specifying more than one statement.
+:::
 
 ## Control-flow
 
@@ -147,11 +139,13 @@ A switch requires the default case, even if it is empty.
 ```dart
 int i = 10;
 
+// if/else
 if (i < 10)
 screm(i);
 else 
 screm('i is not less than 10');
 
+// switch
 switch(i) {
   case 10: {
     screm("i is 10");
@@ -161,6 +155,7 @@ switch(i) {
   }
 }
 
+// ternary
 i == 10 ? 
 screm("i is 10") :
 screm("i is not 10");
@@ -181,86 +176,12 @@ This is a multi-line comment.
 */
 ```
 
-## Standard Methods
- - Date
- - decodeJson
- - encodeJson
- - exit
- - grab
- - mock
- - screm
- - Time
- 
- ### Date
- Get the current date, returns a class type with the following structure:
- 
- 
- ```dart
-class Date {
-  int day;
-  int month;
-  int year;
-  int weekday;
-}
-```
-
-
-To use it:
-
-
-```dart
-class date = Date;
-screm(date.day + " " + date.month + " " + date.year);
-```
-
-
-### exit
-Exits the program with the given code:
-```dart
-exit(1);
-```
-
-### grab
-Returns the source code from a file, while allowing you to import a file:
-```dart
-grab("henlo.birb");
-```
-
-### mock
-Grab user input (STDIN):
-```dart
-screm("What is your name?")
-String name = mock();
-screm("Hi "+ name);
-
-// OR
-
-String msg = "What is your name";
-String name = msg.mock;
-screm("Hi " + name);
-```
-
- ### screm
- Prints a value (STDOUT):
- ```dart
-screm("Henlo birb");
-```
-
-### Time
-Get the current time, returns a class type with the following structure:
- 
- ```dart
-class Time {
-  int hour;
-  int minute;
-  int second;
-  int milliSecond;
-}
-```
-
-To use it:
-
-```dart
-class time = Time;
-screm(date.hour + ":" + date.minute);
-```
+## Keywords
+|assert|enum|nest|throw|
+| -- | -- | -- | -- |
+|break|follows|new|true|
+|case|false|next|var|
+|class|final|noSeeb|void|
+|const|for|return|while|
+|default|grab|static||
+|else|if|switch||
