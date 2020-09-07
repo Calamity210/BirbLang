@@ -947,8 +947,8 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
           return null;
         }
       } else if (visited.type == ASTType.AST_BREAK ||
-          await visited.type == ASTType.AST_CONTINUE) {
-        return await visited;
+          visited.type == ASTType.AST_CONTINUE) {
+        return visited;
       }
     }
   }
@@ -1963,7 +1963,7 @@ Future<ASTNode> visitIf(Runtime runtime, ASTNode node) async {
   if (node.ifExpression.type == ASTType.AST_UNARYOP) {
     if (boolEval(await visit(runtime, node.ifExpression.unaryOpRight)) ==
         false) {
-      await visit(runtime, node.ifBody);
+      return await visit(runtime, node.ifBody);
     } else {
       if (node.ifElse != null) return await visit(runtime, node.ifElse);
 
@@ -1971,7 +1971,7 @@ Future<ASTNode> visitIf(Runtime runtime, ASTNode node) async {
     }
   } else {
     if (boolEval(await visit(runtime, node.ifExpression))) {
-      await visit(runtime, node.ifBody);
+      return await visit(runtime, node.ifBody);
     } else {
       if (node.ifElse != null) return await visit(runtime, node.ifElse);
 
@@ -2054,7 +2054,7 @@ Future<ASTNode> visitWhile(Runtime runtime, ASTNode node) async {
     var visited = await visit(runtime, node.whileBody);
 
     if (visited.type == ASTType.AST_BREAK) break;
-    if (visited.type == ASTType.AST_CONTINUE) continue;
+    else if (visited.type == ASTType.AST_CONTINUE) continue;
   }
 
   return node;
@@ -2067,9 +2067,11 @@ Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
   while (boolEval(await visit(runtime, node.forConditionStatement))) {
     var visited = await visit(runtime, node.forBody);
 
-    if (visited.type == ASTType.AST_BREAK) break;
-    if (visited.type == ASTType.AST_CONTINUE) continue;
-
+    if (visited is BreakNode) break;
+    else if (visited is ContinueNode) {
+    await visit(runtime, node.forChangeStatement);
+    continue;
+    }
     await visit(runtime, node.forChangeStatement);
   }
 
