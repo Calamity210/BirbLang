@@ -1,5 +1,3 @@
-import 'dart:isolate';
-
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/constants.dart';
@@ -1144,6 +1142,10 @@ ASTNode parseDefinition(Parser parser, Scope scope,
             'No annotation ${parser.curToken.value} found!');
     }
   }
+  if (parser.curToken.value == 'const') {
+    isConst = true;
+    eat(parser, TokenType.TOKEN_ID);
+  }
   ASTNode astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
@@ -1391,7 +1393,7 @@ ASTNode parseVariableDefinition(
           astVarDef.variableType = astType;
           if (isConst)
             parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.stringValue}');
+                .replaceAll(RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'), '${astVarDef.variableValue.stringValue}');
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
           parserTypeError(parser);
