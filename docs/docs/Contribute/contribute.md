@@ -2,7 +2,7 @@
 id: contributing
 title: Contributing
 sidebar_label: Contributing
-slug: /
+slug: /contributing
 ---
 
 Want to contribute to birb? This document should help you get started!
