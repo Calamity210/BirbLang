@@ -19,19 +19,44 @@ class ExpectationsParser {
   void _parseExpectations() {
     final content = file.readAsStringSync();
     final lines = content.split(RegExp(r'\n|(\r\n)'));
+    // repeat variables
+    bool isRepeat = false;
+    List<String> repeatOutputs = [];
+    int count = 0;
+
     lines.forEach((line) {
       final commentStart = line.indexOf('//');
       if (commentStart == -1) return;
       // skip the two forward slashes
       final comment = line.substring(commentStart+2).trimLeft();
       if (comment.startsWith('output ')) {
-        _outputs.add(comment.substring('output '.length));
+        if (isRepeat) {
+          repeatOutputs.add(comment.substring('output '.length));
+        } else {
+          _outputs.add(comment.substring('output '.length));
+        }
       } else if (comment.startsWith('error ')) {
         _errors.add(comment.substring('error '.length));
       } else if (comment.startsWith('ignore')) {
-        _outputs.add(null);
+        if (isRepeat) {
+          repeatOutputs.add(null);
+        } else {
+          _outputs.add(null);
+        }
+      } else if (comment.startsWith('repeat ')) {
+        count = int.parse(comment.substring('repeat '.length));
+        isRepeat = true;
+      } else if (comment.startsWith('endrepeat')) {
+        for (int i = 0; i < count; ++i)
+          _outputs.addAll(repeatOutputs);
+        isRepeat = false;
+        repeatOutputs = [];
+        count = 0;
       }
     });
+    if (isRepeat) {
+      print('Warning: repeat directive didn\'t find a matching endrepeat.');
+    }
   }
 
   bool doesExpectOutput() => _outputs.isNotEmpty && _matchedOutputs != _outputs.length;

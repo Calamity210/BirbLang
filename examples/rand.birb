@@ -1,11 +1,15 @@
-var x = rand(10);
-screm(x > 0 && x < 10); // output true
+// repeat 100
+for (int i = 0; i < 100; i++) {
+    var x = rand(10);
+    screm(x > 0 && x < 10 || x == 0); // output true
 
-var y = rand(1.5);
-screm(y > 0 && y < 1.5); // output true
+    var y = rand(1.5);
+    screm(y > 0 && y < 1.5 || x == 0); // output true
 
-var z = rand(true);
-screm(z == true || z == false); // ignore
+    var z = rand(true);
+    screm(z == true || z == false); // output true
 
-var s = rand('zzzzA');
-screm(s) // ignore
+    var s = rand('zzzzA');
+    screm(s); // ignore
+}
+// endrepeat
