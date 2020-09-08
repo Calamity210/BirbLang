@@ -58,6 +58,7 @@ $ yarn install
 $ yarn start
 ```
 
+
 and browse to `http://localhost:3000/` in your browser.
 When you are confident with your changes, open a pull request and request a contributor to review it.
 
@@ -70,7 +71,8 @@ $ yarn install
 $ yarn start
 ```
 
+
 and browse to `http://localhost:3000/` in your browser.
 When you are confident with your changes, open a pull request and request a contributor to review it.
 
-We look forward too your contribution!
+We look forward to your contribution!
