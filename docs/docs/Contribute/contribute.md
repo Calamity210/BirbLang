@@ -52,7 +52,8 @@ title: Some Title // Capitalize first letter
 
 Open `sidebars.js` and add its id in its respective place.
 
-To test your changes, run: ```
+To test your changes, run:
+```
 $ yarn install
 $ yarn start
 ```
