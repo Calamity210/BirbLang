@@ -17,5 +17,6 @@ $ dart2native lib/Birb.dart
 
 - When ready, open and pull request and request a review from me - Calamity210.
 
-# Docs
-https://birbolang.web.app/
+# Documentation
+- [Birb Documentation](https://birbolang.web.app/docs/)
+- [Contributing To Birb](https://birbolang.web.app/docs/contributing)
