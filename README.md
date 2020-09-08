@@ -7,6 +7,7 @@
 
 # Contribution
 
+- Join the discord - https://discord.gg/9dq6YB2
 - Clone the repository
 - Navigate to the new directory and install birb by running:
 ```shell
@@ -16,7 +17,5 @@ $ dart2native lib/Birb.dart
 
 - When ready, open and pull request and request a review from me - Calamity210.
 
-- Join the discord - https://discord.gg/9dq6YB2
-
 # Docs
-https://gc.spidev.codes/docs/birb/
+https://birbolang.web.app/
