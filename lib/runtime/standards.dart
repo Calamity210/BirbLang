@@ -59,6 +59,17 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List args) async {
     await visit(runtime, node);
 
     return AnyNode();
+  } else if (astStr.stringValue.startsWith(RegExp('https?://'))) {
+    if (!astStr.stringValue.endsWith('.birb'))
+      throw UnexpectedTokenException('Cannot import non-birb files.');
+
+    Response response = await get(astStr.stringValue);
+    Lexer lexer = initLexer(response.body);
+    Parser parser = initParser(lexer);
+    ASTNode node = parse(parser);
+    await visit(runtime, node);
+
+    return AnyNode();
   }
   String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
 
