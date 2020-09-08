@@ -1502,6 +1502,74 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
       }
       break;
 
+    case TokenType.TOKEN_LESS_THAN_EQUAL:
+      {
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.intVal <= right.intVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_DOUBLE &&
+            right.type == ASTType.AST_DOUBLE) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.doubleVal <= right.doubleVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.intVal <= right.doubleVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.doubleVal <= right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
+    case TokenType.TOKEN_GREATER_THAN_EQUAL:
+      {
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.intVal >= right.intVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_DOUBLE &&
+            right.type == ASTType.AST_DOUBLE) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.doubleVal >= right.doubleVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.intVal >= right.doubleVal;
+
+          return retVal;
+        }
+        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
+          retVal = BoolNode();
+
+          retVal.boolVal = left.doubleVal >= right.intVal;
+
+          return retVal;
+        }
+      }
+      break;
+
     case TokenType.TOKEN_BITWISE_AND:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {

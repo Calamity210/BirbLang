@@ -765,6 +765,8 @@ ASTNode parseTerm(Parser parser, Scope scope) {
       parser.curToken.type == TokenType.TOKEN_MUL ||
       parser.curToken.type == TokenType.TOKEN_LESS_THAN ||
       parser.curToken.type == TokenType.TOKEN_GREATER_THAN ||
+      parser.curToken.type == TokenType.TOKEN_LESS_THAN_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_GREATER_THAN_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_EQUALITY ||
       parser.curToken.type == TokenType.TOKEN_NOT_EQUAL) {
     var binaryOpOperator = parser.curToken;

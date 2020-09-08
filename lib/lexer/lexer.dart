@@ -142,6 +142,13 @@ Token getNextToken(Lexer lexer) {
           return initToken(TokenType.TOKEN_LSHIFT, value);
         }
 
+        // <=
+        if (lexer.currentChar == '=') {
+          value += lexer.currentChar;
+          advance(lexer);
+          return initToken(TokenType.TOKEN_LESS_THAN_EQUAL, value);
+        }
+
         return initToken(TokenType.TOKEN_LESS_THAN, value);
       case '>':
         String value = lexer.currentChar;
@@ -152,6 +159,13 @@ Token getNextToken(Lexer lexer) {
           value += lexer.currentChar;
           advance(lexer);
           return initToken(TokenType.TOKEN_RSHIFT, value);
+        }
+
+        // >=
+        if (lexer.currentChar == '=') {
+          value += lexer.currentChar;
+          advance(lexer);
+          return initToken(TokenType.TOKEN_GREATER_THAN_EQUAL, value);
         }
 
         return initToken(TokenType.TOKEN_GREATER_THAN, value);
