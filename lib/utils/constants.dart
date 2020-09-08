@@ -8,6 +8,7 @@ const String FOLLOWS = 'follows';
 const String ITERATE = 'iterate';
 const String NEXT = 'next';
 const String NULL = 'noSeeb';
+const String NEW = 'new';
 const String RETURN = 'return';
 const String THROW = 'throw';
 const String TRUE = 'true';

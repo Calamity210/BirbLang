@@ -1,19 +1,11 @@
 class Test {
     String name = "Test";
-    int age = 0;
-
-    void Test(String name, int age) {
-        nest.name = name;
-        nest.age = age;
-    }
+    int age = 10;
 
     int getAge() {
         return nest.age;
     }
 
-    String getName() {
-        return nest.name;
-    }
 }
 
 class FollowsTest follows Test {
@@ -24,12 +16,15 @@ class FollowsTest follows Test {
     int age;
 }
 
-class test = Test;
-test.Test("Birb", 10);
+class test = new Test;
+test.name = 'Birb';
 
-assert(test.getName() == "Birb" && test.getAge() == 10);
-screm(test.getName() + " : " + test.getAge()); // output Birb : 10
+assert(test.name == "Birb" && test.getAge() == 10);
+screm(test.name + " : " + test.getAge()); // output Birb : 10
 
 screm(FollowsTest.name); // output Test
 
-screm(FollowsTest.age); // output 0
+screm(FollowsTest.age); // output 10
+
+var bar = new Test;
+screm(bar.name); // output Test

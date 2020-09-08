@@ -1,11 +1,15 @@
 // output Birb : 10
 // output Test
-// output 0
+// output 10
+// output Test
 grab('class.birb');
 grab('https://raw.githubusercontent.com/Calamity210/BirbLang/master/core/math/math.birb');
 
-Test.Test('foo', 20);
-screm(Test.getName()); // output foo
-screm(Test.getAge()); // output 20
+class newTest = new Test;
+newTest.name = 'foo';
+newTest.age = 20;
+
+screm(newTest.name); // output foo
+screm(newTest.age); // output 20
 
 screm(pi); // output 3.141592653589793

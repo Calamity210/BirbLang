@@ -21,6 +21,7 @@ TYPE TypeNode
 BINARYOP BinaryOpNode binaryOpLeft binaryOpRight binaryOperator
 UNARYOP UnaryOpNode unaryOpRight unaryOperator
 NOOP NoopNode
+NEW NewNode newValue
 BREAK BreakNode
 RETURN ReturnNode returnValue
 THROW ThrowNode throwValue

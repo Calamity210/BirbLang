@@ -69,8 +69,10 @@ bool isDataType(Parser parser) {
 
   bool isDot = getNextToken(parser.lexer).type != TokenType.TOKEN_DOT;
 
-  parser.lexer..lineNum = lineNum..currentIndex = curIndex..currentChar = curChar;
-
+  parser.lexer
+    ..lineNum = lineNum
+    ..currentIndex = curIndex
+    ..currentChar = curChar;
 
   return dataTypes.contains(tokenValue) && isDot;
 }
@@ -148,7 +150,9 @@ ASTNode parseStatement(Parser parser, Scope scope) {
           case BREAK:
             return parseBreak(parser, scope);
           case NEXT:
-            return parseContinue(parser, scope);
+            return parseNext(parser, scope);
+          case NEW:
+            return parseNew(parser, scope);
           case ITERATE:
             return parseIterate(parser, scope);
           case ASSERT:
@@ -622,6 +626,8 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseBool(parser, scope);
     case NULL:
       return parseNull(parser, scope);
+    case NEW:
+      return parseNew(parser, scope);
   }
 
   if (parser.curToken.type == TokenType.TOKEN_PLUS ||
@@ -752,8 +758,7 @@ ASTNode parseTerm(Parser parser, Scope scope) {
     return parseDefinition(parser, scope, true);
   }
 
-  if (isDataType(parser))
-    return parseDefinition(parser, scope);
+  if (isDataType(parser)) return parseDefinition(parser, scope);
 
   var node = parseFactor(parser, scope, false);
   ASTNode astBinaryOp;
@@ -825,7 +830,8 @@ ASTNode parseExpression(Parser parser, Scope scope) {
     }
   }
 
-  while (parser.curToken.type == TokenType.TOKEN_AND || parser.curToken.type == TokenType.TOKEN_OR) {
+  while (parser.curToken.type == TokenType.TOKEN_AND ||
+      parser.curToken.type == TokenType.TOKEN_OR) {
     var binaryOp = parser.curToken;
     eat(parser, binaryOp.type);
 
@@ -851,10 +857,19 @@ ASTNode parseBreak(Parser parser, Scope scope) {
   return initASTWithLine(BreakNode(), parser.lexer.lineNum);
 }
 
-ASTNode parseContinue(Parser parser, Scope scope) {
+ASTNode parseNext(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
 
   return initASTWithLine(NextNode(), parser.lexer.lineNum);
+}
+
+ASTNode parseNew(Parser parser, Scope scope) {
+  eat(parser, TokenType.TOKEN_ID);
+
+  ASTNode newAST = initASTWithLine(NewNode(), parser.lexer.lineNum)
+    ..newValue = parseExpression(parser, scope);
+
+  return newAST;
 }
 
 ASTNode parseReturn(Parser parser, Scope scope) {
@@ -1394,8 +1409,9 @@ ASTNode parseVariableDefinition(
           astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
           astVarDef.variableType = astType;
           if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'), '${astVarDef.variableValue.stringValue}');
+            parser.lexer.program = parser.lexer.program.replaceAll(
+                RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'),
+                '${astVarDef.variableValue.stringValue}');
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
           parserTypeError(parser);

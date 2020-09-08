@@ -1,7 +1,7 @@
 fieldsTypes = {}
 with open('lib/utils/ast/ast_node.dart') as f:
     lines = list(map(lambda l: l.strip(), f.readlines()))
-    lines = lines[lines.index('class ASTNode implements ASTNode {') : ]
+    lines = lines[lines.index('class ASTNode {') : ]
     for line in lines:
         if ' get ' in line: # getter
             field = line.split(' get ')

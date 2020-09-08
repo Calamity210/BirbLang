@@ -14,7 +14,7 @@ ASTNode initASTWithLine(ASTNode node, int line) {
   return node;
 }
 
-class ASTNode {
+abstract class ASTNode {
   ASTNode parent;
 
   bool isClassChild = false;
@@ -48,14 +48,14 @@ class ASTNode {
   String get className => throw Exception('Not part of $runtimeType => $type');
   set className(String _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get classChildren => throw Exception('Not part of $runtimeType => $type');
-  set classChildren(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get classChildren => throw Exception('Not part of $runtimeType => $type');
+  set classChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get compChildren => throw Exception('Not part of $runtimeType => $type');
-  set compChildren(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get compChildren => throw Exception('Not part of $runtimeType => $type');
+  set compChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get compoundValue => throw Exception('Not part of $runtimeType => $type');
-  set compoundValue(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get compoundValue => throw Exception('Not part of $runtimeType => $type');
+  set compoundValue(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   double get doubleVal => throw Exception('Not part of $runtimeType => $type');
   set doubleVal(double _) => throw Exception('Not part of $runtimeType => $type');
@@ -63,8 +63,8 @@ class ASTNode {
   ASTNode get elseBody => throw Exception('Not part of $runtimeType => $type');
   set elseBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get enumElements => throw Exception('Not part of $runtimeType => $type');
-  set enumElements(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get enumElements => throw Exception('Not part of $runtimeType => $type');
+  set enumElements(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get forBody => throw Exception('Not part of $runtimeType => $type');
   set forBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -78,14 +78,14 @@ class ASTNode {
   ASTNode get forInitStatement => throw Exception('Not part of $runtimeType => $type');
   set forInitStatement(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get funcCallArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcCallArgs(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get funcCallArgs => throw Exception('Not part of $runtimeType => $type');
+  set funcCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcCallExpression => throw Exception('Not part of $runtimeType => $type');
   set funcCallExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List get funcDefArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcDefArgs(List _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get funcDefArgs => throw Exception('Not part of $runtimeType => $type');
+  set funcDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcDefBody => throw Exception('Not part of $runtimeType => $type');
   set funcDefBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -137,6 +137,9 @@ class ASTNode {
 
   Map<String, dynamic> get map => throw Exception('Not part of $runtimeType => $type');
   set map(Map<String, dynamic> _) => throw Exception('Not part of $runtimeType => $type');
+
+  ASTNode get newValue => throw Exception('Not part of $runtimeType => $type');
+  set newValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get returnValue => throw Exception('Not part of $runtimeType => $type');
   set returnValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -197,6 +200,8 @@ class ASTNode {
 
   ASTNode get whileExpression => throw Exception('Not part of $runtimeType => $type');
   set whileExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
+
+  ASTNode copy();
 }
 
 enum ASTType {
@@ -222,6 +227,7 @@ enum ASTType {
   AST_BINARYOP,
   AST_UNARYOP,
   AST_NOOP,
+  AST_NEW,
   AST_BREAK,
   AST_RETURN,
   AST_THROW,
