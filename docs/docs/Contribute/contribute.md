@@ -53,7 +53,7 @@ title: Some Title // Capitalize first letter
 Open `sidebars.js` and add its id in its respective place.
 
 To test your changes, run:
-```
+```shell
 $ yarn install
 $ yarn start
 ```
@@ -64,7 +64,8 @@ When you are confident with your changes, open a pull request and request a cont
 ### Edit an older document
 Find the doc in the `docs/` directory and make your changes.
 
-To test your changes, run: ```
+To test your changes, run: 
+```shell
 $ yarn install
 $ yarn start
 ```
