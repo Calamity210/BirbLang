@@ -1,27 +1,30 @@
 lexer:
-- lib/lexer/*
+- lib/lexer/**
 
 coretypes:
-- lib/core_types/*
+- lib/core_types/**
 
 parser:
-- lib/parser/*
+- lib/parser/**
 
 runtime:
-- lib/runtime/*
+- lib/runtime/**
 
 utils:
-- lib/utils/*
+- lib/utils/**
 
 AST:
-- lib/utils/*
-- lib/utils/AST.dart
+- lib/utils/ast/**
 
 tests:
-- test/*
+- test/**
 
 examples:
-- examples/*
+- examples/**
 
 core:
-- core/*
+- core/**
+
+
+docs:
+- docs/**
