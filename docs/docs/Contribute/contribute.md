@@ -19,6 +19,7 @@ There are many ways you can contribute:
 - Navigate to the cloned directory and open it in your IDE of choice.
 - To work on the docs, open up the `docs/` directory and see the [docs section below](#working-on-the-docs)
 - For working on the language itself, look within the `lib/` directory
+- To work on the core libraries, open up the `core/` directory
 - To try out your changes, run the following from the root of the birb project:
 ```shell
 $ dart lib/birb.dart
