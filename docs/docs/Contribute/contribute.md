@@ -16,7 +16,7 @@ There are many ways you can contribute:
 ## How do I get started
 - Fork https://github.com/Calamity210/BirbLang
 - Clone the fork that you made https://github.com/{username}/BirbLang, be sure to clone the master branch
-- Navigate to the new directory and open it in your IDE of choice.
+- Navigate to the cloned directory and open it in your IDE of choice.
 - To work on the docs, open up the `docs/` directory and see the [docs section below](#working-on-the-docs)
 - For working on the language itself, look within the `lib/` directory
 - To try out your changes, run the following from the root of the birb project:
@@ -60,7 +60,7 @@ $ yarn start
 ```
 
 
-and browse to `http://localhost:3000/` in your browser.
+Then browse to http://localhost:3000/ in your browser.
 When you are confident with your changes, open a pull request and request a contributor to review it.
 
 ### Edit an older document
