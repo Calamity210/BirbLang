@@ -81,7 +81,7 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} BirbLang, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} BirbLang`,
     },
     prism: {
      additionalLanguages: ['dart'],
