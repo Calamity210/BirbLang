@@ -66,7 +66,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Initialize and run program
-  String program = File(arguments[0]).readAsStringSync();
+  String program = File(arguments[0]).readAsStringSync().trim();
 
   try {
     if (RegExp('{').allMatches(program).length !=
