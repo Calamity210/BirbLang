@@ -64,7 +64,7 @@ and browse to `http://localhost:3000/` in your browser.
 When you are confident with your changes, open a pull request and request a contributor to review it.
 
 ### Edit an older document
-Find the doc in the `docs/` directory and make your changes.
+Find the doc that you want to edit in the `docs/` directory and make your changes.
 
 To test your changes, run: 
 ```shell
@@ -73,7 +73,7 @@ $ yarn start
 ```
 
 
-and browse to `http://localhost:3000/` in your browser.
+Then browse to http://localhost:3000/ in your browser.
 When you are confident with your changes, open a pull request and request a contributor to review it.
 
 We look forward to your contribution!
