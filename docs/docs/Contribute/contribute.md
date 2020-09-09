@@ -14,7 +14,8 @@ There are many ways you can contribute:
 - Help out with the language directly by opening PRs
 
 ## How do I get started
-- Clone the repo from https://github.com/Calamity210/BirbLang, be sure to clone the master branch
+- Fork https://github.com/Calamity210/BirbLang
+- Clone the fork that you made https://github.com/{username}/BirbLang, be sure to clone the master branch
 - Navigate to the new directory and open it in your IDE of choice.
 - To work on the docs, open up the `docs/` directory and see the [docs section below](#docs)
 - For working on the language itself, look within the `lib/` directory
