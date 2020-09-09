@@ -319,11 +319,7 @@ Future<ASTNode> getVarDefByName(
     Runtime runtime, Scope scope, String varName) async {
   if (scope.owner != null) {
     if (varName == 'nest') {
-      if (scope.owner.parent != null) {
-        return scope.owner.parent;
-      }
-
-      return scope.owner;
+        return scope.owner.parent ?? scope.owner;
     }
   }
 
