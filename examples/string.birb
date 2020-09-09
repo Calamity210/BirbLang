@@ -7,7 +7,7 @@ henlo.trim(); // "Henlo Birb"
 henlo.toUpperCase(); // "HENLO BIRB"
 
 // "HENLO"
-screm(henlo.substring(0, 5)); // output HENLO
+scremLn(henlo.substring(0, 5)); // output HENLO
 
 List colors = ['c', 'o', 'l', 'o', 'r', 's'];
 
@@ -19,10 +19,10 @@ colorStr += '$' + (90 + i) + 'm' + colors[i];
 colorBlocks += '$' + (40 + i) + 'm' + '\n' * 2;
 }
 
-screm(colorStr); // output [90mc[91mo[92ml[93mo[94mr[95ms
+scremLn(colorStr); // output [90mc[91mo[92ml[93mo[94mr[95ms
 
 colorBlocks += '$49m ';
-screm(colorBlocks);
+scremLn(colorBlocks);
 // output [40m
 // output 
 // output [41m

@@ -1,19 +1,19 @@
 int i = 11;
 
-screm(i.bitLength); // output 4
-screm(i.isEven); // output false
-screm(i.isFinite); // output true
-screm(i.isInfinite); // output false
-screm(i.isNaN); // output false
-screm(i.isNegative); // output false
-screm(i.isOdd); // output true
-screm(i.sign); // output 1
-screm(i.runtimeType); // output int
+scremLn(i.bitLength); // output 4
+scremLn(i.isEven); // output false
+scremLn(i.isFinite); // output true
+scremLn(i.isInfinite); // output false
+scremLn(i.isNaN); // output false
+scremLn(i.isNegative); // output false
+scremLn(i.isOdd); // output true
+scremLn(i.sign); // output 1
+scremLn(i.runtimeType); // output int
 
-screm(i.abs()); // output 11
-screm(i.clamp(1, 10)); // output 10
-screm(i.compareTo(6)); // output 1
-screm(i.toStringAsExponential()); // output 1e+1
-screm(i.toUnsigned(1)); // output 1
+scremLn(i.abs()); // output 11
+scremLn(i.clamp(1, 10)); // output 10
+scremLn(i.compareTo(6)); // output 1
+scremLn(i.toStringAsExponential()); // output 1e+1
+scremLn(i.toUnsigned(1)); // output 1
 
-screm(i + 0xFFAAA); // output 1047221
+scremLn(i + 0xFFAAA); // output 1047221

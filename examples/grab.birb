@@ -9,7 +9,7 @@ class newTest = new Test;
 newTest.name = 'foo';
 newTest.age = 20;
 
-screm(newTest.name); // output foo
-screm(newTest.age); // output 20
+scremLn(newTest.name); // output foo
+scremLn(newTest.age); // output 20
 
-screm(pi); // output 3.141592653589793
+scremLn(pi); // output 3.141592653589793

@@ -1,7 +1,7 @@
 int year = Date.year;
 
 if (year == 2020) {
-    screm("2020"); // output 2020
+    scremLn("2020"); // output 2020
 }
 
 // output 0
@@ -9,7 +9,7 @@ if (year == 2020) {
 // output 2
 // output 3
 for (int i = 0; i < 4; i += 1) {
-    screm(i);
+    scremLn(i);
 }
 
 while(year != 2030) {
@@ -17,9 +17,9 @@ year += 1;
 }
 
 assert(year == 2030);
-screm(year); // output 2030
+scremLn(year); // output 2030
 
 if (true)
-  screm('Single Statement Compound'); // output Single Statement Compound
+  scremLn('Single Statement Compound'); // output Single Statement Compound
 
-screm('just testing'); // output just testing
+scremLn('just testing'); // output just testing

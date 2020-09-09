@@ -1,1 +1,1 @@
-screm("Henlo Birb!"); // output Henlo Birb!
+scremLn("Henlo Birb!"); // output Henlo Birb!

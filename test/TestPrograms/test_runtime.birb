@@ -17,12 +17,12 @@ Map goodBadMap = Birb.goodBadMap;
 
    class foo = Birb;
   void printDetails() {
-    screm(foo.favouriteGreeting + " am " + foo.name);
-    screm("I am " + foo.age + " years old");
-    screm("I like " + favouriteFood[0]);
+    scremLn(foo.favouriteGreeting + " am " + foo.name);
+    scremLn("I am " + foo.age + " years old");
+    scremLn("I like " + favouriteFood[0]);
 
     // IDK, first thing that came to mind
-    screm('There is only ' + goodBadMap['goodCount'] + " item in my good list");
+    scremLn('There is only ' + goodBadMap['goodCount'] + " item in my good list");
   }
 
 printDetails();

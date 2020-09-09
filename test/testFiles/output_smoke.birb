@@ -1,1 +1,1 @@
-screm('Hello') // output Hello
+scremLn('Hello') // output Hello

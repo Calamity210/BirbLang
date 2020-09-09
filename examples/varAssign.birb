@@ -1,4 +1,4 @@
 var x = 1;
-screm(x); // output 1
+scremLn(x); // output 1
 x = 2;
-screm(x); // output 2
+scremLn(x); // output 2

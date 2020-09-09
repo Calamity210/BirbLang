@@ -1,3 +1,3 @@
 List list = [10];
 
-screm(list[0]); // output 10
+scremLn(list[0]); // output 10

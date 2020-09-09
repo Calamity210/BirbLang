@@ -4,4 +4,4 @@ Map map = {
 
 String str = encodeJson(map);
 
-screm(str); // output {"content":"foo"}
+scremLn(str); // output {"content":"foo"}

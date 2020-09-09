@@ -1,11 +1,11 @@
 var x = rand(10);
-screm(x >= 0 && x < 10); // output true
+scremLn(x >= 0 && x < 10); // output true
 
 var y = rand(1.5);
-screm(y >= 0 && y < 1.5); // output true
+scremLn(y >= 0 && y < 1.5); // output true
 
 var z = rand(true);
-screm(z == true || z == false); // output true
+scremLn(z == true || z == false); // output true
 
 var s = rand('zzzzA');
-screm(s) // ignore
+scremLn(s) // ignore

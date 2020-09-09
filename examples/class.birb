@@ -20,11 +20,11 @@ class test = new Test;
 test.name = 'Birb';
 
 assert(test.name == "Birb" && test.getAge() == 10);
-screm(test.name + " : " + test.getAge()); // output Birb : 10
+scremLn(test.name + " : " + test.getAge()); // output Birb : 10
 
-screm(FollowsTest.name); // output Test
+scremLn(FollowsTest.name); // output Test
 
-screm(FollowsTest.age); // output 10
+scremLn(FollowsTest.age); // output 10
 
 var bar = new Test;
-screm(bar.name); // output Test
+scremLn(bar.name); // output Test

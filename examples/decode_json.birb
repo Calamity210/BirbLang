@@ -6,4 +6,4 @@ String json = '
 Map map = decodeJson(json);
 
 assert(map["content"] == "foo");
-screm(map["content"]); // output foo
+scremLn(map["content"]); // output foo
