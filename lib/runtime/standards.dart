@@ -35,6 +35,7 @@ void initStandards(Runtime runtime, String path) async {
   // functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'scremLn', funcScremLn);
+  registerGlobalFunction(runtime, 'scremF', funcScremF);
   registerGlobalFunction(runtime, 'beep', funcBeep);
   registerGlobalFunction(runtime, 'beepLn', funcBeepLn);
   registerGlobalFunction(runtime, 'exit', funcExit);
@@ -137,6 +138,29 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List args) {
 
     print(str);
   }
+
+  return INITIALIZED_NOOP;
+}
+
+ASTNode funcScremF(Runtime runtime, ASTNode self, List args) {
+  if (args[0] is! StringNode)
+    throw UnexpectedTypeException('Error [Line ${self.lineNum}]: scremF expects the first parameter to be a String');
+
+  StringNode strAST = args[0];
+
+    String str = astToString(strAST);
+    
+    str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
+      int index = int.parse(match.group(1));
+      return astToString(args[index + 1]);
+    });
+
+    str = str.replaceAll(r'\{', '\{').replaceAll(r'\}', r'}');
+
+    if (str == null)
+      throw UnexpectedTokenException('Error [Line ${self.lineNum}]: Screm must contain non-null arguments');
+
+    stdout.write(str);
 
   return INITIALIZED_NOOP;
 }
