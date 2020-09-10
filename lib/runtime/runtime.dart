@@ -105,7 +105,7 @@ ASTNode mapRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
 void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
   if (scope == runtime.scope) return;
 
-  var garbage = [];
+  List<ASTNode> garbage = [];
 
   for (ASTNode newDef in scope.variableDefinitions)
     if (!oldDefList.contains(newDef)) garbage.add(newDef);
@@ -324,7 +324,7 @@ Future<ASTNode> getVarDefByName(
   }
 
   return scope.variableDefinitions.firstWhere(
-      (e) => (e as ASTNode).variableName == varName,
+      (e) => e.variableName == varName,
       orElse: () => null);
 }
 
@@ -801,7 +801,7 @@ Future<ASTNode> runtimeFuncLookup(
   if (funcDef == null) return null;
 
   if (funcDef.futureFuncPointer != null) {
-    var visitedFuncPointerArgs = [];
+    List<ASTNode> visitedFuncPointerArgs = [];
 
     for (int i = 0; i < node.funcCallArgs.length; i++) {
       ASTNode astArg = node.funcCallArgs[i];
@@ -827,7 +827,7 @@ Future<ASTNode> runtimeFuncLookup(
   }
 
   if (funcDef.funcPointer != null) {
-    var visitedFuncPointerArgs = [];
+    List<ASTNode> visitedFuncPointerArgs = [];
 
     for (int i = 0; i < node.funcCallArgs.length; i++) {
       ASTNode astArg = node.funcCallArgs[i];
@@ -866,7 +866,7 @@ Future<ASTNode> runtimeFuncLookup(
       finalRes = StrBufferNode();
     }
 
-    var callArgs = [];
+    List<ASTNode> callArgs = [];
     callArgs.add(finalRes);
 
     for (int i = 0; i < funcDef.compChildren.length; i++) {
@@ -938,7 +938,7 @@ Future<ASTNode> visitFuncCall(Runtime runtime, ASTNode node) async {
 
 Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
   var scope = getScope(runtime, node);
-  var oldDefList = [];
+  List<ASTNode> oldDefList = [];
 
   for (int i = 0; i < scope.variableDefinitions.length; i++) {
     ASTNode varDef = scope.variableDefinitions[i];
@@ -1075,7 +1075,7 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
 
             if (fDef.funcName == funcCallName) {
               if (fDef.funcPointer != null) {
-                var visitedFuncPointerArgs = [];
+                List<ASTNode> visitedFuncPointerArgs = [];
 
                 for (int j = 0;
                     j < node.binaryOpRight.funcCallArgs.length;
@@ -2224,7 +2224,7 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
   }
 
   var fDefBodyScope = fDef.funcDefBody.scope;
-  var iterableVarName = (fDef.funcDefArgs[0] as ASTNode).variableName;
+  var iterableVarName = (fDef.funcDefArgs[0]).variableName;
 
   int i = 0;
 
@@ -2239,7 +2239,7 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
     indexVar = VarDefNode();
     indexVar.variableValue = IntNode();
     indexVar.variableValue.intVal = i;
-    indexVar.variableName = (fDef.funcDefArgs[0] as ASTNode).variableName;
+    indexVar.variableName = (fDef.funcDefArgs[0]).variableName;
 
     fDefBodyScope.variableDefinitions.add(indexVar);
   }

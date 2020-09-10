@@ -465,7 +465,8 @@ Token collectId(Lexer lexer) {
     while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar)) advance(lexer);
   }
 
-  if (RegExp(r'[\?]').hasMatch(lexer.currentChar)) {
+  // Nullable?
+  if (lexer.currentChar == '?' && RegExp(r'\s').hasMatch(lexer.program[lexer.currentIndex + 1])) {
     advance(lexer);
   }
 

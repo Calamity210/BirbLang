@@ -3,9 +3,9 @@ import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/utils/scope.dart';
 
-typedef AstFuncPointer = ASTNode Function(Runtime runtime, ASTNode self, List args);
+typedef AstFuncPointer = ASTNode Function(Runtime runtime, ASTNode self, List<ASTNode> args);
 typedef AstFutureFuncPointer = Future<ASTNode> Function(
-    Runtime runtime, ASTNode self, List args);
+    Runtime runtime, ASTNode self, List<ASTNode> args);
 
 
 ASTNode initASTWithLine(ASTNode node, int line) {
