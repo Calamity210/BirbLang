@@ -3,11 +3,11 @@ id: string
 title: String
 ---
 
-An array of chars (UTF-16 code units).
+Strings are mainly used to represent text and is an array of chars (UTF-16 code units or sequence of UTF-16 code units). 
 
 A data type used mainly to represent text, denoted by `'` (single quotes) or `"` (double quotes) and its wrapped within.
 
-Strings in birb are multiline by default:
+A string can be either single or multiline. Strings in birb are multiline by default:
 
 ```dart
 screm("This string will print on one line");
