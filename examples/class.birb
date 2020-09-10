@@ -28,3 +28,5 @@ scremLn(FollowsTest.age); // output 10
 
 var bar = new Test;
 scremLn(bar.name); // output Test
+
+scremLn(Test.variableDefinitions); // output {name: Test, age: 10}

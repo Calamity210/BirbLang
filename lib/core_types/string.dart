@@ -11,25 +11,25 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        ASTNode astList = ListNode()..listElements = left.stringValue.codeUnits;
+        ListNode astList = ListNode()..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
     case 'isEmpty':
       {
-        ASTNode astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
+        BoolNode astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        ASTNode astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
+        BoolNode astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
         return astBool;
       }
 
     case 'length':
       {
-        var intAST = IntNode()..intVal = left.stringValue.length;
+        IntNode intAST = IntNode()..intVal = left.stringValue.length;
 
         return intAST;
       }
@@ -37,7 +37,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
     case 'mock':
       {
         print(left.stringValue);
-        ASTNode astString = StringNode()
+        StringNode astString = StringNode()
           ..stringValue =
               stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
@@ -45,7 +45,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toBinary':
       {
-        ASTNode astList = ListNode()
+        ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(2))
               .toList();
@@ -54,7 +54,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toOct':
       {
-        ASTNode astList = ListNode()
+        ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(8))
               .toList();
@@ -63,7 +63,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toHex':
       {
-        ASTNode astList = ListNode()
+        ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(16))
               .toList();
@@ -73,7 +73,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
 
     case 'runtimeType':
       {
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.stringValue.runtimeType.toString();
         ;
         return stringAST;
@@ -91,7 +91,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
-        ASTNode ast = IntNode()
+        IntNode ast = IntNode()
           ..intVal = left.stringValue
               .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
 
@@ -103,7 +103,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        ASTNode ast = IntNode()
+        IntNode ast = IntNode()
           ..intVal = left.stringValue
               .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -115,7 +115,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        ASTNode ast = BoolNode()
+        BoolNode ast = BoolNode()
           ..boolVal = left.stringValue.contains(
               node.binaryOpRight.funcCallArgs[0].stringValue,
               node.binaryOpRight.funcCallArgs[1].intVal);
@@ -128,7 +128,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        ASTNode ast = BoolNode()
+        BoolNode ast = BoolNode()
           ..boolVal = left.stringValue
               .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -141,7 +141,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
         List args = node.binaryOpRight.funcCallArgs;
-        ASTNode ast = IntNode()
+        IntNode ast = IntNode()
           ..intVal =
               left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
 
@@ -154,7 +154,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
         List args = node.binaryOpRight.funcCallArgs;
-        ASTNode ast = IntNode()
+        IntNode ast = IntNode()
           ..intVal =
               left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
 
@@ -227,7 +227,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        ASTNode ast = ListNode();
+        ListNode ast = ListNode();
         ast.listElements = left.stringValue
             .split(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -241,7 +241,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
 
         List args = node.binaryOpRight.funcCallArgs;
 
-        ASTNode ast = BoolNode();
+        BoolNode ast = BoolNode();
         ast.boolVal =
             left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
 
@@ -255,7 +255,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
 
         List args = node.binaryOpRight.funcCallArgs;
 
-        ASTNode ast = StringNode();
+        StringNode ast = StringNode();
         ast.stringValue =
             left.stringValue.substring(args[0].intVal, args[1].intVal);
 

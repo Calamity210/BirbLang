@@ -2,6 +2,7 @@
 // output Test
 // output 10
 // output Test
+// output {name: Test, age: 10}
 grab('class.birb');
 grab('https://raw.githubusercontent.com/Calamity210/BirbLang/master/core/math/math.birb');
 

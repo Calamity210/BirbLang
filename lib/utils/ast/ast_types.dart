@@ -128,14 +128,17 @@ class ClassNode extends ASTNode {
   ASTNode copy() {
     ClassNode node = ClassNode()
       ..scope = scope
-      ..className = className
+      ..className = 'boogie'
       ..superClass = (superClass?.copy())
       ..variableType = (variableType?.copy());
 
     classChildren.forEach((child) {
       ASTNode copyChild = child?.copy();
-      copyChild.parent = node;
       node.classChildren.add(copyChild);
+    });
+
+    classChildren.forEach((child) {
+      child.parent = node;
     });
 
     funcDefinitions.forEach((child) {
@@ -356,6 +359,12 @@ class VarDefNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return variableValue.toString();
+  }
 }
 
 class VarAssignmentNode extends ASTNode {
@@ -417,6 +426,12 @@ class StringNode extends ASTNode {
     StringNode node = StringNode()..scope = scope..stringValue = stringValue;
     return node;
   }
+
+  @override
+  String toString() {
+   super.toString();
+   return stringValue;
+  }
 }
 
 class StrBufferNode extends ASTNode {
@@ -434,6 +449,12 @@ class StrBufferNode extends ASTNode {
     StrBufferNode node = StrBufferNode()..scope = scope..strBuffer = strBuffer;
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return strBuffer.toString();
   }
 }
 
@@ -456,6 +477,12 @@ class IntNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return intVal.toString();
+  }
 }
 
 class DoubleNode extends ASTNode {
@@ -477,6 +504,12 @@ class DoubleNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return doubleVal.toString();
+  }
 }
 
 class BoolNode extends ASTNode {
@@ -497,6 +530,12 @@ class BoolNode extends ASTNode {
       ..intVal = intVal;
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return boolVal.toString();
   }
 }
 

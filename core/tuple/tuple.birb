@@ -1,0 +1,112 @@
+class Tuple2 {
+  /// First item of the tuple
+  final var item1;
+
+  /// Second item of the tuple
+  final var item2;
+
+  /// Creates a new tuple with the given items.
+  class create(var item1, var item2) {
+    class newTuple = new Tuple2;
+    newTuple.item1 = item1;
+    newTuple.item2 = item2;
+
+    return newTuple;
+  }
+
+  /// Create a new tuple with the given list.
+  class fromList(List items) {
+    if (items.length != 2) {
+      throw ArgumentError.withMsg('Tuple2 requires 2 items');
+    }
+
+    return Tuple2.create(items[0], items[1]);
+  }
+
+  /// Returns a tuple with the only first item given a value.
+  class withItem1(var item1) => Tuple2.create(item1, nest.item2);
+
+  /// Returns a tuple with the only second item given a value.
+  class withItem2(var item2) => Tuple2.create(nest.item1, item2);
+
+  /// Returns a List with the items of this tuple.
+  List toList() => [nest.item1, nest.item2];
+
+  /// Returns a String representation of this tuple
+  String toString() => '[' + nest.item1 + ', ' + nest.item2 + ']';
+
+  // Returns true if all items of this tuple are equal to the items of `other`.
+  bool isEqualTo(class other) {
+    bool isEqual = true;
+    for (int i = 0; i < nest.variableDefinitions.length; i++) {
+        isEqual = isEqual && nest.variableDefinitions[i] == other.variableDefinitions[i];
+    }
+    return isEqual;
+  }
+}
+
+class Tuple3 {
+  /// First item of the tuple
+  final var item1;
+
+  /// Second item of the tuple
+  final var item2;
+
+  /// Third item of the tuple
+  final var item3;
+
+  /// Creates a new tuple with the given items.
+  class create(var item1, var item2, var item3) {
+    class newTuple = new Tuple3;
+    newTuple.item1 = item1;
+    newTuple.item2 = item2;
+    newTuple.item3 = item3;
+
+    return newTuple;
+  }
+
+  /// Create a new tuple with the given list.
+  class fromList(List items) {
+    if (items.length != 3) {
+      throw ArgumentError.withMsg('Tuple3 requires 3 items');
+    }
+
+    return Tuple3.create(items[0], items[1], items[2]);
+  }
+
+  /// Returns a tuple with the only first item given a value.
+  class withItem1(var item1) => Tuple3.create(item1, nest.item2, nest.item3);
+
+  /// Returns a tuple with the only second item given a value.
+  class withItem2(var item2) => Tuple3.create(nest.item1, item2, nest.item3);
+
+  /// Returns a tuple with the only third item given a value.
+  class withItem3(var item3) => Tuple3.create(nest.item1, nest.item2, item3);
+
+  /// Returns a List with the items of this tuple.
+  List toList() => [nest.item1, nest.item2, nest.item3];
+
+  /// Returns a String representation of this tuple
+  String toString() => '[' + nest.item1 + ', ' + nest.item2 + ',' + nest.item3 ]';
+
+  // Returns true if all items of this tuple are equal to the items of `other`.
+  bool isEqualTo(class other) {
+    bool isEqual = true;
+    for (int i = 0; i < nest.variableDefinitions.length; i++) {
+        isEqual = isEqual && nest.variableDefinitions[i] == other.variableDefinitions[i];
+    }
+    return isEqual;
+  }
+}
+
+
+class ArgumentError {
+    String msg;
+
+    class withMsg(String msg) {
+        class argumentError = new ArgumentError;
+        argumentError.msg = msg;
+
+        return argumentError;
+    }
+}

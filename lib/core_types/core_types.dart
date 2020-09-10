@@ -1,3 +1,4 @@
+export 'class.dart';
 export 'double.dart';
 export 'int.dart';
 export 'list.dart';

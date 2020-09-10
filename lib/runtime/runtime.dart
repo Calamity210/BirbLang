@@ -1011,6 +1011,12 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
             binOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
             binOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
             binOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
+
+          var classPropertyNode = await visitClassProperties(node, left);
+
+          if (classPropertyNode != null)
+            return classPropertyNode;
+
           binOpRight.classChildren = left.classChildren;
           binOpRight.scope = left.scope;
           binOpRight.isClassChild = true;
@@ -2155,8 +2161,7 @@ Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
   return node;
 }
 
-Future<ASTNode> visitNew(Runtime runtime, ASTNode node) async =>
-    (await visit(runtime, node.newValue)).copy();
+Future<ASTNode> visitNew(Runtime runtime, ASTNode node) async =>  (await visit(runtime, node.newValue)).copy();
 
 Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
   var scope = getScope(runtime, node);

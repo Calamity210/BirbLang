@@ -8,55 +8,55 @@ ASTNode visitIntProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'bitLength':
       {
-        ASTNode intAST = IntNode()..intVal = left.intVal.bitLength;
+        IntNode intAST = IntNode()..intVal = left.intVal.bitLength;
         return intAST;
       }
 
     case 'isEven':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isEven;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isEven;
         return boolAST;
       }
 
     case 'isFinite':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isFinite;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isFinite;
         return boolAST;
       }
 
     case 'isInfinite':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isInfinite;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isInfinite;
         return boolAST;
       }
 
     case 'isNaN':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isNaN;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isNaN;
         return boolAST;
       }
 
     case 'isNegative':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isNegative;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isNegative;
         return boolAST;
       }
 
     case 'isOdd':
       {
-        ASTNode boolAST = BoolNode()..boolVal = left.intVal.isOdd;
+        BoolNode boolAST = BoolNode()..boolVal = left.intVal.isOdd;
         return boolAST;
       }
 
     case 'sign':
       {
-        ASTNode intAST = IntNode()..intVal = left.intVal.sign;
+        IntNode intAST = IntNode()..intVal = left.intVal.sign;
         return intAST;
       }
 
     case 'runtimeType':
       {
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.intVal.runtimeType.toString();
         return stringAST;
       }
@@ -71,7 +71,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'abs':
       {
-        ASTNode intAST = IntNode()..intVal = left.intVal.abs();
+        IntNode intAST = IntNode()..intVal = left.intVal.abs();
         return intAST;
       }
 
@@ -80,7 +80,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
         List args = node.binaryOpRight.funcCallArgs;
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal = left.intVal.clamp(args[0].intVal, args[1].intVal);
         return intAST;
       }
@@ -88,7 +88,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'compareTo':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal =
               left.intVal.compareTo(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
@@ -97,7 +97,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'gcd':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal = left.intVal.gcd(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
       }
@@ -105,7 +105,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'modInverse':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal =
               left.intVal.modInverse(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
@@ -116,7 +116,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
         List args = node.binaryOpRight.funcCallArgs;
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal = left.intVal.modPow(args[0].intVal, args[1].intVal);
         return intAST;
       }
@@ -124,7 +124,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'remainder':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal =
               left.intVal.remainder(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
@@ -132,14 +132,14 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
 
     case 'toDouble':
       {
-        ASTNode doubleAST = DoubleNode()..doubleVal = left.intVal.toDouble();
+        DoubleNode doubleAST = DoubleNode()..doubleVal = left.intVal.toDouble();
         return doubleAST;
       }
 
     case 'toRadixString':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toRadixString(node.binaryOpRight.funcCallArgs[0].intVal);
         return stringAST;
@@ -148,7 +148,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'toSigned':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal =
               left.intVal.toSigned(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
@@ -156,14 +156,14 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
 
     case 'toString':
       {
-        ASTNode stringAST = StringNode()..stringValue = left.intVal.toString();
+        StringNode stringAST = StringNode()..stringValue = left.intVal.toString();
         return stringAST;
       }
 
     case 'toStringAsExponential':
       {
         List args = node.binaryOpRight.funcCallArgs;
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsExponential(args.isEmpty ? 0 : args[0].intVal);
         return stringAST;
@@ -172,7 +172,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'toStringAsFixed':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsFixed(node.binaryOpRight.funcCallArgs[0].intVal);
         return stringAST;
@@ -181,7 +181,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'toStringAsPrecision':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode stringAST = StringNode()
+        StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsPrecision(node.binaryOpRight.funcCallArgs[0].intVal);
         return stringAST;
@@ -190,7 +190,7 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
     case 'toUnsigned':
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        ASTNode intAST = IntNode()
+        IntNode intAST = IntNode()
           ..intVal =
               left.intVal.toUnsigned(node.binaryOpRight.funcCallArgs[0].intVal);
         return intAST;
