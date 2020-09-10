@@ -5,7 +5,7 @@ title: String
 
 An array of chars (UTF-16 code units).
 
-A data type used mainly to represent text, denoted by the `'` or `"` its wrapped within.
+A data type used mainly to represent text, denoted by `'` (single quotes) or `"` (double quotes) and its wrapped within.
 
 Strings in birb are multiline by default:
 
