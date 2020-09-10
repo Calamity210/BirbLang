@@ -1,7 +1,6 @@
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/scope.dart';
 
 typedef AstFuncPointer = ASTNode Function(Runtime runtime, ASTNode self, List args);
@@ -119,6 +118,9 @@ abstract class ASTNode {
 
   bool get isFinal => throw Exception('Not part of $runtimeType => $type');
   set isFinal(bool _) => throw Exception('Not part of $runtimeType => $type');
+
+  bool get isNullable => throw Exception('Not part of $runtimeType => $type');
+  set isNullable(bool _) => throw Exception('Not part of $runtimeType => $type');
 
   bool get isSuperseding => throw Exception('Not part of $runtimeType => $type');
   set isSuperseding(bool _) => throw Exception('Not part of $runtimeType => $type');

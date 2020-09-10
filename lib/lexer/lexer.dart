@@ -35,7 +35,7 @@ Token getNextToken(Lexer lexer) {
     }
 
     // Collect identifiers
-    if (RegExp('[a-zA-Z0-9]').hasMatch(lexer.currentChar)) {
+    if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
       return collectId(lexer);
     }
 
@@ -462,7 +462,11 @@ Token collectId(Lexer lexer) {
   // Identifiers can only start with `_` or any alphabet
   if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
     advance(lexer);
-    while (RegExp('[a-zA-Z0-9]').hasMatch(lexer.currentChar)) advance(lexer);
+    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar)) advance(lexer);
+  }
+
+  if (RegExp(r'[\?]').hasMatch(lexer.currentChar)) {
+    advance(lexer);
   }
 
   return initToken(TokenType.TOKEN_ID,

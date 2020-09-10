@@ -263,7 +263,6 @@ ASTNode funcRand(Runtime runtime, ASTNode self, List args) {
     String result = '';
 
     for (int i = 0; i < max.stringValue.length; i++) {
-      int range = max.stringValue.codeUnitAt(i) - 65;
       int randVal = 65 + rand.nextInt(65);
       result += String.fromCharCode(randVal);
     }

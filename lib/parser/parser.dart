@@ -17,17 +17,15 @@ class Parser {
 
 /// Initializes and returns a parser with a lexer
 Parser initParser(Lexer lexer) {
-  var parser = Parser()
-    ..lexer = lexer;
+  var parser = Parser()..lexer = lexer;
   parser.curToken = getNextToken(parser.lexer);
 
   return parser;
 }
 
 /// Throws an UnexpectedTypeException
-void parserTypeError(Parser parser) =>
-    throw UnexpectedTypeException(
-        '[Line ${parser.lexer.lineNum}] Invalid type');
+void parserTypeError(Parser parser) => throw UnexpectedTypeException(
+    '[Line ${parser.lexer.lineNum}] Invalid type');
 
 /// Throws a SyntaxException
 void parserSyntaxError(Parser parser) =>
@@ -36,8 +34,7 @@ void parserSyntaxError(Parser parser) =>
 /// Throws a UnexpectedTokenException
 void parserUnexpectedToken(Parser parser, TokenType type) =>
     throw UnexpectedTokenException(
-        '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken
-            .value}`, was expecting `$type`');
+        '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
 
 /// Sets the ast to be a child of a class
 ASTNode asClassChild(ASTNode ast, ASTNode object) {
@@ -51,7 +48,6 @@ bool isDataType(Parser parser) {
   String tokenValue = parser.curToken.value;
 
   List dataTypes = [
-    'Future',
     'void',
     'var',
     'int',
@@ -70,19 +66,23 @@ bool isDataType(Parser parser) {
   int curIndex = parser.lexer.currentIndex;
   String curChar = parser.lexer.currentChar;
 
-  bool isDot = getNextToken(parser.lexer).type != TokenType.TOKEN_DOT;
+  bool isDot = getNextToken(parser.lexer).type == TokenType.TOKEN_DOT;
 
   parser.lexer
     ..lineNum = lineNum
     ..currentIndex = curIndex
     ..currentChar = curChar;
 
-  return dataTypes.contains(tokenValue) && isDot;
+  for (String type in dataTypes) {
+    if (!isDot && type == tokenValue || type + '?' == tokenValue) return true;
+  }
+
+  return false;
 }
 
 /// Check if the current token is a variable modifier
 bool isModifier(String tokenValue) {
-  return tokenValue == CONST || tokenValue == FINAL || tokenValue == STATIC;
+  return tokenValue == CONST || tokenValue == FINAL;
 }
 
 /// Parses a single statement compound
@@ -173,7 +173,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
         while (parser.curToken.type == TokenType.TOKEN_DOT) {
           eat(parser, TokenType.TOKEN_DOT);
           var ast =
-          initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+              initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
           ast.binaryOpLeft = a;
           eat(parser, TokenType.TOKEN_ID);
           var varAST = parseVariable(parser, scope);
@@ -185,7 +185,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
 
         while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
           var astListAccess =
-          initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
+              initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
           astListAccess.binaryOpLeft = a;
           eat(parser, TokenType.TOKEN_LBRACKET);
           astListAccess.listAccessPointer = parseExpression(parser, scope);
@@ -243,8 +243,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
       while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
         if (parser.lexer.currentIndex == parser.lexer.program.length)
           throw UnexpectedTokenException(
-              '[Lines $lineNum-${parser.lexer
-                  .lineNum}] No closing brace `}` was found');
+              '[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
         eat(parser, parser.curToken.type);
       }
       eat(parser, TokenType.TOKEN_RBRACE);
@@ -283,8 +282,7 @@ ASTNode parseStatements(Parser parser, Scope scope) {
   if (parser.curToken.type != TokenType.TOKEN_RBRACE &&
       parser.lexer.currentIndex != parser.lexer.program.length)
     throw UnexpectedTokenException(
-        'Error [Line ${parser.lexer.lineNum}]: Expected `;` but found `${parser
-            .curToken.value}`');
+        'Error [Line ${parser.lexer.lineNum}]: Expected `;` but found `${parser.curToken.value}`');
 
   return compound;
 }
@@ -296,6 +294,9 @@ ASTNode parseType(Parser parser, Scope scope) {
   var type = initDataType();
 
   var tokenValue = parser.curToken.value;
+
+  if (tokenValue.endsWith('?'))
+    tokenValue = tokenValue.replaceRange(tokenValue.length- 1, tokenValue.length, '');
 
   switch (tokenValue) {
     case 'void':
@@ -374,8 +375,7 @@ ASTNode parseInt(Parser parser, Scope scope) {
 }
 
 ASTNode parseBool(Parser parser, Scope scope) {
-  var ast = initASTWithLine(BoolNode(), parser.lexer.lineNum)
-    ..scope = scope;
+  var ast = initASTWithLine(BoolNode(), parser.lexer.lineNum)..scope = scope;
 
   if (parser.curToken.value == 'false' || parser.curToken.value == 'true') {
     ast.boolVal = parser.curToken.value == 'true';
@@ -389,8 +389,7 @@ ASTNode parseBool(Parser parser, Scope scope) {
 }
 
 ASTNode parseNull(Parser parser, Scope scope) {
-  var ast = initASTWithLine(NullNode(), parser.lexer.lineNum)
-    ..scope = scope;
+  var ast = initASTWithLine(NullNode(), parser.lexer.lineNum)..scope = scope;
 
   eat(parser, TokenType.TOKEN_ID);
 
@@ -551,18 +550,15 @@ ASTNode parseMap(Parser parser, Scope scope) {
         eat(parser, TokenType.TOKEN_COLON);
       else
         throw UnexpectedTokenException(
-            'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser
-                .curToken.value}`, expected `:`.');
+            'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
 
       if (parser.curToken.type == TokenType.TOKEN_COMMA)
         throw UnexpectedTokenException(
-            'Error: [Line ${parser.lexer
-                .lineNum}] Expected value for key `$key`');
+            'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
       ast.map[key] = parseExpression(parser, scope);
     } else
       throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer
-              .lineNum}] Maps can only hold strings as keys.');
+          'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');
   }
 
   while (parser.curToken.type == TokenType.TOKEN_COMMA) {
@@ -575,13 +571,11 @@ ASTNode parseMap(Parser parser, Scope scope) {
       eat(parser, TokenType.TOKEN_COLON);
     else
       throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser
-              .curToken.value}`, expected `:`.');
+          'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
 
     if (parser.curToken.type == TokenType.TOKEN_COMMA)
       throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer
-              .lineNum}] Expected value for key `$key`');
+          'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
 
     ast.map[key] = parseExpression(parser, scope);
   }
@@ -677,7 +671,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 
     while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
       var astListAccess =
-      initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
+          initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
       astListAccess.binaryOpLeft = a;
 
       eat(parser, TokenType.TOKEN_LBRACKET);
@@ -712,7 +706,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 
     while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
       var astListAccess =
-      initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
+          initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
       astListAccess.binaryOpLeft = a;
 
       eat(parser, TokenType.TOKEN_LBRACKET);
@@ -755,17 +749,17 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
   }
 }
 
-ASTNode parseTerm(Parser parser, Scope scope) {
+ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
   var tokenValue = parser.curToken.value;
 
   if (isModifier(tokenValue)) {
     eat(parser, TokenType.TOKEN_ID);
-    if (tokenValue == FINAL) return parseDefinition(parser, scope, false, true);
+    if (tokenValue == FINAL) return parseDefinition(parser, scope, false, true, false, true);
 
-    return parseDefinition(parser, scope, true);
+    return parseDefinition(parser, scope, true, false, false, true);
   }
 
-  if (isDataType(parser)) return parseDefinition(parser, scope);
+  if (isDataType(parser)) return parseDefinition(parser, scope, false, false, false, true);
 
   var node = parseFactor(parser, scope, false);
   ASTNode astBinaryOp;
@@ -795,8 +789,8 @@ ASTNode parseTerm(Parser parser, Scope scope) {
   return node;
 }
 
-ASTNode parseExpression(Parser parser, Scope scope) {
-  var node = parseTerm(parser, scope);
+ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
+  var node = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
   ASTNode astBinaryOp;
 
   while (parser.curToken.type == TokenType.TOKEN_PLUS ||
@@ -819,7 +813,7 @@ ASTNode parseExpression(Parser parser, Scope scope) {
 
       astBinaryOp.binaryOpLeft = node;
       astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight = parseTerm(parser, scope);
+      astBinaryOp.binaryOpRight = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
 
       node = astBinaryOp;
     } else {
@@ -831,7 +825,7 @@ ASTNode parseExpression(Parser parser, Scope scope) {
 
       astBinaryOp.binaryOpLeft = node;
       astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight = parseTerm(parser, scope);
+      astBinaryOp.binaryOpRight = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
 
       node = astBinaryOp;
     }
@@ -1146,7 +1140,7 @@ ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
 }
 
 ASTNode parseDefinition(Parser parser, Scope scope,
-    [bool isConst = false, bool isFinal = false, bool isSuperseding = false]) {
+    [bool isConst = false, bool isFinal = false, bool isSuperseding = false, bool isFuncDefArgs = false]) {
   if (parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
     eat(parser, TokenType.TOKEN_LESS_THAN);
 
@@ -1166,10 +1160,15 @@ ASTNode parseDefinition(Parser parser, Scope scope,
             'No annotation `${parser.curToken.value}` found!');
     }
   }
+
+  bool isNullable = parser.curToken.value.endsWith('?');
+
+  // TODO (Calamity): refactor
   if (parser.curToken.value == 'const') {
     isConst = true;
     eat(parser, TokenType.TOKEN_ID);
   }
+
   ASTNode astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
@@ -1177,9 +1176,19 @@ ASTNode parseDefinition(Parser parser, Scope scope,
   String name;
   bool isEnum = false;
 
+  // TODO (Calamity): refactor
   if (parser.prevToken.value == 'StrBuffer' &&
-      parser.curToken.type == TokenType.TOKEN_LPAREN)
-    return parseStrBuffer(parser, scope, isConst, isFinal);
+      parser.curToken.type == TokenType.TOKEN_LPAREN) {
+    var strBuffer = parseStrBuffer(parser, scope, isConst, isFinal);
+    if (isNullable) {
+      strBuffer.isNullable = true;
+    } else if (!isFuncDefArgs && strBuffer.variableValue == null
+        || strBuffer.variableValue is NullNode) {
+      throw UnexpectedTypeException('Error [Line: ${parser.lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
+    }
+
+    return strBuffer;
+  }
 
   if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
     name = parser.curToken.value;
@@ -1195,36 +1204,37 @@ ASTNode parseDefinition(Parser parser, Scope scope,
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     return parseFunctionDefinition(parser, scope, name, astType);
   } else {
-    return parseVariableDefinition(
-        parser,
-        scope,
-        name,
-        astType,
-        isEnum,
-        isConst,
-        isFinal,
-        isSuperseding);
+    var varDef = parseVariableDefinition(
+        parser, scope, name, astType, isEnum, isConst, isFinal, isSuperseding);
+
+    if (isNullable) {
+      varDef.isNullable = true;
+    } else if (!isFuncDefArgs && varDef.variableValue == null
+        || varDef.variableValue is NullNode) {
+      throw UnexpectedTypeException('Error [Line ${parser.lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
+   }
+
+    return varDef;
   }
 }
 
-ASTNode parseFunctionDefinition(Parser parser, Scope scope, String funcName,
-    ASTNode astType) {
+ASTNode parseFunctionDefinition(
+    Parser parser, Scope scope, String funcName, ASTNode astType) {
   var ast = initASTWithLine(FuncDefNode(), parser.lexer.lineNum)
     ..funcName = funcName
     ..funcDefType = astType
     ..funcDefArgs = [];
 
-  var newScope = initScope(false)
-    ..owner = ast;
+  var newScope = initScope(false)..owner = ast;
 
   eat(parser, TokenType.TOKEN_LPAREN);
 
   if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
-    ast.funcDefArgs.add(parseExpression(parser, scope));
+    ast.funcDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
       eat(parser, TokenType.TOKEN_COMMA);
-      ast.funcDefArgs.add(parseExpression(parser, scope));
+      ast.funcDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
     }
   }
 
@@ -1336,12 +1346,12 @@ ASTNode parseFunctionDefinition(Parser parser, Scope scope, String funcName,
   return ast;
 }
 
-ASTNode parseVariableDefinition(Parser parser, Scope scope, String name,
-    ASTNode astType,
+ASTNode parseVariableDefinition(
+    Parser parser, Scope scope, String name, ASTNode astType,
     [bool isEnum = false,
-      bool isConst = false,
-      bool isFinal = false,
-      bool isSuperseding = false]) {
+    bool isConst = false,
+    bool isFinal = false,
+    bool isSuperseding = false]) {
   var astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
     ..scope = scope
     ..variableName = name
@@ -1353,8 +1363,7 @@ ASTNode parseVariableDefinition(Parser parser, Scope scope, String name,
     var astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
     astType.scope = scope;
 
-    var type = initDataType()
-      ..type = DATATYPE.DATA_TYPE_ENUM;
+    var type = initDataType()..type = DATATYPE.DATA_TYPE_ENUM;
     astType.typeValue = type;
 
     astVarDef.variableType = astType;
@@ -1367,9 +1376,9 @@ ASTNode parseVariableDefinition(Parser parser, Scope scope, String name,
     eat(parser, TokenType.TOKEN_ID);
 
     VariableNode superClass =
-    initASTWithLine(VariableNode(), parser.lexer.lineNum)
-      ..scope = scope
-      ..variableName = parser.curToken.value;
+        initASTWithLine(VariableNode(), parser.lexer.lineNum)
+          ..scope = scope
+          ..variableName = parser.curToken.value;
 
     eat(parser, TokenType.TOKEN_ID);
 

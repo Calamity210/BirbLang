@@ -121,14 +121,8 @@ Future<ASTNode> runtimeFuncCall(
 
   var funcDefBodyScope = fDef.funcDefBody.scope;
 
-  funcDefBodyScope.variableDefinitions.clear();
-
   for (int x = 0; x < fCall.funcCallArgs.length; x++) {
     ASTNode astArg = fCall.funcCallArgs[x];
-
-    if (x > fDef.funcDefArgs.length - 1)
-      throw InvalidArgumentsException(
-          'Error: [Line ${astArg.lineNum}] Too many arguments\n');
 
     ASTNode astFDefArg = fDef.funcDefArgs[x];
     var argName = astFDefArg.variableName;
@@ -137,14 +131,23 @@ Future<ASTNode> runtimeFuncCall(
     newVariableDef.variableType = astFDefArg.variableType;
 
     if (astArg.type == ASTType.AST_VARIABLE) {
-      var vdef = await getVarDefByName(
+      var vDef = await getVarDefByName(
           runtime, getScope(runtime, astArg), astArg.variableName);
 
-      if (vdef != null) newVariableDef.variableValue = vdef.variableValue;
+      if (vDef != null) newVariableDef.variableValue = vDef.variableValue;
     }
 
     newVariableDef.variableValue ??= await visit(runtime, astArg);
     newVariableDef.variableName = argName;
+
+    DATATYPE varDefValType = newVariableDef.variableType.typeValue.type;
+
+    if (varDefValType != DATATYPE.DATA_TYPE_VAR &&
+        !varDefValType.toString().endsWith(newVariableDef.variableValue.type
+            .toString()
+            .replaceFirst('ASTType.AST_', ''))) {
+      throw UnexpectedTypeException('[Line ${fCall.lineNum}] Invalid type');
+    }
 
     funcDefBodyScope.variableDefinitions.add(newVariableDef);
   }
@@ -199,8 +202,7 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
         nullVars.forEach((child) {
           ASTNode superVariable = superClass.classChildren.firstWhere(
               (superChild) =>
-                  superChild.variableName ==
-                  (child as ASTNode).variableName);
+                  superChild.variableName == (child as ASTNode).variableName);
           (child as ASTNode).variableValue = superVariable.variableValue;
         });
       }
@@ -256,9 +258,7 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
 
       String classToString = '';
 
-      throwArg.classChildren
-          .whereType<VarDefNode>()
-          .forEach((varDef) {
+      throwArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
         classToString +=
             '\t${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
@@ -319,7 +319,7 @@ Future<ASTNode> getVarDefByName(
     Runtime runtime, Scope scope, String varName) async {
   if (scope.owner != null) {
     if (varName == 'nest') {
-        return scope.owner.parent ?? scope.owner;
+      return scope.owner.parent ?? scope.owner;
     }
   }
 
@@ -460,8 +460,10 @@ Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
   return node.variableValue ?? node;
 }
 
-Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
+Future<ASTNode> visitVarAssignment(
+    Runtime runtime, VarAssignmentNode node) async {
   var left = node.variableAssignmentLeft;
+
   var localScope = node.scope;
   var globalScope = runtime.scope;
 
@@ -490,6 +492,20 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
           throw ReassigningFinalVariableException(
               'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`$stacktrace');
         }
+
+        if (!objectVarDef.isNullable && node.variableValue == null ||
+            node.variableValue is NullNode) {
+          String stacktrace =
+              '\nThe stacktrace when the error was thrown was:\n';
+
+          for (Map item in runtime.stack.reversed.take(5))
+            stacktrace +=
+                ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+          throw UnexpectedTypeException(
+              'Error [Line ${node.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable\n$stacktrace');
+        }
+
         objectVarDef.variableValue = value;
 
         return value;
@@ -1011,11 +1027,9 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
             binOpRight.type == ASTType.AST_VARIABLE_ASSIGNMENT ||
             binOpRight.type == ASTType.AST_VARIABLE_MODIFIER ||
             binOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
-
           var classPropertyNode = await visitClassProperties(node, left);
 
-          if (classPropertyNode != null)
-            return classPropertyNode;
+          if (classPropertyNode != null) return classPropertyNode;
 
           binOpRight.classChildren = left.classChildren;
           binOpRight.scope = left.scope;
@@ -1130,36 +1144,35 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
   } else {
     var index = ast.intVal;
     if (left.type == ASTType.AST_LIST) {
-      if (left.listElements.isNotEmpty &&
-        index < left.listElements.length) {
-      if (left.listElements[index] is Map) {
-        var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
-        ASTNode mapAst = MapNode()
-          ..typeValue = type
-          ..scope = left.scope
-          ..map = left.listElements[index];
+      if (left.listElements.isNotEmpty && index < left.listElements.length) {
+        if (left.listElements[index] is Map) {
+          var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
+          ASTNode mapAst = MapNode()
+            ..typeValue = type
+            ..scope = left.scope
+            ..map = left.listElements[index];
 
-        return mapAst;
-      } else if (left.listElements[index] is String) {
-        var type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-        ASTNode stringAst = StringNode()
-          ..typeValue = type
-          ..scope = left.scope
-          ..stringValue = left.listElements[index];
+          return mapAst;
+        } else if (left.listElements[index] is String) {
+          var type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+          ASTNode stringAst = StringNode()
+            ..typeValue = type
+            ..scope = left.scope
+            ..stringValue = left.listElements[index];
 
-        return stringAst;
+          return stringAst;
+        }
+        return left.listElements[index];
+      } else {
+        String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+        for (Map item in runtime.stack.reversed.take(5))
+          stacktrace +=
+              ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+        throw RangeException(
+            'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}$stacktrace');
       }
-      return left.listElements[index];
-    } else {
-      String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
-
-      for (Map item in runtime.stack.reversed.take(5))
-        stacktrace +=
-            ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
-
-      throw RangeException(
-          'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}$stacktrace');
-    }
     }
 
     if (left.type == ASTType.AST_MAP) {
@@ -1168,7 +1181,7 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
 
         for (Map item in runtime.stack.reversed.take(5))
           stacktrace +=
-          ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+              ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
 
         throw RangeException(
             'Error: Invalid map index: Valid range is: ${left.map.keys.isNotEmpty ? left.map.keys.length - 1 : 0}$stacktrace');
@@ -2177,7 +2190,8 @@ Future<ASTNode> visitFor(Runtime runtime, ASTNode node) async {
   return node;
 }
 
-Future<ASTNode> visitNew(Runtime runtime, ASTNode node) async =>  (await visit(runtime, node.newValue)).copy();
+Future<ASTNode> visitNew(Runtime runtime, ASTNode node) async =>
+    (await visit(runtime, node.newValue)).copy();
 
 Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
   var scope = getScope(runtime, node);

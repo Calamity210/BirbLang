@@ -10,10 +10,10 @@ class Test {
 
 class FollowsTest follows Test {
     <Supersede>
-    String name;
+    String? name;
 
     <Supersede>
-    int age;
+    int? age;
 }
 
 class test = new Test;

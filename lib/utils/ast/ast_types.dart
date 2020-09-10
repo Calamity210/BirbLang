@@ -340,6 +340,9 @@ class VarDefNode extends ASTNode {
   bool isFinal;
 
   @override
+  bool isNullable = false;
+
+  @override
   ASTNode savedFuncCall;
 
   @override

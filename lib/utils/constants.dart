@@ -23,7 +23,6 @@ const String WHILE = 'while';
 // MODIFIERS
 const String CONST = 'const';
 const String FINAL = 'final';
-const String STATIC = 'static'; // TODO: implement
 
 // Annotations
 const String SUPERSEDE = 'Supersede';
