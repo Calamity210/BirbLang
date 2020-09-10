@@ -128,7 +128,7 @@ class ClassNode extends ASTNode {
   ASTNode copy() {
     ClassNode node = ClassNode()
       ..scope = scope
-      ..className = 'boogie'
+      ..className = className
       ..superClass = (superClass?.copy())
       ..variableType = (variableType?.copy());
 
@@ -349,7 +349,6 @@ class VarDefNode extends ASTNode {
   ASTNode copy() {
     VarDefNode node = VarDefNode()
       ..scope = scope
-      ..isFinal = isFinal
       ..savedFuncCall = (savedFuncCall?.copy())
       ..variableAssignmentLeft = (variableAssignmentLeft?.copy())
       ..isSuperseding = isSuperseding
@@ -652,7 +651,7 @@ class ThrowNode extends ASTNode {
   ASTType type = ASTType.AST_THROW;
 
   @override
-  VariableNode throwValue;
+  ASTNode throwValue;
 
   @override
   ASTNode copy() {

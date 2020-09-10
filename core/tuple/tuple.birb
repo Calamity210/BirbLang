@@ -1,9 +1,9 @@
 class Tuple2 {
   /// First item of the tuple
-  final var item1;
+  var item1;
 
   /// Second item of the tuple
-  final var item2;
+  var item2;
 
   /// Creates a new tuple with the given items.
   class create(var item1, var item2) {
@@ -47,17 +47,17 @@ class Tuple2 {
 
 class Tuple3 {
   /// First item of the tuple
-  final var item1;
+  var item1;
 
   /// Second item of the tuple
-  final var item2;
+  var item2;
 
   /// Third item of the tuple
-  final var item3;
+  var item3;
 
   /// Creates a new tuple with the given items.
   class create(var item1, var item2, var item3) {
-    class newTuple = new Tuple3;
+  class newTuple = new Tuple3;
     newTuple.item1 = item1;
     newTuple.item2 = item2;
     newTuple.item3 = item3;
@@ -87,7 +87,7 @@ class Tuple3 {
   List toList() => [nest.item1, nest.item2, nest.item3];
 
   /// Returns a String representation of this tuple
-  String toString() => '[' + nest.item1 + ', ' + nest.item2 + ',' + nest.item3 ]';
+  String toString() => '[' + nest.item1 + ', ' + nest.item2 + ',' + nest.item3 + ']';
 
   // Returns true if all items of this tuple are equal to the items of `other`.
   bool isEqualTo(class other) {
@@ -97,6 +97,7 @@ class Tuple3 {
     }
     return isEqual;
   }
+
 }
 
 

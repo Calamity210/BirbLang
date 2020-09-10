@@ -479,7 +479,7 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, ASTNode node) async {
         if (value.type == ASTType.AST_DOUBLE) {
           value.intVal = value.doubleVal.toInt();
         }
-        if (objectVarDef.isFinal) {
+        if (objectVarDef.isFinal ?? false) {
           String stacktrace =
               '\nThe stacktrace when the error was thrown was:\n';
 
@@ -1129,7 +1129,8 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
       return null;
   } else {
     var index = ast.intVal;
-    if (left.type == ASTType.AST_LIST) if (left.listElements.isNotEmpty &&
+    if (left.type == ASTType.AST_LIST) {
+      if (left.listElements.isNotEmpty &&
         index < left.listElements.length) {
       if (left.listElements[index] is Map) {
         var type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
@@ -1158,6 +1159,21 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
 
       throw RangeException(
           'Error: Invalid list index: Valid range is: ${left.listElements.isNotEmpty ? left.listElements.length - 1 : 0}$stacktrace');
+    }
+    }
+
+    if (left.type == ASTType.AST_MAP) {
+      if (index >= left.map.keys.length) {
+        String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
+
+        for (Map item in runtime.stack.reversed.take(5))
+          stacktrace +=
+          ' [Line:${item['line']}] ${runtime.path}::${item['function']}\n';
+
+        throw RangeException(
+            'Error: Invalid map index: Valid range is: ${left.map.keys.isNotEmpty ? left.map.keys.length - 1 : 0}$stacktrace');
+      }
+      return left.map[left.map.keys.toList()[index]];
     }
 
     String stacktrace = '\nThe stacktrace when the error was thrown was:\n';

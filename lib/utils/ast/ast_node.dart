@@ -144,8 +144,8 @@ abstract class ASTNode {
   ASTNode get returnValue => throw Exception('Not part of $runtimeType => $type');
   set returnValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  VariableNode get throwValue => throw Exception('Not part of $runtimeType => $type');
-  set throwValue(VariableNode _) => throw Exception('Not part of $runtimeType => $type');
+  ASTNode get throwValue => throw Exception('Not part of $runtimeType => $type');
+  set throwValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get savedFuncCall => throw Exception('Not part of $runtimeType => $type');
   set savedFuncCall(ASTNode _) => throw Exception('Not part of $runtimeType => $type');

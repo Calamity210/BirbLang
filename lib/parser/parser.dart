@@ -252,18 +252,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
       return initASTWithLine(NoopNode(), lineNum);
 
     case TokenType.TOKEN_LBRACKET:
-      int lineNum = parser.lexer.lineNum;
-      while (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
-        if (parser.lexer.currentIndex == parser.lexer.program.length)
-          throw UnexpectedTokenException(
-              '[Lines $lineNum-${parser.lexer
-                  .lineNum}] No closing bracket `]` was found');
-        eat(parser, parser.curToken.type);
-      }
-      eat(parser, TokenType.TOKEN_RBRACKET);
-      eat(parser, TokenType.TOKEN_SEMI);
-
-      return initASTWithLine(NoopNode(), lineNum);
+      return parseList(parser, scope);
 
     default:
       return initASTWithLine(NoopNode(), parser.lexer.lineNum);
@@ -1174,7 +1163,7 @@ ASTNode parseDefinition(Parser parser, Scope scope,
         break;
       default:
         throw UnexpectedTokenException(
-            'No annotation ${parser.curToken.value} found!');
+            'No annotation `${parser.curToken.value}` found!');
     }
   }
   if (parser.curToken.value == 'const') {
@@ -1243,8 +1232,9 @@ ASTNode parseFunctionDefinition(Parser parser, Scope scope, String funcName,
 
   if (parser.curToken.type == TokenType.TOKEN_INLINE) {
     eat(parser, TokenType.TOKEN_INLINE);
-    ast.funcDefBody = parseStatement(parser, newScope);
+    ast.funcDefBody = parseOneStatementCompound(parser, newScope);
     ast.funcDefBody.scope = newScope;
+
     return ast;
   }
 
