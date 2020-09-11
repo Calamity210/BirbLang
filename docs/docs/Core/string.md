@@ -7,7 +7,7 @@ An array of chars (UTF-16 code units).
 
 A data type used mainly to represent text, denoted by the `'` or `"` its wrapped within.
 
-You can indicate that a String is raw and should treat `\` as a literal character, by prefixing it with `r` Strings in birb are multiline by default:
+You can indicate that a String is raw and should treat `\` as a literal character by prefixing it with `r`. Strings in birb are multiline by default:
 
 ```dart
 screm("This string will print on one line");
