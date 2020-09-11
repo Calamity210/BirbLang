@@ -1,3 +1,5 @@
+grab('birb:convert');
+
 Map map = {
 "content": "foo"
 };

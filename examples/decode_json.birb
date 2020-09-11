@@ -1,3 +1,5 @@
+grab('birb:convert');
+
 String json = '
 {
 "content": "foo"

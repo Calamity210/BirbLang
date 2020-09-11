@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
+import 'package:Birb/external/convert.dart';
+import 'package:Birb/external/http.dart';
+import 'package:Birb/external/io.dart';
+import 'package:Birb/external/math.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:http/http.dart';
@@ -38,15 +41,9 @@ void initStandards(Runtime runtime, String path) async {
   registerGlobalFunction(runtime, 'scremF', funcScremF);
   registerGlobalFunction(runtime, 'beep', funcBeep);
   registerGlobalFunction(runtime, 'beepLn', funcBeepLn);
-  registerGlobalFunction(runtime, 'exit', funcExit);
-  registerGlobalFunction(runtime, 'rand', funcRand);
   registerGlobalFunction(runtime, 'mock', funcMock);
-  registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
-  registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
 
   registerGlobalFutureFunction(runtime, 'grab', funcGrab);
-  registerGlobalFutureFunction(runtime, 'GET', funcGet);
-  registerGlobalFutureFunction(runtime, 'POST', funcPost);
   registerGlobalFutureFunction(runtime, 'variableFromString', funcVarFromString);
 }
 
@@ -63,6 +60,27 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     await visit(runtime, node);
 
     return AnyNode();
+  } else if (astStr.stringValue.startsWith('dart:')) {
+  String fileName = astStr.stringValue.replaceAll('dart:', '');
+
+    switch (fileName) {
+      case 'convert':
+        registerConvert(runtime);
+        break;
+      case 'io':
+        registerIO(runtime);
+        break;
+      case 'http':
+        registerHTTP(runtime);
+        break;
+      case 'math':
+        registerMath(runtime);
+        break;
+      default:
+        throw UnexpectedTokenException('Error [Line ${self.lineNum}]:Dart file $fileName no found.');
+    }
+
+    return INITIALIZED_NOOP;
   } else if (astStr.stringValue.startsWith(RegExp('https?://'))) {
     if (!astStr.stringValue.endsWith('.birb'))
       throw UnexpectedTokenException('Cannot import non-birb files.');
@@ -231,50 +249,6 @@ ASTNode funcMock(Runtime runtime, ASTNode self, List<ASTNode> args) {
       stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
   return astString;
-}
-
-/**
- * IO
- */
-ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_INT]);
-
-  ASTNode exitAST = args[0];
-
-  exit(exitAST.intVal);
-}
-
-ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
-
-  ASTNode max = args[0];
-
-  if (max is IntNode) {
-    int randVal = Random().nextInt(max.intVal);
-    IntNode intNode = IntNode()..intVal = randVal..doubleVal = randVal.toDouble();
-    return intNode;
-  } else if (max is DoubleNode) {
-    double randVal = Random().nextDouble() * max.doubleVal;
-    DoubleNode doubleNode = DoubleNode()..doubleVal = randVal..intVal = randVal.toInt();
-
-    return doubleNode;
-  } else if (max is StringNode) {
-    Random rand = Random();
-    String result = '';
-
-    for (int i = 0; i < max.stringValue.length; i++) {
-      int randVal = 65 + rand.nextInt(65);
-      result += String.fromCharCode(randVal);
-    }
-
-    StringNode strNode = StringNode()..stringValue = result;
-    return strNode;
-  } else if (max is BoolNode) {
-    BoolNode boolNode = BoolNode()..boolVal = Random().nextBool();
-    return boolNode;
-  }
-
-  throw UnexpectedTypeException('The rand method only takes [String, double, int, and bool] arugment types');
 }
 
 /**
@@ -460,285 +434,8 @@ ASTNode doubleClass(Runtime runtime) {
   return astObj;
 }
 
-/**
- * HTTP
- */
-Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async {
-  if (args.length == 3)
-    runtimeExpectArgs(args,
-        [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_FUNC_DEFINITION]);
-  else
-    runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_MAP]);
-
-  String url = (args[0]).stringValue;
-  Map headers = (args[1]).map;
-  ASTNode funcDef;
-  ASTNode funCall;
-
-  if (args.length == 3) {
-    funcDef = args[2];
-    ASTNode funcCalExpr = VariableNode();
-    funcCalExpr.variableName = funcDef.funcName;
-
-    funCall = FuncCallNode();
-    funCall.funcName = funcDef.funcName;
-    funCall.funcCallExpression = funcCalExpr;
-  }
-
-  Map<String, String> head = {};
-  headers.forEach((key, value) => head[key] = (value as ASTNode).stringValue);
-
-  Response response = await get(url, headers: head);
-  if (args.length == 3) await visitFuncCall(runtime, funCall);
-
-  var astObj = ClassNode();
-  astObj.variableType = TypeNode();
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
-
-  // BODY
-  var ast = VarDefNode();
-  ast.variableName = 'body';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-
-  var astVal = StringNode();
-  astVal.stringValue = response.body;
-  ast.variableValue = astVal;
-
-  astObj.classChildren.add(ast);
-
-  // BODY BYTES
-  ast = VarDefNode();
-  ast.variableName = 'bodyBytes';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
-
-  var astListVal = ListNode();
-  astListVal.listElements = response.bodyBytes;
-  ast.variableValue = astListVal;
-
-  astObj.classChildren.add(ast);
-
-  // STATUS CODE
-  ast = VarDefNode();
-  ast.variableName = 'statusCode';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  var astIntVal = IntNode();
-  astIntVal.intVal = response.statusCode;
-  ast.variableValue = astIntVal;
-
-  astObj.classChildren.add(ast);
-
-  // CONTENT LENGTH
-  ast = VarDefNode();
-  ast.variableName = 'contentLength';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-  astIntVal = IntNode();
-  astIntVal.intVal = response.contentLength;
-  ast.variableValue = astIntVal;
-
-  astObj.classChildren.add(ast);
-
-  // REASON PHRASE
-  ast = VarDefNode();
-  ast.variableName = 'reason';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-
-  astVal = StringNode();
-  astVal.stringValue = response.reasonPhrase;
-  ast.variableValue = astVal;
-
-  astObj.classChildren.add(ast);
-
-  // HEADERS
-  ast = VarDefNode();
-  ast.variableName = 'headers';
-  ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
-
-  var astMapVal = MapNode();
-  astMapVal.map = response.headers;
-  ast.variableValue = astMapVal;
-
-  astObj.classChildren.add(ast);
-
-  return astObj;
-}
-
-Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) async {
-    if (args.length == 4)
-      runtimeExpectArgs(args, [
-        ASTType.AST_STRING,
-        ASTType.AST_MAP,
-        ASTType.AST_MAP,
-        ASTType.AST_FUNC_DEFINITION
-      ]);
-    else
-      runtimeExpectArgs(
-          args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
-
-    String url = (args[0]).stringValue;
-    Map bodyEarly = (args[1]).map;
-    Map head = (args[2]).map;
-
-    ASTNode funcDef;
-    ASTNode funCall;
-
-    if (args.length == 4) {
-      funcDef = args[3];
-      ASTNode funcCalExpr = VariableNode();
-      funcCalExpr.variableName = funcDef.funcName;
-
-      funCall = FuncCallNode();
-      funCall.funcName = funcDef.funcName;
-      funCall.funcCallExpression = funcCalExpr;
-    }
-
-    Map<String, String> body = {};
-    bodyEarly.forEach((key, value) => body[key] = (value as ASTNode).stringValue);
-
-    Map<String, String> headers = {};
-    head.forEach((key, value) => headers[key] = (value as ASTNode).stringValue);
-
-    Response response = await post(url, body: body, headers: headers);
-    if (args.length == 4) await visitCompound(runtime, funCall);
-
-    var astObj = ClassNode();
-    astObj.variableType = TypeNode();
-    astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
-
-    // BODY
-    var ast = VarDefNode();
-    ast.variableName = 'body';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-
-    var astVal = StringNode();
-    astVal.stringValue = response.body;
-    ast.variableValue = astVal;
-
-    astObj.classChildren.add(ast);
-
-    // BODY BYTES
-    ast = VarDefNode();
-    ast.variableName = 'bodyBytes';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
-
-    var astListVal = ListNode();
-    astListVal.listElements = response.bodyBytes;
-    ast.variableValue = astListVal;
-
-    astObj.classChildren.add(ast);
-
-    // STATUS CODE
-    ast = VarDefNode();
-    ast.variableName = 'statusCode';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-    var astIntVal = IntNode();
-    astIntVal.intVal = response.statusCode;
-    ast.variableValue = astIntVal;
-
-    astObj.classChildren.add(ast);
-
-    // CONTENT LENGTH
-    ast = VarDefNode();
-    ast.variableName = 'contentLength';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
-
-    astIntVal = IntNode();
-    astVal.intVal = response.contentLength;
-    ast.variableValue = astVal;
-
-    astObj.classChildren.add(ast);
-
-    // REASON PHRASE
-    ast = VarDefNode();
-    ast.variableName = 'reason';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
-
-    astVal = StringNode();
-    astVal.stringValue = response.reasonPhrase;
-    ast.variableValue = astVal;
-
-    astObj.classChildren.add(ast);
-
-    // HEADERS
-    ast = VarDefNode();
-    ast.variableName = 'headers';
-    ast.variableType = TypeNode();
-    ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
-
-    var astMapVal = MapNode();
-    astMapVal.map = response.headers;
-    ast.variableValue = astMapVal;
-
-    astObj.classChildren.add(ast);
-
-    return astObj;
-  }
-  Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
+Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
     runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
     return await getVarDefByName(runtime, getScope(runtime, args[0]), args[0].stringValue);
-  }
-
-  ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
-    runtimeExpectArgs(args, [ASTType.AST_STRING]);
-
-    String jsonString = (args[0]).stringValue;
-
-    var decoded = jsonDecode(jsonString);
-    ASTNode jsonAST;
-    if (decoded is List)
-      jsonAST = ListNode()..listElements = decoded;
-    else
-      jsonAST = MapNode()..map = jsonDecode(jsonString) as Map<String, dynamic>;
-
-    return jsonAST;
-  }
-
-  ASTNode funcEncodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
-    runtimeExpectArgs(args, [ASTType.AST_MAP]);
-
-    Map map = (args[0]).map;
-
-    Map jsonMap = {};
-
-    map.forEach((key, value) {
-      ASTNode val = value;
-      switch (val.type) {
-        case ASTType.AST_STRING:
-          jsonMap[key] = val.stringValue;
-          break;
-        case ASTType.AST_INT:
-          jsonMap[key] = val.intVal;
-          break;
-        case ASTType.AST_DOUBLE:
-          jsonMap[key] = val.doubleVal;
-          break;
-        case ASTType.AST_LIST:
-          jsonMap[key] = val.listElements;
-          break;
-        case ASTType.AST_MAP:
-          jsonMap[key] = val.map;
-          break;
-        default:
-          throw JsonValueTypeException(key, val.type);
-      }
-      return;
-    });
-
-    ASTNode jsonAST = StringNode()..stringValue = jsonEncode(jsonMap);
-
-    return jsonAST;
-  }
+}
