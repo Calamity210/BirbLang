@@ -49,7 +49,9 @@ Supported data types yet are:
 
 ## Primitive Types example
  ```dart
-String str = "Henlo birb";
+String str = "Henlo\nbirb"; // \n is taken as an escape character
+String raw = r'Henlo\nbirb'; // \n is taken literally
+
 
 int length = str.length; // 10
 

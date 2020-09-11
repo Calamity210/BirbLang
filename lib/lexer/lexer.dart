@@ -34,6 +34,19 @@ Token getNextToken(Lexer lexer) {
       return collectNumber(lexer);
     }
 
+    if (lexer.currentChar == 'r') {
+      advance(lexer);
+
+      if (lexer.currentChar == '"')
+        collectString(lexer, true);
+      else if (lexer.currentChar == "'")
+        collectSingleQuoteString(lexer, true);
+
+      if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
+        return collectId(lexer, 'r');
+      }
+    }
+
     // Collect identifiers
     if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
       return collectId(lexer);
@@ -346,7 +359,7 @@ void skipBlockComment(Lexer lexer) {
 }
 
 /// Collect a string from within double quotation marks
-Token collectString(Lexer lexer) {
+Token collectString(Lexer lexer, [bool isRaw = false]) {
   expect(lexer, '"');
   advance(lexer);
 
@@ -361,7 +374,7 @@ Token collectString(Lexer lexer) {
   }
 
   String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value.escape());
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -369,7 +382,7 @@ Token collectString(Lexer lexer) {
 }
 
 /// Collect a string from within single quotation marks
-Token collectSingleQuoteString(Lexer lexer) {
+Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
   expect(lexer, '\'');
   advance(lexer);
 
@@ -384,7 +397,7 @@ Token collectSingleQuoteString(Lexer lexer) {
   }
 
   String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, value.escape());
+  Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -456,7 +469,7 @@ Token collectNumber(Lexer lexer) {
 }
 
 /// Collects identifiers
-Token collectId(Lexer lexer) {
+Token collectId(Lexer lexer, [String prefix = '']) {
   int initialIndex = lexer.currentIndex;
 
   // Identifiers can only start with `_` or any alphabet
@@ -471,7 +484,7 @@ Token collectId(Lexer lexer) {
   }
 
   return initToken(TokenType.TOKEN_ID,
-      lexer.program.substring(initialIndex, lexer.currentIndex));
+      prefix + lexer.program.substring(initialIndex, lexer.currentIndex));
 }
 
 /// Check if the character is numeric
