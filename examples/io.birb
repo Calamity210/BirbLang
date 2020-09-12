@@ -1,6 +1,6 @@
 grab("birb:io");
 
-scremLn(cwd().runtimeType); // output String;
-scremLn(system("echo", ["henlo"]).runtimeType); // output Map;
+scremLn(cwd().runtimeType); // output String
+scremLn(system("echo", ["test"]).runtimeType); // output Map
 
 exit(0);
