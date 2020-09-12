@@ -38,3 +38,20 @@ ASTNode visitListProperties(ASTNode node, ASTNode left) {
 
   throw NoSuchPropertyException(node.binaryOpRight.variableName, 'list');
 }
+
+/// Visits methods for `List`s
+ASTNode visitListMethods(ASTNode node, ASTNode left) {
+  switch (node.binaryOpRight.funcCallExpression.variableName) {
+    case 'toString':
+      {
+        ASTNode stringAST = StringNode()
+          ..stringValue = left.listElements.toString();
+        return stringAST;
+      }
+    default:
+      {
+        throw NoSuchMethodException(
+            node.binaryOpRight.funcCallExpression.variableName, 'list');
+      }
+  }
+}
