@@ -3,7 +3,7 @@ List list = [10];
 scremLn(list[0]); // output 10
 scremLn(list.isEmpty); // output false
 scremLn(list.isNotEmpty); // output true
-scremLn(list.hashCode); // ignore
+scremLn(list.hashCode.runtimeType); // output int
 scremLn(list.runtimeType); // output List<dynamic>
 
 // Methods
