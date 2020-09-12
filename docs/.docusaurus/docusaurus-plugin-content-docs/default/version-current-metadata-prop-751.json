@@ -23,6 +23,11 @@
                 "type": "link",
                 "label": "String",
                 "href": "/docs/Core/string"
+              },
+              {
+                "type": "link",
+                "label": "Map",
+                "href": "/docs/Core/map"
               }
             ]
           }
@@ -44,6 +49,7 @@
   },
   "permalinkToSidebar": {
     "/docs/contributing": "BirbLang",
+    "/docs/Core/map": "BirbLang",
     "/docs/Core/string": "BirbLang",
     "/docs/": "BirbLang"
   }
