@@ -31,7 +31,7 @@ Future<ASTNode> visitStrBufferProperties(ASTNode node, ASTNode left) async {
   }
 }
 
-/// Visits methods for `StrBuffer`
+/// VisIterateNodes methods for `StrBuffer`
 ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
@@ -59,8 +59,8 @@ ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
 
     case 'writeAsciiCode':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-      left.strBuffer
-          .writeCharCode((node.binaryOpRight.funcCallArgs[0] as ASTNode).intVal);
+      left.strBuffer.writeCharCode(
+          (node.binaryOpRight.funcCallArgs[0] as ASTNode).intVal);
       return left;
 
     case 'writeLine':

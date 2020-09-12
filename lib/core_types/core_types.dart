@@ -4,3 +4,4 @@ export 'int.dart';
 export 'list.dart';
 export 'strbuffer.dart';
 export 'string.dart';
+export 'map.dart';

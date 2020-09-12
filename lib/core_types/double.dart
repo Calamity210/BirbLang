@@ -64,7 +64,8 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
 
     case 'ceilToDouble':
       {
-        DoubleNode doubleAST = DoubleNode()..doubleVal = left.doubleVal.ceilToDouble();
+        DoubleNode doubleAST = DoubleNode()
+          ..doubleVal = left.doubleVal.ceilToDouble();
         return doubleAST;
       }
 
@@ -133,7 +134,8 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
 
     case 'toString':
       {
-        StringNode stringAST = StringNode()..stringValue = left.doubleVal.toString();
+        StringNode stringAST = StringNode()
+          ..stringValue = left.doubleVal.toString();
         return stringAST;
       }
 
