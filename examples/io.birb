@@ -1,6 +1,6 @@
 grab("birb:io");
 
-scremLn(cwd().runtimeType) // output String;
-scremLn(system("where", ["dart"]).runtimeType) // output Map;
+scremLn(cwd().runtimeType); // output String;
+scremLn(system("where", ["dart"]).runtimeType); // output Map;
 
 exit(0);
