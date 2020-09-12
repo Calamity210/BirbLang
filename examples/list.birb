@@ -1,3 +1,7 @@
 List list = [10];
 
 scremLn(list[0]); // output 10
+scremLn(list.isEmpty); // false
+scremLn(list.isNotEmpty); // true
+scremLn(list.hashCode); // ignore
+scremLn(list.runtimeType); // List<dynamic>

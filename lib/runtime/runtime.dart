@@ -323,9 +323,8 @@ Future<ASTNode> getVarDefByName(
     }
   }
 
-  return scope.variableDefinitions.firstWhere(
-      (e) => e.variableName == varName,
-      orElse: () => null);
+  return scope.variableDefinitions
+      .firstWhere((e) => e.variableName == varName, orElse: () => null);
 }
 
 Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
