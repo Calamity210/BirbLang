@@ -156,7 +156,8 @@ ASTNode visitIntMethods(ASTNode node, ASTNode left) {
 
     case 'toString':
       {
-        StringNode stringAST = StringNode()..stringValue = left.intVal.toString();
+        StringNode stringAST = StringNode()
+          ..stringValue = left.intVal.toString();
         return stringAST;
       }
 

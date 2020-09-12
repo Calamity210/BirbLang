@@ -323,9 +323,8 @@ Future<ASTNode> getVarDefByName(
     }
   }
 
-  return scope.variableDefinitions.firstWhere(
-      (e) => e.variableName == varName,
-      orElse: () => null);
+  return scope.variableDefinitions
+      .firstWhere((e) => e.variableName == varName, orElse: () => null);
 }
 
 Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
@@ -1016,7 +1015,10 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
           return visitDoubleMethods(node, left);
         break;
       case ASTType.AST_MAP:
-        // TODO(Calamity210): Handle this case.
+        if (node.binaryOpRight.type == ASTType.AST_VARIABLE)
+          return visitMapProperties(node, left);
+        else if (node.binaryOpRight.type == ASTType.AST_FUNC_CALL)
+          return visitMapMethods(node, left);
         break;
       case ASTType.AST_BOOL:
         // TODO(Calamity210): Handle this case.

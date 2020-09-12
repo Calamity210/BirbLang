@@ -11,7 +11,8 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        ListNode astList = ListNode()..listElements = left.stringValue.codeUnits;
+        ListNode astList = ListNode()
+          ..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
