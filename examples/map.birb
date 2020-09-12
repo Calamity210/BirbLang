@@ -3,3 +3,10 @@ Map map = {
 };
 
 scremLn(map["content"]); // output This is a message
+scremLn(map.isEmpty); // false
+scremLn(map.isNotEmpty); // truelength
+scremLn(map.length); // 1
+scremLn(map.hashCode); // ignore
+
+// Methods
+scremLn(map.toString()); // ignore
