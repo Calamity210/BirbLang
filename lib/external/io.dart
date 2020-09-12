@@ -54,13 +54,12 @@ Future<MapNode> funcSystem(
 
   MapNode res = MapNode();
 
-  await Process.run(args[0].stringValue,
-          args[1].listElements.map((e) => e.toString()).toList())
-      .then((ProcessResult pr) {
-    result['exitCode'] = pr.exitCode.toString();
-    result['stdout'] = pr.stdout.toString();
-    result['stderr'] = pr.stderr.toString();
-  });
+  ProcessResult pr = await Process.run(args[0].stringValue,
+      args[1].listElements.map((e) => e.toString()).toList());
+
+  result['errorCode'] = pr.exitCode;
+  result['stdout'] = pr.stdout;
+  result['sterr'] = pr.stderr;
 
   res.map = result;
 
