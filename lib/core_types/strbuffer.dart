@@ -59,8 +59,8 @@ ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
 
     case 'writeAsciiCode':
       runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-      left.strBuffer
-          .writeCharCode((node.binaryOpRight.funcCallArgs[0] as ASTNode).intVal);
+      left.strBuffer.writeCharCode(
+          (node.binaryOpRight.funcCallArgs[0] as ASTNode).intVal);
       return left;
 
     case 'writeLine':
