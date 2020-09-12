@@ -11,26 +11,26 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'codeUnits':
       {
-        ListNode astList = ListNode()
+        final ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits;
         return astList;
       }
 
     case 'isEmpty':
       {
-        BoolNode astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
+        final BoolNode astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        BoolNode astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
+        final BoolNode astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
         return astBool;
       }
 
     case 'length':
       {
-        IntNode intAST = IntNode()..intVal = left.stringValue.length;
+        final IntNode intAST = IntNode()..intVal = left.stringValue.length;
 
         return intAST;
       }
@@ -38,7 +38,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
     case 'mock':
       {
         print(left.stringValue);
-        StringNode astString = StringNode()
+        final StringNode astString = StringNode()
           ..stringValue =
               stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
@@ -46,7 +46,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toBinary':
       {
-        ListNode astList = ListNode()
+        final ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(2))
               .toList();
@@ -55,7 +55,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toOct':
       {
-        ListNode astList = ListNode()
+        final ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(8))
               .toList();
@@ -64,7 +64,7 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
       }
     case 'toHex':
       {
-        ListNode astList = ListNode()
+        final ListNode astList = ListNode()
           ..listElements = left.stringValue.codeUnits
               .map((e) => e.toRadixString(16))
               .toList();
@@ -74,9 +74,8 @@ ASTNode visitStringProperties(ASTNode node, ASTNode left) {
 
     case 'runtimeType':
       {
-        StringNode stringAST = StringNode()
+        final StringNode stringAST = StringNode()
           ..stringValue = left.stringValue.runtimeType.toString();
-        ;
         return stringAST;
       }
 
@@ -92,7 +91,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
-        IntNode ast = IntNode()
+        final IntNode ast = IntNode()
           ..intVal = left.stringValue
               .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
 
@@ -104,7 +103,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        IntNode ast = IntNode()
+        final IntNode ast = IntNode()
           ..intVal = left.stringValue
               .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -116,7 +115,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        BoolNode ast = BoolNode()
+        final BoolNode ast = BoolNode()
           ..boolVal = left.stringValue.contains(
               node.binaryOpRight.funcCallArgs[0].stringValue,
               node.binaryOpRight.funcCallArgs[1].intVal);
@@ -129,7 +128,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        BoolNode ast = BoolNode()
+        final BoolNode ast = BoolNode()
           ..boolVal = left.stringValue
               .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -141,8 +140,8 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        List args = node.binaryOpRight.funcCallArgs;
-        IntNode ast = IntNode()
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final IntNode ast = IntNode()
           ..intVal =
               left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
 
@@ -154,8 +153,8 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        List args = node.binaryOpRight.funcCallArgs;
-        IntNode ast = IntNode()
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final IntNode ast = IntNode()
           ..intVal =
               left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
 
@@ -166,7 +165,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue =
             left.stringValue.padLeft(args[0].intVal, args[1].stringValue);
@@ -177,7 +176,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
       {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue =
             left.stringValue.padRight(args[0].intVal, args[1].stringValue);
@@ -190,7 +189,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING]);
 
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue = left.stringValue
             .replaceAll(args[0].stringValue, args[1].stringValue);
@@ -203,7 +202,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING, ASTType.AST_INT]);
 
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
         left.stringValue = left.stringValue.replaceFirst(
             args[0].stringValue, args[1].stringValue, args[2].intVal);
@@ -216,7 +215,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_STRING]);
 
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
         left.stringValue
             .replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
 
@@ -228,7 +227,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        ListNode ast = ListNode();
+        final ListNode ast = ListNode();
         ast.listElements = left.stringValue
             .split(node.binaryOpRight.funcCallArgs[0].stringValue);
 
@@ -240,9 +239,9 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
-        BoolNode ast = BoolNode();
+        final BoolNode ast = BoolNode();
         ast.boolVal =
             left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
 
@@ -254,9 +253,9 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
 
-        List args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
-        StringNode ast = StringNode();
+        final StringNode ast = StringNode();
         ast.stringValue =
             left.stringValue.substring(args[0].intVal, args[1].intVal);
 

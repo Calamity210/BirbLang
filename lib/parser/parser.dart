@@ -1,12 +1,12 @@
+import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
-
-import 'data_type.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/utils/scope.dart';
 import 'package:Birb/lexer/token.dart';
+
 
 class Parser {
   Lexer lexer;
@@ -17,7 +17,7 @@ class Parser {
 
 /// Initializes and returns a parser with a lexer
 Parser initParser(Lexer lexer) {
-  var parser = Parser()..lexer = lexer;
+  final parser = Parser()..lexer = lexer;
   parser.curToken = getNextToken(parser.lexer);
 
   return parser;
@@ -45,9 +45,9 @@ ASTNode asClassChild(ASTNode ast, ASTNode object) {
 
 /// Check if the token is a DataType
 bool isDataType(Parser parser) {
-  String tokenValue = parser.curToken.value;
+  final String tokenValue = parser.curToken.value;
 
-  List dataTypes = [
+  final List dataTypes = [
     'void',
     'var',
     'int',
@@ -62,19 +62,20 @@ bool isDataType(Parser parser) {
     'Source'
   ];
 
-  int lineNum = parser.lexer.lineNum;
-  int curIndex = parser.lexer.currentIndex;
-  String curChar = parser.lexer.currentChar;
+  final int lineNum = parser.lexer.lineNum;
+  final int curIndex = parser.lexer.currentIndex;
+  final String curChar = parser.lexer.currentChar;
 
-  bool isDot = getNextToken(parser.lexer).type == TokenType.TOKEN_DOT;
+  final bool isDot = getNextToken(parser.lexer).type == TokenType.TOKEN_DOT;
 
   parser.lexer
     ..lineNum = lineNum
     ..currentIndex = curIndex
     ..currentChar = curChar;
 
-  for (String type in dataTypes) {
-    if (!isDot && type == tokenValue || type + '?' == tokenValue) return true;
+  for (final String type in dataTypes) {
+    if (!isDot && type == tokenValue || type + '?' == tokenValue)
+      return true;
   }
 
   return false;
@@ -92,10 +93,10 @@ bool isModifier(String tokenValue) {
 ///   screm("foo")
 /// ```
 ASTNode parseOneStatementCompound(Parser parser, Scope scope) {
-  var compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
+  final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
   compound.scope = scope;
 
-  var statement = parseStatement(parser, scope);
+  final statement = parseStatement(parser, scope);
   compound.compoundValue.add(statement);
 
   return compound;
@@ -118,7 +119,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
   switch (parser.curToken.type) {
     case TokenType.TOKEN_ID:
       {
-        var tokenValue = parser.curToken.value;
+        final tokenValue = parser.curToken.value;
 
         if (isModifier(tokenValue)) {
           eat(parser, TokenType.TOKEN_ID);
@@ -172,11 +173,13 @@ ASTNode parseStatement(Parser parser, Scope scope) {
 
         while (parser.curToken.type == TokenType.TOKEN_DOT) {
           eat(parser, TokenType.TOKEN_DOT);
-          var ast =
-              initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-          ast.binaryOpLeft = a;
+
+          final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum)..binaryOpLeft = a;
+
           eat(parser, TokenType.TOKEN_ID);
-          var varAST = parseVariable(parser, scope);
+
+          final varAST = parseVariable(parser, scope);
+
           ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
               ? parseFuncCall(parser, scope, varAST)
               : varAST;
@@ -184,23 +187,25 @@ ASTNode parseStatement(Parser parser, Scope scope) {
         }
 
         while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-          var astListAccess =
-              initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
+          final astListAccess = initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
           astListAccess.binaryOpLeft = a;
           eat(parser, TokenType.TOKEN_LBRACKET);
+
           astListAccess.listAccessPointer = parseExpression(parser, scope);
+
           eat(parser, TokenType.TOKEN_RBRACKET);
 
           a = astListAccess;
         }
 
-        if (a != null) return a;
+        if (a != null)
+          return a;
       }
       break;
     case TokenType.TOKEN_LESS_THAN:
       eat(parser, TokenType.TOKEN_LESS_THAN);
 
-      String annotation = parser.curToken.value;
+      final String annotation = parser.curToken.value;
       eat(parser, TokenType.TOKEN_ID);
 
       eat(parser, TokenType.TOKEN_GREATER_THAN);
@@ -227,10 +232,10 @@ ASTNode parseStatement(Parser parser, Scope scope) {
     case TokenType.TOKEN_SUB_SUB:
     case TokenType.TOKEN_MUL_MUL:
       {
-        Token operator = parser.curToken;
+        final Token operator = parser.curToken;
         eat(parser, operator.type);
 
-        ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
+        final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
           ..binaryOpRight = parseStatement(parser, scope)
           ..binaryOperator = operator
           ..scope = scope;
@@ -239,11 +244,10 @@ ASTNode parseStatement(Parser parser, Scope scope) {
       }
       break;
     case TokenType.TOKEN_LBRACE:
-      int lineNum = parser.lexer.lineNum;
+      final int lineNum = parser.lexer.lineNum;
       while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
         if (parser.lexer.currentIndex == parser.lexer.program.length)
-          throw UnexpectedTokenException(
-              '[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
+          throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
         eat(parser, parser.curToken.type);
       }
       eat(parser, TokenType.TOKEN_RBRACE);
@@ -261,7 +265,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
 }
 
 ASTNode parseStatements(Parser parser, Scope scope) {
-  var compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
+  final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
   compound.scope = scope;
 
   ASTNode statement = parseStatement(parser, scope);
@@ -288,15 +292,16 @@ ASTNode parseStatements(Parser parser, Scope scope) {
 }
 
 ASTNode parseType(Parser parser, Scope scope) {
-  ASTNode astType = initASTWithLine(TypeNode(), parser.lexer.lineNum)
+  final ASTNode astType = initASTWithLine(TypeNode(), parser.lexer.lineNum)
     ..scope = scope;
 
-  var type = initDataType();
+  final type = initDataType();
 
   var tokenValue = parser.curToken.value;
 
   if (tokenValue.endsWith('?'))
-    tokenValue = tokenValue.replaceRange(tokenValue.length- 1, tokenValue.length, '');
+    tokenValue =
+        tokenValue.replaceRange(tokenValue.length - 1, tokenValue.length, '');
 
   switch (tokenValue) {
     case 'void':
@@ -345,7 +350,7 @@ ASTNode parseType(Parser parser, Scope scope) {
 }
 
 ASTNode parseDouble(Parser parser, Scope scope) {
-  var ast = initASTWithLine(DoubleNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(DoubleNode(), parser.lexer.lineNum);
   ast.scope = scope;
   ast.doubleVal = double.parse(parser.curToken.value);
 
@@ -355,7 +360,7 @@ ASTNode parseDouble(Parser parser, Scope scope) {
 }
 
 ASTNode parseString(Parser parser, Scope scope) {
-  var ast = initASTWithLine(StringNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(StringNode(), parser.lexer.lineNum)
     ..scope = scope
     ..stringValue = parser.curToken.value;
 
@@ -365,7 +370,7 @@ ASTNode parseString(Parser parser, Scope scope) {
 }
 
 ASTNode parseInt(Parser parser, Scope scope) {
-  var ast = initASTWithLine(IntNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(IntNode(), parser.lexer.lineNum)
     ..scope = scope
     ..intVal = int.tryParse(parser.curToken.value);
 
@@ -375,7 +380,7 @@ ASTNode parseInt(Parser parser, Scope scope) {
 }
 
 ASTNode parseBool(Parser parser, Scope scope) {
-  var ast = initASTWithLine(BoolNode(), parser.lexer.lineNum)..scope = scope;
+  final ast = initASTWithLine(BoolNode(), parser.lexer.lineNum)..scope = scope;
 
   if (parser.curToken.value == 'false' || parser.curToken.value == 'true') {
     ast.boolVal = parser.curToken.value == 'true';
@@ -389,7 +394,7 @@ ASTNode parseBool(Parser parser, Scope scope) {
 }
 
 ASTNode parseNull(Parser parser, Scope scope) {
-  var ast = initASTWithLine(NullNode(), parser.lexer.lineNum)..scope = scope;
+  final ast = initASTWithLine(NullNode(), parser.lexer.lineNum)..scope = scope;
 
   eat(parser, TokenType.TOKEN_ID);
 
@@ -397,12 +402,12 @@ ASTNode parseNull(Parser parser, Scope scope) {
 }
 
 ASTNode parseVariable(Parser parser, Scope scope) {
-  var ast = initASTWithLine(VariableNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(VariableNode(), parser.lexer.lineNum)
     ..scope = scope
     ..variableName = parser.prevToken.value;
 
   if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
-    var astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum)
+    final astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum)
       ..variableAssignmentLeft = ast
       ..variableValue = parseExpression(parser, scope)
       ..scope = scope;
@@ -412,7 +417,7 @@ ASTNode parseVariable(Parser parser, Scope scope) {
 
   if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
     eat(parser, TokenType.TOKEN_EQUAL);
-    var astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum);
+    final astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum);
     astAssign.variableAssignmentLeft = ast;
     astAssign.variableValue = parseExpression(parser, scope);
     astAssign.scope = scope;
@@ -422,11 +427,11 @@ ASTNode parseVariable(Parser parser, Scope scope) {
   if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
       parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
       parser.curToken.type == TokenType.TOKEN_MUL_MUL) {
-    Token operator = parser.curToken;
+    final Token operator = parser.curToken;
 
     eat(parser, operator.type);
 
-    ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
+    final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
       ..binaryOpLeft = ast
       ..binaryOperator = operator
       ..scope = scope;
@@ -437,11 +442,11 @@ ASTNode parseVariable(Parser parser, Scope scope) {
       parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
-    Token operator = parser.curToken;
+    final Token operator = parser.curToken;
 
     eat(parser, operator.type);
 
-    ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
+    final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
       ..binaryOpLeft = ast
       ..binaryOpRight = parseExpression(parser, scope)
       ..binaryOperator = operator
@@ -461,14 +466,16 @@ ASTNode parseBrace(Parser parser, Scope scope) {
 }
 
 ASTNode parseClass(Parser parser, Scope scope) {
-  ASTNode ast = initASTWithLine(ClassNode(), parser.lexer.lineNum)
+  final ASTNode ast = initASTWithLine(ClassNode(), parser.lexer.lineNum)
     ..scope = scope
     ..className = parser.prevToken.value
     ..classChildren = [];
 
-  var newScope = initScope(false);
+  final newScope = initScope(false);
 
-  if (scope != null) if (scope.owner != null) newScope.owner = scope.owner;
+  if (scope != null)
+    if (scope.owner != null)
+      newScope.owner = scope.owner;
 
   eat(parser, TokenType.TOKEN_LBRACE);
 
@@ -499,11 +506,11 @@ ASTNode parseClass(Parser parser, Scope scope) {
 }
 
 ASTNode parseEnum(Parser parser, Scope scope) {
-  var ast = initASTWithLine(EnumNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(EnumNode(), parser.lexer.lineNum);
   ast.scope = scope;
   ast.enumElements = [];
 
-  var newScope = initScope(false);
+  final newScope = initScope(false);
 
   if (scope != null) {
     if (scope.owner != null) {
@@ -537,13 +544,13 @@ ASTNode parseEnum(Parser parser, Scope scope) {
 ASTNode parseMap(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_LBRACE);
 
-  var ast = initASTWithLine(MapNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(MapNode(), parser.lexer.lineNum);
   ast.scope = scope;
   ast.map = {};
 
   if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
     if (parser.curToken.type == TokenType.TOKEN_STRING_VALUE) {
-      String key = parser.curToken.value;
+      final String key = parser.curToken.value;
       eat(parser, TokenType.TOKEN_STRING_VALUE);
 
       if (parser.curToken.type == TokenType.TOKEN_COLON)
@@ -564,7 +571,7 @@ ASTNode parseMap(Parser parser, Scope scope) {
   while (parser.curToken.type == TokenType.TOKEN_COMMA) {
     eat(parser, TokenType.TOKEN_COMMA);
 
-    String key = parser.curToken.value;
+    final String key = parser.curToken.value;
     eat(parser, TokenType.TOKEN_STRING_VALUE);
 
     if (parser.curToken.type == TokenType.TOKEN_COLON)
@@ -586,7 +593,7 @@ ASTNode parseMap(Parser parser, Scope scope) {
 
 ASTNode parseList(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_LBRACKET);
-  var ast = initASTWithLine(ListNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(ListNode(), parser.lexer.lineNum);
   ast.scope = scope;
   ast.listElements = [];
 
@@ -610,10 +617,10 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
       parser.curToken.type == TokenType.TOKEN_NOT ||
       parser.curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
-    var unOpOperator = parser.curToken;
+    final unOpOperator = parser.curToken;
     eat(parser, unOpOperator.type);
 
-    var ast = initASTWithLine(UnaryOpNode(), parser.lexer.lineNum);
+    final ast = initASTWithLine(UnaryOpNode(), parser.lexer.lineNum);
     ast.scope = scope;
     ast.unaryOperator = unOpOperator;
     ast.unaryOpRight = parseTerm(parser, scope);
@@ -647,10 +654,10 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = a;
       eat(parser, TokenType.TOKEN_ID);
-      var varAST = parseVariable(parser, scope);
+      final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
           ? parseFuncCall(parser, scope, varAST)
           : varAST;
@@ -659,10 +666,10 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = a;
       eat(parser, TokenType.TOKEN_ID);
-      var varAST = parseVariable(parser, scope);
+      final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
           ? parseFuncCall(parser, scope, varAST)
           : varAST;
@@ -670,7 +677,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     }
 
     while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-      var astListAccess =
+      final astListAccess =
           initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
       astListAccess.binaryOpLeft = a;
 
@@ -684,7 +691,8 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     while (parser.curToken.type == TokenType.TOKEN_LPAREN)
       a = parseFuncCall(parser, scope, a);
 
-    if (a != null) return a;
+    if (a != null)
+      return a;
   }
 
   if (parser.curToken.type == TokenType.TOKEN_ID) {
@@ -694,10 +702,10 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = a;
       eat(parser, TokenType.TOKEN_ID);
-      var varAST = parseVariable(parser, scope);
+      final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
           ? parseFuncCall(parser, scope, varAST)
           : varAST;
@@ -705,7 +713,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     }
 
     while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-      var astListAccess =
+      final astListAccess =
           initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
       astListAccess.binaryOpLeft = a;
 
@@ -719,13 +727,14 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     while (parser.curToken.type == TokenType.TOKEN_LPAREN)
       a = parseFuncCall(parser, scope, a);
 
-    if (a != null) return a;
+    if (a != null)
+      return a;
   }
 
   /* */
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     eat(parser, TokenType.TOKEN_LPAREN);
-    var astExpression = parseExpression(parser, scope);
+    final astExpression = parseExpression(parser, scope);
     eat(parser, TokenType.TOKEN_RPAREN);
 
     return astExpression;
@@ -750,16 +759,18 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
 }
 
 ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
-  var tokenValue = parser.curToken.value;
+  final tokenValue = parser.curToken.value;
 
   if (isModifier(tokenValue)) {
     eat(parser, TokenType.TOKEN_ID);
-    if (tokenValue == FINAL) return parseDefinition(parser, scope, false, true, false, true);
+    if (tokenValue == FINAL)
+      return parseDefinition(parser, scope, false, true, false, true);
 
     return parseDefinition(parser, scope, true, false, false, true);
   }
 
-  if (isDataType(parser)) return parseDefinition(parser, scope, false, false, false, true);
+  if (isDataType(parser))
+    return parseDefinition(parser, scope, false, false, false, true);
 
   var node = parseFactor(parser, scope, false);
   ASTNode astBinaryOp;
@@ -775,7 +786,7 @@ ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
       parser.curToken.type == TokenType.TOKEN_GREATER_THAN_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_EQUALITY ||
       parser.curToken.type == TokenType.TOKEN_NOT_EQUAL) {
-    var binaryOpOperator = parser.curToken;
+    final binaryOpOperator = parser.curToken;
     eat(parser, binaryOpOperator.type);
 
     astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
@@ -789,7 +800,8 @@ ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
   return node;
 }
 
-ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
+ASTNode parseExpression(Parser parser, Scope scope,
+    {bool isFuncDefArgs = false}) {
   var node = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
   ASTNode astBinaryOp;
 
@@ -805,7 +817,7 @@ ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}
       parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
         parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
-      var binaryOp = parser.curToken;
+      final binaryOp = parser.curToken;
       eat(parser, binaryOp.type);
 
       astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
@@ -813,11 +825,12 @@ ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}
 
       astBinaryOp.binaryOpLeft = node;
       astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
+      astBinaryOp.binaryOpRight =
+          parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
 
       node = astBinaryOp;
     } else {
-      var binaryOp = parser.curToken;
+      final binaryOp = parser.curToken;
       eat(parser, binaryOp.type);
 
       astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
@@ -825,7 +838,8 @@ ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}
 
       astBinaryOp.binaryOpLeft = node;
       astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
+      astBinaryOp.binaryOpRight =
+          parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
 
       node = astBinaryOp;
     }
@@ -833,7 +847,7 @@ ASTNode parseExpression(Parser parser, Scope scope, {bool isFuncDefArgs = false}
 
   while (parser.curToken.type == TokenType.TOKEN_AND ||
       parser.curToken.type == TokenType.TOKEN_OR) {
-    var binaryOp = parser.curToken;
+    final binaryOp = parser.curToken;
     eat(parser, binaryOp.type);
 
     astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
@@ -867,7 +881,7 @@ ASTNode parseNext(Parser parser, Scope scope) {
 ASTNode parseNew(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
 
-  ASTNode newAST = initASTWithLine(NewNode(), parser.lexer.lineNum)
+  final ASTNode newAST = initASTWithLine(NewNode(), parser.lexer.lineNum)
     ..newValue = parseExpression(parser, scope);
 
   return newAST;
@@ -875,7 +889,7 @@ ASTNode parseNew(Parser parser, Scope scope) {
 
 ASTNode parseReturn(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  var ast = initASTWithLine(ReturnNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(ReturnNode(), parser.lexer.lineNum)
     ..scope = scope
     ..returnValue = parseExpression(parser, scope) ?? NullNode();
 
@@ -884,7 +898,7 @@ ASTNode parseReturn(Parser parser, Scope scope) {
 
 ASTNode parseThrow(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  var ast = initASTWithLine(ThrowNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(ThrowNode(), parser.lexer.lineNum)
     ..scope = scope
     ..throwValue = parseExpression(parser, scope) ?? NullNode();
 
@@ -892,7 +906,7 @@ ASTNode parseThrow(Parser parser, Scope scope) {
 }
 
 ASTNode parseIf(Parser parser, Scope scope) {
-  var ast = initASTWithLine(IfNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(IfNode(), parser.lexer.lineNum);
   eat(parser, TokenType.TOKEN_ID);
   eat(parser, TokenType.TOKEN_LPAREN);
 
@@ -923,9 +937,9 @@ ASTNode parseIf(Parser parser, Scope scope) {
         ast.elseBody.scope = scope;
         eat(parser, TokenType.TOKEN_RBRACE);
       } else {
-        var compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
+        final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
         compound.scope = scope;
-        var statement = parseStatement(parser, scope);
+        final statement = parseStatement(parser, scope);
         eat(parser, TokenType.TOKEN_SEMI);
         compound.compoundValue.add(statement);
 
@@ -939,7 +953,7 @@ ASTNode parseIf(Parser parser, Scope scope) {
 }
 
 ASTNode parseSwitch(Parser parser, Scope scope) {
-  ASTNode switchAST = initASTWithLine(SwitchNode(), parser.lexer.lineNum)
+  final ASTNode switchAST = initASTWithLine(SwitchNode(), parser.lexer.lineNum)
     ..switchCases = {};
 
   eat(parser, TokenType.TOKEN_ID);
@@ -982,7 +996,7 @@ ASTNode parseSwitch(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_COLON);
   eat(parser, TokenType.TOKEN_LBRACE);
 
-  ASTNode defaultFuncAST = parseStatements(parser, scope);
+  final ASTNode defaultFuncAST = parseStatements(parser, scope);
 
   eat(parser, TokenType.TOKEN_RBRACE);
 
@@ -994,7 +1008,7 @@ ASTNode parseSwitch(Parser parser, Scope scope) {
 }
 
 ASTNode parseTernary(Parser parser, Scope scope, ASTNode expr) {
-  var ternary = initASTWithLine(TernaryNode(), parser.lexer.lineNum);
+  final ternary = initASTWithLine(TernaryNode(), parser.lexer.lineNum);
   ternary.ternaryExpression = expr;
 
   eat(parser, TokenType.TOKEN_QUESTION);
@@ -1010,7 +1024,7 @@ ASTNode parseTernary(Parser parser, Scope scope, ASTNode expr) {
 
 ASTNode parseIterate(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  var astVar = parseExpression(parser, scope);
+  final astVar = parseExpression(parser, scope);
   eat(parser, TokenType.TOKEN_ID);
 
   ASTNode astFuncName;
@@ -1030,7 +1044,7 @@ ASTNode parseIterate(Parser parser, Scope scope) {
     astFuncName = parseVariable(parser, scope);
   }
 
-  var ast = initASTWithLine(IterateNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(IterateNode(), parser.lexer.lineNum);
   ast.iterateIterable = astVar;
   ast.iterateFunction = astFuncName;
 
@@ -1039,7 +1053,7 @@ ASTNode parseIterate(Parser parser, Scope scope) {
 
 ASTNode parseAssert(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
-  var ast = initASTWithLine(AssertNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(AssertNode(), parser.lexer.lineNum);
   ast.assertExpression = parseExpression(parser, scope);
 
   return ast;
@@ -1048,7 +1062,7 @@ ASTNode parseAssert(Parser parser, Scope scope) {
 ASTNode parseWhile(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
   eat(parser, TokenType.TOKEN_LPAREN);
-  var ast = initASTWithLine(WhileNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(WhileNode(), parser.lexer.lineNum);
   ast.whileExpression = parseExpression(parser, scope);
   eat(parser, TokenType.TOKEN_RPAREN);
 
@@ -1066,7 +1080,7 @@ ASTNode parseWhile(Parser parser, Scope scope) {
 }
 
 ASTNode parseFor(Parser parser, Scope scope) {
-  var ast = ForNode();
+  final ast = ForNode();
 
   eat(parser, TokenType.TOKEN_ID);
   eat(parser, TokenType.TOKEN_LPAREN);
@@ -1095,7 +1109,7 @@ ASTNode parseFor(Parser parser, Scope scope) {
 }
 
 ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
-  var ast = initASTWithLine(FuncCallNode(), parser.lexer.lineNum);
+  final ast = initASTWithLine(FuncCallNode(), parser.lexer.lineNum);
   ast.funcCallExpression = expr;
   eat(parser, TokenType.TOKEN_LPAREN);
 
@@ -1106,10 +1120,10 @@ ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = astExpr;
       eat(parser, TokenType.TOKEN_ID);
-      var varAST = parseVariable(parser, scope);
+      final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
           ? parseFuncCall(parser, scope, varAST)
           : varAST;
@@ -1140,11 +1154,14 @@ ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
 }
 
 ASTNode parseDefinition(Parser parser, Scope scope,
-    [bool isConst = false, bool isFinal = false, bool isSuperseding = false, bool isFuncDefArgs = false]) {
+    [bool isConst = false,
+    bool isFinal = false,
+    bool isSuperseding = false,
+    bool isFuncDefArgs = false]) {
   if (parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
     eat(parser, TokenType.TOKEN_LESS_THAN);
 
-    String annotation = parser.curToken.value;
+    final String annotation = parser.curToken.value;
     eat(parser, TokenType.TOKEN_ID);
 
     eat(parser, TokenType.TOKEN_GREATER_THAN);
@@ -1161,30 +1178,31 @@ ASTNode parseDefinition(Parser parser, Scope scope,
     }
   }
 
-  bool isNullable = parser.curToken.value.endsWith('?');
+  final bool isNullable = parser.curToken.value.endsWith('?');
 
-  // TODO (Calamity): refactor
+  // TODO(Calamity): refactor
   if (parser.curToken.value == 'const') {
     isConst = true;
     eat(parser, TokenType.TOKEN_ID);
   }
 
-  ASTNode astType = parseType(parser, scope);
+  final ASTNode astType = parseType(parser, scope);
 
   parser.dataType = astType.typeValue;
 
   String name;
   bool isEnum = false;
 
-  // TODO (Calamity): refactor
+  // TODO(Calamity): refactor
   if (parser.prevToken.value == 'StrBuffer' &&
       parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    var strBuffer = parseStrBuffer(parser, scope, isConst, isFinal);
+    final strBuffer = parseStrBuffer(parser, scope, isConst, isFinal);
     if (isNullable) {
       strBuffer.isNullable = true;
-    } else if (!isFuncDefArgs && strBuffer.variableValue == null
-        || strBuffer.variableValue is NullNode) {
-      throw UnexpectedTypeException('Error [Line: ${parser.lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
+    } else if (!isFuncDefArgs && strBuffer.variableValue == null ||
+        strBuffer.variableValue is NullNode) {
+      throw UnexpectedTypeException(
+          'Error [Line: ${parser.lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
     }
 
     return strBuffer;
@@ -1204,15 +1222,16 @@ ASTNode parseDefinition(Parser parser, Scope scope,
   if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
     return parseFunctionDefinition(parser, scope, name, astType);
   } else {
-    var varDef = parseVariableDefinition(
+    final varDef = parseVariableDefinition(
         parser, scope, name, astType, isEnum, isConst, isFinal, isSuperseding);
 
     if (isNullable) {
       varDef.isNullable = true;
-    } else if (!isFuncDefArgs && varDef.variableValue == null
-        || varDef.variableValue is NullNode) {
-      throw UnexpectedTypeException('Error [Line ${parser.lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
-   }
+    } else if (!isFuncDefArgs && varDef.variableValue == null ||
+        varDef.variableValue is NullNode) {
+      throw UnexpectedTypeException(
+          'Error [Line ${parser.lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
+    }
 
     return varDef;
   }
@@ -1220,12 +1239,12 @@ ASTNode parseDefinition(Parser parser, Scope scope,
 
 ASTNode parseFunctionDefinition(
     Parser parser, Scope scope, String funcName, ASTNode astType) {
-  var ast = initASTWithLine(FuncDefNode(), parser.lexer.lineNum)
+  final ast = initASTWithLine(FuncDefNode(), parser.lexer.lineNum)
     ..funcName = funcName
     ..funcDefType = astType
     ..funcDefArgs = [];
 
-  var newScope = initScope(false)..owner = ast;
+  final newScope = initScope(false)..owner = ast;
 
   eat(parser, TokenType.TOKEN_LPAREN);
 
@@ -1352,7 +1371,7 @@ ASTNode parseVariableDefinition(
     bool isConst = false,
     bool isFinal = false,
     bool isSuperseding = false]) {
-  var astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
+  final astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
     ..scope = scope
     ..variableName = name
     ..variableType = astType
@@ -1360,10 +1379,10 @@ ASTNode parseVariableDefinition(
     ..isSuperseding = isSuperseding;
 
   if (isEnum) {
-    var astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
+    final astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
     astType.scope = scope;
 
-    var type = initDataType()..type = DATATYPE.DATA_TYPE_ENUM;
+    final type = initDataType()..type = DATATYPE.DATA_TYPE_ENUM;
     astType.typeValue = type;
 
     astVarDef.variableType = astType;
@@ -1375,7 +1394,7 @@ ASTNode parseVariableDefinition(
   if (parser.curToken.value == 'follows') {
     eat(parser, TokenType.TOKEN_ID);
 
-    VariableNode superClass =
+    final VariableNode superClass =
         initASTWithLine(VariableNode(), parser.lexer.lineNum)
           ..scope = scope
           ..variableName = parser.curToken.value;
@@ -1411,7 +1430,8 @@ ASTNode parseVariableDefinition(
   }
 
   if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-    if (isEnum) parserSyntaxError(parser);
+    if (isEnum)
+      parserSyntaxError(parser);
 
     eat(parser, TokenType.TOKEN_EQUAL);
 
@@ -1419,10 +1439,10 @@ ASTNode parseVariableDefinition(
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      var ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = astVarDef.variableValue;
       eat(parser, TokenType.TOKEN_ID);
-      var varAST = parseVariable(parser, scope);
+      final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
           ? parseFuncCall(parser, scope, varAST)
           : varAST;
@@ -1437,7 +1457,7 @@ ASTNode parseVariableDefinition(
           if (isConst)
             parser.lexer.program = parser.lexer.program.replaceAll(
                 RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'),
-                '${astVarDef.variableValue.stringValue}');
+                  astVarDef.variableValue.stringValue);
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
           parserTypeError(parser);
@@ -1447,8 +1467,8 @@ ASTNode parseVariableDefinition(
           astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
           astVarDef.variableType = astType;
           if (isConst)
-            parser.lexer.program = parser.lexer.program.replaceAll(
-                name, '${astVarDef.variableValue.strBuffer.toString()}');
+            parser.lexer.program = parser.lexer.program.replaceAll(name,
+                astVarDef.variableValue.strBuffer.toString());
         }
         if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
           parserTypeError(parser);
@@ -1523,7 +1543,7 @@ ASTNode parseVariableDefinition(
 ASTNode parseStrBuffer(Parser parser, Scope scope,
     [bool isConst = false, bool isFinal = false]) {
   eat(parser, TokenType.TOKEN_LPAREN);
-  ASTNode strBufferAST = initASTWithLine(StrBufferNode(), parser.lexer.lineNum)
+  final ASTNode strBufferAST = initASTWithLine(StrBufferNode(), parser.lexer.lineNum)
     ..strBuffer = StringBuffer(parser.curToken.value)
     ..isFinal = isFinal;
 

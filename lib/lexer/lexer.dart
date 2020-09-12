@@ -11,7 +11,7 @@ class Lexer {
 
 /// Initializes and returns a new lexer
 Lexer initLexer(String program) {
-  var lexer = Lexer()
+  final lexer = Lexer()
     ..program = program.trim()
     ..currentIndex = 0
     ..lineNum = 1;
@@ -25,9 +25,10 @@ Token getNextToken(Lexer lexer) {
   while (
       lexer.currentIndex < lexer.program.length && lexer.currentChar != null) {
     // Skip
-    if (lexer.currentChar == ' ' ||
-        lexer.currentChar == '\n' ||
-        lexer.currentChar == '\r') skipWhitespace(lexer);
+    if (lexer.currentChar == ' '
+        || lexer.currentChar == '\n'
+        || lexer.currentChar == '\r')
+      skipWhitespace(lexer);
 
     // Collect a num
     if (isNumeric(lexer.currentChar)) {
@@ -305,8 +306,8 @@ bool isAtEnd(Lexer lexer) {
 
 /// Advances while returning a Token
 Token advanceWithToken(Lexer lexer, TokenType type) {
-  String value = lexer.currentChar;
-  Token token = initToken(type, value);
+  final String value = lexer.currentChar;
+  final Token token = initToken(type, value);
 
   advance(lexer);
   skipWhitespace(lexer);
@@ -327,8 +328,12 @@ void skipWhitespace(Lexer lexer) {
   while (lexer.currentChar == ' ' ||
       lexer.currentChar == '\n' ||
       lexer.currentChar == '\r') {
-    if (lexer.currentChar == '') return;
-    if (lexer.currentChar == '\n') ++lexer.lineNum;
+
+    if (lexer.currentChar == '')
+      return;
+
+    if (lexer.currentChar == '\n')
+      ++lexer.lineNum;
     advance(lexer);
   }
 }
@@ -363,7 +368,7 @@ Token collectString(Lexer lexer, [bool isRaw = false]) {
   expect(lexer, '"');
   advance(lexer);
 
-  int initialIndex = lexer.currentIndex;
+  final int initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '"') {
     if (lexer.currentIndex == lexer.program.length - 1)
@@ -373,8 +378,8 @@ Token collectString(Lexer lexer, [bool isRaw = false]) {
     advance(lexer);
   }
 
-  String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -386,7 +391,7 @@ Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
   expect(lexer, '\'');
   advance(lexer);
 
-  int initialIndex = lexer.currentIndex;
+  final int initialIndex = lexer.currentIndex;
 
   while (lexer.currentChar != '\'') {
     if (lexer.currentIndex == lexer.program.length - 1)
@@ -396,8 +401,8 @@ Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
     advance(lexer);
   }
 
-  String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -470,12 +475,14 @@ Token collectNumber(Lexer lexer) {
 
 /// Collects identifiers
 Token collectId(Lexer lexer, [String prefix = '']) {
-  int initialIndex = lexer.currentIndex;
+  final int initialIndex = lexer.currentIndex;
 
   // Identifiers can only start with `_` or any alphabet
   if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
     advance(lexer);
-    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar)) advance(lexer);
+
+    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar))
+      advance(lexer);
   }
 
   // Nullable?
@@ -489,9 +496,11 @@ Token collectId(Lexer lexer, [String prefix = '']) {
 
 /// Check if the character is numeric
 bool isNumeric(String s) {
-  return s == null
-      ? false
-      : double.tryParse(s) != null || int.tryParse(s) != null;
+  if (s == null) {
+    return false;
+  } else {
+    return double.tryParse(s) != null || int.tryParse(s) != null;
+  }
 }
 
 extension on String {

@@ -7,10 +7,10 @@ import 'package:test/test.dart' as test;
 
 void main() {
   test.test("Parser doesn't crash" , () {
-    Lexer lexer = initLexer(
+    final Lexer lexer = initLexer(
         File('./test/TestPrograms/test_parser.birb').readAsStringSync());
-    Parser parser = initParser(lexer);
-    ASTNode ast = parse(parser);
+    final Parser parser = initParser(lexer);
+    final ASTNode ast = parse(parser);
 
     assert(parser != null);
     test.expect(ast.type, test.equals(ASTType.AST_COMPOUND));

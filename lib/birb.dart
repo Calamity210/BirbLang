@@ -13,7 +13,7 @@ Future<void> main(List<String> arguments) async {
   final isInteractive = arguments.isEmpty;
 
   /// Runtime visitor
-  Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
+  final Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
 
   Lexer lexer;
 
@@ -42,7 +42,7 @@ Future<void> main(List<String> arguments) async {
       try {
         if (RegExp('{').allMatches(str).length <
             RegExp('}').allMatches(str).length) {
-          throw UnexpectedTokenException('Unexpected token `}`');
+          throw const UnexpectedTokenException('Unexpected token `}`');
         }
 
         // Exit shell
@@ -56,7 +56,8 @@ Future<void> main(List<String> arguments) async {
         node = parse(parser);
         await visit(runtime, node);
       } catch (e) {
-        if (e is! BirbException) rethrow;
+        if (e is! BirbException)
+          rethrow;
         stderr.write(e);
       }
     }
@@ -66,14 +67,14 @@ Future<void> main(List<String> arguments) async {
   }
 
   // Initialize and run program
-  String program = File(arguments[0]).readAsStringSync().trim();
+  final String program = File(arguments[0]).readAsStringSync().trim();
 
   try {
     if (RegExp('{').allMatches(program).length !=
         RegExp('}').allMatches(program).length) {
-      int lParenCount = RegExp('{').allMatches(program).length;
-      Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
-      int rParenCount = rParenMatches.length;
+      final int lParenCount = RegExp('{').allMatches(program).length;
+      final Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
+      final int rParenCount = rParenMatches.length;
 
       if (lParenCount > rParenCount) {
         throw UnexpectedTokenException(
@@ -95,7 +96,8 @@ Future<void> main(List<String> arguments) async {
     node = parse(parser);
     await visit(runtime, node);
   } catch (e) {
-    if (e is! BirbException) rethrow;
+    if (e is! BirbException)
+      rethrow;
     stderr.write(e);
   }
 }

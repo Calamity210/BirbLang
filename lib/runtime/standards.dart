@@ -19,7 +19,7 @@ import 'package:Birb/runtime/runtime.dart';
 String filePath = '';
 ASTNode INITIALIZED_NOOP;
 
-void initStandards(Runtime runtime, String path) async {
+Future<void> initStandards(Runtime runtime, String path) async {
   if (path != null) {
     filePath = path.replaceAllMapped(RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
   }
@@ -50,18 +50,18 @@ void initStandards(Runtime runtime, String path) async {
 Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
-  ASTNode astStr = args[0];
+  final ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
-    String fileName = astStr.stringValue.split(':')[1];
+    final String fileName = astStr.stringValue.split(':')[1];
 
-    Lexer lexer = initLexer(File('${Directory.current.path}/core/$fileName/$fileName.birb').readAsStringSync());
-    Parser parser = initParser(lexer);
-    ASTNode node = parse(parser);
+    final Lexer lexer = initLexer(File('${Directory.current.path}/core/$fileName/$fileName.birb').readAsStringSync());
+    final Parser parser = initParser(lexer);
+    final ASTNode node = parse(parser);
     await visit(runtime, node);
 
     return AnyNode();
   } else if (astStr.stringValue.startsWith('dart:')) {
-  String fileName = astStr.stringValue.replaceAll('dart:', '');
+  final String fileName = astStr.stringValue.replaceAll('dart:', '');
 
     switch (fileName) {
       case 'convert':
@@ -83,21 +83,21 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     return INITIALIZED_NOOP;
   } else if (astStr.stringValue.startsWith(RegExp('https?://'))) {
     if (!astStr.stringValue.endsWith('.birb'))
-      throw UnexpectedTokenException('Cannot import non-birb files.');
+      throw const UnexpectedTokenException('Cannot import non-birb files.');
 
-    Response response = await get(astStr.stringValue);
-    Lexer lexer = initLexer(response.body);
-    Parser parser = initParser(lexer);
-    ASTNode node = parse(parser);
+    final Response response = await get(astStr.stringValue);
+    final Lexer lexer = initLexer(response.body);
+    final Parser parser = initParser(lexer);
+    final ASTNode node = parse(parser);
     await visit(runtime, node);
 
     return AnyNode();
   }
-  String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
+  final String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
 
-  Lexer lexer = initLexer(File(filename).readAsStringSync());
-  Parser parser = initParser(lexer);
-  ASTNode node = parse(parser);
+  final Lexer lexer = initLexer(File(filename).readAsStringSync());
+  final Parser parser = initParser(lexer);
+  final ASTNode node = parse(parser);
   await visit(runtime, node);
 
   return AnyNode();
@@ -114,17 +114,17 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${(varDef).variableName}: ${astToString((varDef).variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stdout.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    var str = astToString(astArg);
+    final str = astToString(astArg);
 
     if (str == null)
-      throw UnexpectedTokenException('Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stdout.write(str);
   }
@@ -150,10 +150,10 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       return INITIALIZED_NOOP;
     }
 
-    var str = astToString(astArg);
+    final str = astToString(astArg);
 
     if (str == null)
-      throw UnexpectedTokenException('Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     print(str);
   }
@@ -165,12 +165,12 @@ ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
   if (args[0] is! StringNode)
     throw UnexpectedTypeException('Error [Line ${self.lineNum}]: scremF expects the first parameter to be a String');
 
-  StringNode strAST = args[0];
+  final StringNode strAST = args[0];
 
     String str = astToString(strAST);
     
     str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
-      int index = int.parse(match.group(1));
+      final int index = int.parse(match.group(1));
       return astToString(args[index + 1]);
     });
 
@@ -195,17 +195,17 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${(varDef).variableName}: ${astToString((varDef).variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stderr.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    var str = astToString(astArg);
+    final str = astToString(astArg);
 
     if (str == null)
-      throw UnexpectedTokenException('Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stderr.write(str);
   }
@@ -224,17 +224,17 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${(varDef).variableName}: ${astToString((varDef).variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stderr.write('$classToString\n');
       return INITIALIZED_NOOP;
     }
 
-    var str = astToString(astArg);
+    final str = astToString(astArg);
 
     if (str == null)
-      throw UnexpectedTokenException('Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stderr.write('$str\n');
   }
@@ -244,62 +244,61 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
 /// STDIN
 ASTNode funcMock(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  var astString = StringNode();
+  final astString = StringNode();
   astString.stringValue =
       stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
   return astString;
 }
 
-/**
- * DATE AND TIME
- */
+/// DATE AND TIME
+
 ASTNode dateClass(Runtime runtime) {
-  var astObj = ClassNode();
+  final astObj = ClassNode();
 
   // ADD YEAR TO DATE OBJECT
-  var astVarYear = VarDefNode();
+  final VarDefNode astVarYear = VarDefNode();
   astVarYear.variableName = 'year';
   astVarYear.variableType = TypeNode();
   astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntYear = IntNode();
+  final IntNode astIntYear = IntNode();
   astIntYear.intVal = DateTime.now().year;
   astVarYear.variableValue = astIntYear;
 
   astObj.classChildren.add(astVarYear);
 
   // ADD MONTH TO DATE OBJECT
-  var astVarMonth = VarDefNode();
+  final VarDefNode astVarMonth = VarDefNode();
   astVarMonth.variableName = 'month';
   astVarMonth.variableType = TypeNode();
   astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntMonth = IntNode();
+  final IntNode astIntMonth = IntNode();
   astIntMonth.intVal = DateTime.now().month;
   astVarMonth.variableValue = astIntMonth;
 
   astObj.classChildren.add(astVarMonth);
 
   // ADD DAYS TO DATE OBJECT
-  var astVarDay = VarDefNode();
+  final VarDefNode astVarDay = VarDefNode();
   astVarDay.variableName = 'day';
   astVarDay.variableType = TypeNode();
   astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntDay = IntNode();
+  final IntNode astIntDay = IntNode();
   astIntDay.intVal = DateTime.now().day;
   astVarDay.variableValue = astIntDay;
 
   astObj.classChildren.add(astVarDay);
 
   // ADD DAYS TO DATE OBJECT
-  var astVarWeekDay = VarDefNode();
+  final VarDefNode astVarWeekDay = VarDefNode();
   astVarWeekDay.variableName = 'weekday';
   astVarWeekDay.variableType = TypeNode();
   astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntWeekDay = IntNode();
+  final IntNode astIntWeekDay = IntNode();
   astIntWeekDay.intVal = DateTime.now().weekday;
   astVarWeekDay.variableValue = astIntWeekDay;
 
@@ -309,54 +308,54 @@ ASTNode dateClass(Runtime runtime) {
 }
 
 ASTNode timeClass(Runtime runtime) {
-  var astObj = ClassNode();
+  final ClassNode astObj = ClassNode();
   astObj.variableType = TypeNode();
   astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD HOURS TO TIME OBJECT
-  var astVarHour = VarDefNode();
+  final VarDefNode astVarHour = VarDefNode();
   astVarHour.variableName = 'hour';
   astVarHour.variableType = TypeNode();
   astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntHour = IntNode();
+  final IntNode astIntHour = IntNode();
   astIntHour.intVal = DateTime.now().hour;
   astVarHour.variableValue = astIntHour;
 
   astObj.classChildren.add(astVarHour);
 
   // ADD MINUTES TO TIME OBJECT
-  var astVarMinute = VarDefNode();
+  final VarDefNode astVarMinute = VarDefNode();
   astVarMinute.variableName = 'minute';
   astVarMinute.variableType = TypeNode();
   astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntMinute = IntNode();
+  final IntNode astIntMinute = IntNode();
   astIntMinute.intVal = DateTime.now().minute;
   astVarHour.variableValue = astIntMinute;
 
   astObj.classChildren.add(astVarMinute);
 
   // ADD SECONDS TO TIME OBJECT
-  var astVarSeconds = VarDefNode();
+  final VarDefNode astVarSeconds = VarDefNode();
   astVarSeconds.variableName = 'second';
   astVarSeconds.variableType = TypeNode();
   astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntSeconds = IntNode();
+  final IntNode astIntSeconds = IntNode();
   astIntSeconds.intVal = DateTime.now().second;
   astVarSeconds.variableValue = astIntSeconds;
 
   astObj.classChildren.add(astVarSeconds);
 
   // ADD MILLISECONDS TO TIME OBJECT
-  var astVarMilliSeconds = VarDefNode();
+  final VarDefNode astVarMilliSeconds = VarDefNode();
   astVarMilliSeconds.variableName = 'milliSecond';
   astVarMilliSeconds.variableType = TypeNode();
   astVarMilliSeconds.variableType.typeValue =
       initDataTypeAs(DATATYPE.DATA_TYPE_INT);
 
-  var astIntMilliSeconds = IntNode();
+  final IntNode astIntMilliSeconds = IntNode();
   astIntMilliSeconds.intVal = DateTime.now().millisecond;
   astVarMilliSeconds.variableValue = astIntMilliSeconds;
 
@@ -366,39 +365,39 @@ ASTNode timeClass(Runtime runtime) {
 }
 
 ASTNode doubleClass(Runtime runtime) {
-  var astObj = ClassNode();
+  final ClassNode astObj = ClassNode();
 
   // INFINITY
-  var astVarInfinity = VarDefNode()
+  final VarDefNode astVarInfinity = VarDefNode()
     ..variableName = 'infinity'
     ..variableType = TypeNode()
     ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
 
-  var astInfinity = DoubleNode();
+  final DoubleNode astInfinity = DoubleNode();
   astInfinity.doubleVal = 1 / 0;
   astVarInfinity.variableValue = astInfinity;
 
   astObj.classChildren.add(astVarInfinity);
 
   // -INFINITY
-  var astVarNegInfinity = VarDefNode()
+  final VarDefNode astVarNegInfinity = VarDefNode()
     ..variableName = 'negInfinity'
     ..variableType = TypeNode()
     ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
 
-  var astNegInfinity = DoubleNode();
+  final DoubleNode astNegInfinity = DoubleNode();
   astNegInfinity.doubleVal = -1 / 0;
   astVarNegInfinity.variableValue = astNegInfinity;
 
   astObj.classChildren.add(astVarNegInfinity);
 
   // NaN
-  var astVarNaN = VarDefNode()
+  final VarDefNode astVarNaN = VarDefNode()
     ..variableName = 'nan'
     ..variableType = TypeNode()
     ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
 
-  var astNaN = DoubleNode();
+  final astNaN = DoubleNode();
   astNaN.doubleVal = 0 / 0;
 
   astVarNaN.variableValue = astNaN;
@@ -406,12 +405,12 @@ ASTNode doubleClass(Runtime runtime) {
   astObj.classChildren.add(astVarNaN);
 
   // MAXFINITE
-  var astVarMaxFinite = VarDefNode()
+  final astVarMaxFinite = VarDefNode()
     ..variableName = 'maxFinite'
     ..variableType = TypeNode()
     ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
 
-  var astMaxFinite = DoubleNode();
+  final astMaxFinite = DoubleNode();
   astMaxFinite.doubleVal = 1.7976931348623157e+308;
 
   astVarMaxFinite.variableValue = astMaxFinite;
@@ -419,12 +418,12 @@ ASTNode doubleClass(Runtime runtime) {
   astObj.classChildren.add(astVarMaxFinite);
 
   // MINPOSITIVE
-  var astVarMinPositive = VarDefNode()
+  final astVarMinPositive = VarDefNode()
     ..variableName = 'minPositive'
     ..variableType = TypeNode()
     ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
 
-  var astMinPositive = DoubleNode();
+  final astMinPositive = DoubleNode();
   astMinPositive.doubleVal = 5e-324;
 
   astVarMinPositive.variableValue = astMinPositive;

@@ -12,32 +12,32 @@ void registerMath(Runtime runtime) {
 ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
 
-  ASTNode max = args[0];
+  final ASTNode max = args[0];
 
   if (max is IntNode) {
-    int randVal = Random().nextInt(max.intVal);
-    IntNode intNode = IntNode()..intVal = randVal..doubleVal = randVal.toDouble();
+    final int randVal = Random().nextInt(max.intVal);
+    final IntNode intNode = IntNode()..intVal = randVal..doubleVal = randVal.toDouble();
     return intNode;
   } else if (max is DoubleNode) {
-    double randVal = Random().nextDouble() * max.doubleVal;
-    DoubleNode doubleNode = DoubleNode()..doubleVal = randVal..intVal = randVal.toInt();
+    final double randVal = Random().nextDouble() * max.doubleVal;
+    final DoubleNode doubleNode = DoubleNode()..doubleVal = randVal..intVal = randVal.toInt();
 
     return doubleNode;
   } else if (max is StringNode) {
-    Random rand = Random();
+    final Random rand = Random();
     String result = '';
 
     for (int i = 0; i < max.stringValue.length; i++) {
-      int randVal = 65 + rand.nextInt(65);
+      final int randVal = 65 + rand.nextInt(65);
       result += String.fromCharCode(randVal);
     }
 
-    StringNode strNode = StringNode()..stringValue = result;
+    final StringNode strNode = StringNode()..stringValue = result;
     return strNode;
   } else if (max is BoolNode) {
-    BoolNode boolNode = BoolNode()..boolVal = Random().nextBool();
+    final BoolNode boolNode = BoolNode()..boolVal = Random().nextBool();
     return boolNode;
   }
 
-  throw UnexpectedTypeException('The rand method only takes [String, double, int, and bool] argument types');
+  throw const UnexpectedTypeException('The rand method only takes [String, double, int, and bool] argument types');
 }

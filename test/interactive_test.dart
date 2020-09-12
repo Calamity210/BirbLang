@@ -26,6 +26,6 @@ void main() {
       test.expect(await process.exitCode, test.equals(0),
           reason: 'non-zero exit code');
     },
-    timeout: test.Timeout(Duration(seconds: 5)),
+    timeout: const test.Timeout(Duration(seconds: 5)),
   );
 }

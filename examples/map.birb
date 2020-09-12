@@ -2,11 +2,11 @@ Map map = {
     "content": "This is a message"
 };
 
+// Properties
 scremLn(map["content"]); // output This is a message
 scremLn(map.isEmpty); // output false
 scremLn(map.isNotEmpty); // output true
 scremLn(map.length); // output 1
-scremLn(map.hashCode.runtimeType); // output int
 
 // Methods
 scremLn(map.toString()); // output {content: This is a message}

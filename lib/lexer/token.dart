@@ -57,7 +57,7 @@ class Token {
 }
 
 Token initToken(TokenType type, String value) {
-  var token = Token()
+  final token = Token()
     ..type = type
     ..value = value;
   return token;

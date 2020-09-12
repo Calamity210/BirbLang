@@ -7,41 +7,34 @@ ASTNode visitMapProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'runtimeType':
       {
-        StringNode stringAST = StringNode()
-          ..stringValue = left.map.runtimeType.toString();
+        final StringNode stringAST = StringNode()
+          ..stringValue = 'Map';
         return stringAST;
       }
 
     case 'isEmpty':
       {
-        ASTNode astBool = BoolNode()..boolVal = left.map.isEmpty;
+        final ASTNode astBool = BoolNode()..boolVal = left.map.isEmpty;
 
         return astBool;
       }
 
     case 'isNotEmpty':
       {
-        ASTNode astBool = BoolNode()..boolVal = left.map.isNotEmpty;
+        final ASTNode astBool = BoolNode()..boolVal = left.map.isNotEmpty;
 
         return astBool;
       }
 
     case 'length':
       {
-        ASTNode astInt = IntNode()..intVal = left.map.length;
-
-        return astInt;
-      }
-
-    case 'hashCode':
-      {
-        ASTNode astInt = IntNode()..intVal = left.map.hashCode;
+        final ASTNode astInt = IntNode()..intVal = left.map.length;
 
         return astInt;
       }
 
     default:
-      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'map');
+      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'Map');
   }
 }
 
@@ -50,14 +43,13 @@ ASTNode visitMapMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
       {
-        ASTNode strAST = StringNode()..stringValue = left.map.toString();
+        final ASTNode strAST = StringNode()..stringValue = left.map.toString();
         return strAST;
       }
 
     default:
       {
-        throw NoSuchMethodException(
-            node.binaryOpRight.funcCallExpression.variableName, 'StrBuffer');
+        throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'Map');
       }
   }
 }
