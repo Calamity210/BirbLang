@@ -44,7 +44,7 @@ export default [
 },
 {
   path: '/search',
-  component: ComponentCreator('/search','722'),
+  component: ComponentCreator('/search','53f'),
   exact: true,
 },
 {
