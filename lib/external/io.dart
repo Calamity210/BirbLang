@@ -34,7 +34,7 @@ ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
   return INITIALIZED_NOOP;
 }
 
-ASTNode funcCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
+StringNode funcCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
   StringNode res = StringNode();
   Directory current = Directory.current;
 
@@ -42,7 +42,7 @@ ASTNode funcCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
   return res;
 }
 
-Future<ASTNode> funcSystem(
+Future<MapNode> funcSystem(
     Runtime runtime, ASTNode self, List<ASTNode> args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_LIST]);
 
