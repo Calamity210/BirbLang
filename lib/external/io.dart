@@ -9,7 +9,8 @@ import 'package:Birb/utils/scope.dart';
 void registerIO(Runtime runtime) {
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'free', funcFree);
-  registerGlobalFunction(runtime, 'system', funcSystem);
+  registerGlobalFunction(runtime, 'cwd', funcCwd);
+  registerGlobalFutureFunction(runtime, 'system', funcSystem);
 }
 
 ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
@@ -33,8 +34,35 @@ ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
   return INITIALIZED_NOOP;
 }
 
-ASTNode funcSystem(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  String executable = args[0].toString().split(' ')[0];
-  List arguments = args[0].toString().split(' ');
-  Process.run(args[0].toString(), args[1].listElements);
+ASTNode funcCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
+  StringNode res = StringNode();
+  Directory current = Directory.current;
+
+  res.stringValue = current.path.toString();
+  return res;
+}
+
+Future<ASTNode> funcSystem(
+    Runtime runtime, ASTNode self, List<ASTNode> args) async {
+  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_LIST]);
+
+  Map<String, dynamic> result = {
+    'errorCode': null,
+    'stdout': null,
+    'stderr': null
+  };
+
+  MapNode res = MapNode();
+
+  await Process.run(args[0].stringValue,
+          args[1].listElements.map((e) => e.toString()).toList())
+      .then((ProcessResult pr) {
+    result['exitCode'] = pr.exitCode.toString();
+    result['stdout'] = pr.stdout.toString();
+    result['stderr'] = pr.stderr.toString();
+  });
+
+  res.map = result;
+
+  return res;
 }

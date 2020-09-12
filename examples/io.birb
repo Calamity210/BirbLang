@@ -1,3 +1,6 @@
 grab("birb:io");
 
-system("where", ["dart"]);
+scremLn(cwd());
+scremLn(system("where", ["dart"]));
+
+exit(0);
