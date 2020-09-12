@@ -9,6 +9,7 @@ import 'package:Birb/utils/scope.dart';
 void registerIO(Runtime runtime) {
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'free', funcFree);
+  registerGlobalFunction(runtime, 'system', funcSystem);
 }
 
 ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
@@ -23,11 +24,17 @@ ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
   Scope scope = getScope(runtime, self);
 
   args.forEach((arg) {
-    if (arg is! VariableNode)
-      return;
+    if (arg is! VariableNode) return;
 
-    scope.variableDefinitions.removeWhere((varDef) => varDef.variableName == arg.variableName);
+    scope.variableDefinitions
+        .removeWhere((varDef) => varDef.variableName == arg.variableName);
   });
 
   return INITIALIZED_NOOP;
+}
+
+ASTNode funcSystem(Runtime runtime, ASTNode self, List<ASTNode> args) {
+  String executable = args[0].toString().split(' ')[0];
+  List arguments = args[0].toString().split(' ');
+  Process.run(args[0].toString(), args[1].listElements);
 }
