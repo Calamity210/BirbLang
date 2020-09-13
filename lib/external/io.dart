@@ -9,8 +9,7 @@ import 'package:Birb/utils/scope.dart';
 void registerIO(Runtime runtime) {
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'free', funcFree);
-  registerGlobalVariable(runtime, 'cwd',
-      StringNode()..stringValue = Directory.current.absolute.path.toString());
+  registerGlobalFunction(runtime, 'getCwd', funcGetCwd);
   registerGlobalFutureFunction(runtime, 'system', funcSystem);
 }
 
@@ -20,6 +19,10 @@ ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
   final exitAST = args[0];
 
   exit(exitAST.intVal);
+}
+
+StringNode funcGetCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
+  return StringNode()..stringValue = Directory.current.absolute.path.toString();
 }
 
 ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
@@ -53,9 +56,9 @@ Future<MapNode> funcSystem(
       args[1].listElements.map((e) => e.toString()).toList(),
       runInShell: shell);
 
-  result['errorCode'] = pr.exitCode;
-  result['stdout'] = pr.stdout;
-  result['sterr'] = pr.stderr;
+  result['errorCode'] = pr.exitCode.toString();
+  result['stdout'] = pr.stdout.toString();
+  result['sterr'] = pr.stderr.toString();
 
   res.map = result;
 
