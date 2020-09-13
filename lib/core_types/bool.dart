@@ -3,8 +3,6 @@ import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
-import '../utils/ast/ast_node.dart';
-
 /// Visits properties for `Bool`s
 ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {

@@ -9,9 +9,6 @@ import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/standards.dart';
 import 'package:Birb/lexer/token.dart';
 
-import '../core_types/core_types.dart';
-import '../utils/ast/ast_node.dart';
-
 class Runtime {
   Scope scope;
   List listMethods;
