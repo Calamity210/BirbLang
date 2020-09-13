@@ -6,14 +6,28 @@ import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';
 import 'package:Birb/runtime/runtime.dart';
+import 'package:Birb/package_manager.dart';
 
 Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will
-  /// start up allowing developers to write programs directly from their terminal
-  final isInteractive = arguments.isEmpty;
+  /// start up allowing developers to write programs directly from their terminal\
 
+  if (arguments[0] != 'install') {
+    run(arguments.isEmpty, arguments);
+  } else {
+    print(arguments.length);
+    if (arguments.length != 2)
+      throw ArgumentError('Expected 1 argument but 0 were passed :(');
+    else {
+      install(arguments[1]);
+    }
+  }
+}
+
+Future<void> run(isInteractive, arguments) async {
   /// Runtime visitor
-  final Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
+  final Runtime runtime =
+      isInteractive ? initRuntime('') : initRuntime(arguments[0]);
 
   Lexer lexer;
 
@@ -56,8 +70,7 @@ Future<void> main(List<String> arguments) async {
         node = parse(parser);
         await visit(runtime, node);
       } catch (e) {
-        if (e is! BirbException)
-          rethrow;
+        if (e is! BirbException) rethrow;
         stderr.write(e);
       }
     }
@@ -73,7 +86,8 @@ Future<void> main(List<String> arguments) async {
     if (RegExp('{').allMatches(program).length !=
         RegExp('}').allMatches(program).length) {
       final int lParenCount = RegExp('{').allMatches(program).length;
-      final Iterable<RegExpMatch> rParenMatches = RegExp('}').allMatches(program);
+      final Iterable<RegExpMatch> rParenMatches =
+          RegExp('}').allMatches(program);
       final int rParenCount = rParenMatches.length;
 
       if (lParenCount > rParenCount) {
@@ -96,8 +110,7 @@ Future<void> main(List<String> arguments) async {
     node = parse(parser);
     await visit(runtime, node);
   } catch (e) {
-    if (e is! BirbException)
-      rethrow;
+    if (e is! BirbException) rethrow;
     stderr.write(e);
   }
 }
