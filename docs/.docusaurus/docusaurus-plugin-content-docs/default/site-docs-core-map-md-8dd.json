@@ -1,0 +1,23 @@
+{
+  "unversionedId": "Core/map",
+  "id": "Core/map",
+  "isDocsHomePage": false,
+  "title": "Map",
+  "description": "A Map is a dictionary of key/value pairs, in which you can get a value associated with its key.",
+  "source": "@site/docs\\Core\\map.md",
+  "slug": "/Core/map",
+  "permalink": "/docs/Core/map",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/map.md",
+  "version": "current",
+  "lastUpdatedBy": "Author",
+  "lastUpdatedAt": 1539502055,
+  "sidebar": "BirbLang",
+  "previous": {
+    "title": "String",
+    "permalink": "/docs/Core/string"
+  },
+  "next": {
+    "title": "Contributing",
+    "permalink": "/docs/contributing"
+  }
+}

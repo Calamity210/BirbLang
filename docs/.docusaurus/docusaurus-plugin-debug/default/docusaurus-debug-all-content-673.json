@@ -8,8 +8,8 @@
           "versionPath": "/docs",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
-          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\docs",
+          "sidebarFilePath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebars.js",
+          "docsDirPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\docs",
           "mainDocId": "tour",
           "sidebars": {
             "BirbLang": [
@@ -30,6 +30,10 @@
                       {
                         "type": "doc",
                         "id": "Core/string"
+                      },
+                      {
+                        "type": "doc",
+                        "id": "Core/map"
                       }
                     ]
                   }
@@ -50,6 +54,7 @@
           },
           "permalinkToSidebar": {
             "/docs/contributing": "BirbLang",
+            "/docs/Core/map": "BirbLang",
             "/docs/Core/string": "BirbLang",
             "/docs/": "BirbLang"
           },
@@ -70,8 +75,31 @@
               "sidebar_label": "Contributing",
               "sidebar": "BirbLang",
               "previous": {
+                "title": "Map",
+                "permalink": "/docs/Core/map"
+              }
+            },
+            {
+              "unversionedId": "Core/map",
+              "id": "Core/map",
+              "isDocsHomePage": false,
+              "title": "Map",
+              "description": "A Map is a dictionary of key/value pairs, in which you can get a value associated with its key.",
+              "source": "@site/docs\\Core\\map.md",
+              "slug": "/Core/map",
+              "permalink": "/docs/Core/map",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/map.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "BirbLang",
+              "previous": {
                 "title": "String",
                 "permalink": "/docs/Core/string"
+              },
+              "next": {
+                "title": "Contributing",
+                "permalink": "/docs/contributing"
               }
             },
             {
@@ -93,8 +121,8 @@
                 "permalink": "/docs/"
               },
               "next": {
-                "title": "Contributing",
-                "permalink": "/docs/contributing"
+                "title": "Map",
+                "permalink": "/docs/Core/map"
               }
             },
             {
@@ -129,8 +157,8 @@
           "versionPath": "/community",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
-          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\community",
+          "sidebarFilePath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
+          "docsDirPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\community",
           "mainDocId": "support",
           "sidebars": {
             "community": [
