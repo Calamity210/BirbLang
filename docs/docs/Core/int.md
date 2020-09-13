@@ -75,7 +75,7 @@ bool isNegative = number.isNegative; // false
 
 ### isOdd
 
-`bool isodd`
+`bool isOdd`
 
 True if the number is odd.
 
@@ -89,7 +89,7 @@ bool isOdd = number.isOdd; // false
 
 `int sign`
 
-Returns the sign of this integer.
+Returns the sign of this integer. Returns 0, -1 for values less than zero and +1 for values greater than zero.
 
 **Example**
 ```dart
@@ -101,7 +101,7 @@ bool signValue = number.sign; // 1
 
 `String runtimeType`
 
-Return the runtime type of this
+Returns the runtime type of this
 
 **Example**
 ```dart
