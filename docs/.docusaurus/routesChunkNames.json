@@ -36,7 +36,7 @@
     "component": "component---theme-doc-item-178-a40",
     "content": "content---community-supportf-9-f-7f2"
   },
-  "/docs-d1f": {
+  "/docs-1b4": {
     "component": "component---theme-doc-page-1-be-9be",
     "versionMetadata": "versionMetadata---docsf-97-b71"
   },
@@ -47,6 +47,10 @@
   "/docs/contributing-024": {
     "component": "component---theme-doc-item-178-a40",
     "content": "content---docs-contributing-14-d-d29"
+  },
+  "/docs/Core/int-d0a": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---docs-core-int-145-bbe"
   },
   "/docs/Core/map-5a1": {
     "component": "component---theme-doc-item-178-a40",

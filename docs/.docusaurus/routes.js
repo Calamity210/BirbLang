@@ -61,7 +61,7 @@ export default [
 },
 {
   path: '/docs',
-  component: ComponentCreator('/docs','d1f'),
+  component: ComponentCreator('/docs','1b4'),
   
   routes: [
 {
@@ -72,6 +72,11 @@ export default [
 {
   path: '/docs/contributing',
   component: ComponentCreator('/docs/contributing','024'),
+  exact: true,
+},
+{
+  path: '/docs/Core/int',
+  component: ComponentCreator('/docs/Core/int','d0a'),
   exact: true,
 },
 {

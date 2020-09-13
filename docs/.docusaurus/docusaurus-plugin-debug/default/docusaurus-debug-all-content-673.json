@@ -33,6 +33,10 @@
                       },
                       {
                         "type": "doc",
+                        "id": "Core/int"
+                      },
+                      {
+                        "type": "doc",
                         "id": "Core/map"
                       }
                     ]
@@ -54,6 +58,7 @@
           },
           "permalinkToSidebar": {
             "/docs/contributing": "BirbLang",
+            "/docs/Core/int": "BirbLang",
             "/docs/Core/map": "BirbLang",
             "/docs/Core/string": "BirbLang",
             "/docs/": "BirbLang"
@@ -80,6 +85,29 @@
               }
             },
             {
+              "unversionedId": "Core/int",
+              "id": "Core/int",
+              "isDocsHomePage": false,
+              "title": "int",
+              "description": "An integer number.",
+              "source": "@site/docs\\Core\\int.md",
+              "slug": "/Core/int",
+              "permalink": "/docs/Core/int",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/int.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "BirbLang",
+              "previous": {
+                "title": "String",
+                "permalink": "/docs/Core/string"
+              },
+              "next": {
+                "title": "Map",
+                "permalink": "/docs/Core/map"
+              }
+            },
+            {
               "unversionedId": "Core/map",
               "id": "Core/map",
               "isDocsHomePage": false,
@@ -94,8 +122,8 @@
               "lastUpdatedAt": 1539502055,
               "sidebar": "BirbLang",
               "previous": {
-                "title": "String",
-                "permalink": "/docs/Core/string"
+                "title": "int",
+                "permalink": "/docs/Core/int"
               },
               "next": {
                 "title": "Contributing",
@@ -121,8 +149,8 @@
                 "permalink": "/docs/"
               },
               "next": {
-                "title": "Map",
-                "permalink": "/docs/Core/map"
+                "title": "int",
+                "permalink": "/docs/Core/int"
               }
             },
             {

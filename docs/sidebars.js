@@ -6,8 +6,12 @@ module.exports = {
         items: [
         'tour',
             {
-                Core: ['Core/string', 'Core/map'],
-            },
+                Core: [
+                'Core/string', 
+                'Core/int',
+                'Core/map',
+              ],
+            }
         ],
       },
         {

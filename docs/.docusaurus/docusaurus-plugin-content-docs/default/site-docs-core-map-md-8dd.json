@@ -13,8 +13,8 @@
   "lastUpdatedAt": 1539502055,
   "sidebar": "BirbLang",
   "previous": {
-    "title": "String",
-    "permalink": "/docs/Core/string"
+    "title": "int",
+    "permalink": "/docs/Core/int"
   },
   "next": {
     "title": "Contributing",
