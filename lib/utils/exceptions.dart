@@ -4,8 +4,9 @@ abstract class BirbException implements Exception {}
 
 /// Thrown when trying to access a non-existent function
 class UndefinedFunctionException implements BirbException {
-  final String message;
   const UndefinedFunctionException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'UndefinedFunctionException: $message';
@@ -13,8 +14,9 @@ class UndefinedFunctionException implements BirbException {
 
 /// Thrown when trying to access a non-existent variable
 class UndefinedVariableException implements BirbException {
-  final String message;
   const UndefinedVariableException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'UndefinedVariableException: $message';
@@ -22,8 +24,9 @@ class UndefinedVariableException implements BirbException {
 
 /// Thrown when attempting to assign a value to a non-existent variable
 class AssigningUndefinedVariableException implements BirbException {
-  final String message;
   const AssigningUndefinedVariableException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'AssigningUndefinedVariableException: $message';
@@ -32,8 +35,9 @@ class AssigningUndefinedVariableException implements BirbException {
 /// Thrown when attempting to redefine an existing variable.
 /// Different from reassigning a value
 class MultipleVariableDefinitionsException implements BirbException {
-  final String message;
   const MultipleVariableDefinitionsException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'MultipleVariableDefinitionsException: $message';
@@ -41,8 +45,9 @@ class MultipleVariableDefinitionsException implements BirbException {
 
 /// Thrown when reassigning a value to a variable declared as `final`
 class ReassigningFinalVariableException implements BirbException {
-  final String message;
   const ReassigningFinalVariableException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'ReassigningFinalVariableException: $message';
@@ -50,8 +55,9 @@ class ReassigningFinalVariableException implements BirbException {
 
 /// Thrown when passing a wrong data type
 class UnexpectedTypeException implements BirbException {
-  final String message;
   const UnexpectedTypeException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'InvalidTypeException: $message';
@@ -59,8 +65,9 @@ class UnexpectedTypeException implements BirbException {
 
 /// Thrown when trying to access a non-existing map entry
 class MapEntryNotFoundException implements BirbException {
-  final String message;
   const MapEntryNotFoundException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'MapEntryNotFoundException: $message';
@@ -68,8 +75,9 @@ class MapEntryNotFoundException implements BirbException {
 
 /// Thrown when passing an index not within range
 class RangeException implements BirbException {
-  final String message;
   const RangeException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'RangeException: $message';
@@ -77,8 +85,9 @@ class RangeException implements BirbException {
 
 /// Thrown when passing invalid arguments
 class InvalidArgumentsException implements BirbException {
-  final String message;
   const InvalidArgumentsException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'InvalidArgumentsException: $message';
@@ -86,8 +95,9 @@ class InvalidArgumentsException implements BirbException {
 
 /// Thrown when a case/clause is uncaught
 class UncaughtStatementException implements BirbException {
-  final String message;
   const UncaughtStatementException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'UncaughtStatementException: $message';
@@ -95,8 +105,9 @@ class UncaughtStatementException implements BirbException {
 
 /// Thrown when no left value is provided
 class NoLeftValueException implements BirbException {
-  final String message;
   const NoLeftValueException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'NoLeftValueException: $message';
@@ -104,8 +115,9 @@ class NoLeftValueException implements BirbException {
 
 /// Thrown when attempting to use an invalid operator
 class InvalidOperatorException implements BirbException {
-  final String message;
   const InvalidOperatorException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'InvalidOperatorException: $message';
@@ -113,8 +125,9 @@ class InvalidOperatorException implements BirbException {
 
 /// Thrown when an `assert` fails
 class AssertionException implements BirbException {
-  final String message;
   const AssertionException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'AssertionException: $message';
@@ -122,8 +135,9 @@ class AssertionException implements BirbException {
 
 /// Thrown when an unexpected token is encountered by the lexer or parser
 class UnexpectedTokenException implements BirbException {
-  final String message;
   const UnexpectedTokenException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'UnexpectedTokenException: $message';
@@ -131,8 +145,9 @@ class UnexpectedTokenException implements BirbException {
 
 /// Thrown when the syntax is invalid
 class SyntaxException implements BirbException {
-  final String message;
   const SyntaxException(this.message);
+
+  final String message;
 
   @override
   String toString() => 'SyntaxException: $message';
@@ -140,11 +155,12 @@ class SyntaxException implements BirbException {
 
 /// Thrown when an unsupported datatype is placed in a map
 class JsonValueTypeException implements BirbException {
+  const JsonValueTypeException(this.key, this.type);
+
   // Birb only supports String keys as of yet
   final String key;
   final ASTType type;
 
-  const JsonValueTypeException(this.key, this.type);
 
   @override
   String toString() =>
@@ -154,10 +170,11 @@ class JsonValueTypeException implements BirbException {
 
 /// Thrown to indicate that a property was not found for the specified datatype
 class NoSuchPropertyException implements BirbException {
+  const NoSuchPropertyException(this.propertyName, this.typeName);
+
   final String propertyName;
   final String typeName;
 
-  const NoSuchPropertyException(this.propertyName, this.typeName);
 
   @override
   String toString() => 'NoSuchPropertyException: No such property `$propertyName` for `$typeName`';
@@ -165,10 +182,11 @@ class NoSuchPropertyException implements BirbException {
 
 /// Thrown to indicate that a method was not found for the specified datatype
 class NoSuchMethodException implements BirbException {
+  const NoSuchMethodException(this.methodName, this.typeName);
+
   final String methodName;
   final String typeName;
 
-  const NoSuchMethodException(this.methodName, this.typeName);
 
   @override
   String toString() => 'NoSuchMethodException: No such method `$methodName` for `$typeName`';

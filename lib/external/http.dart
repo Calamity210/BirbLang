@@ -16,14 +16,14 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   else
     runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_MAP]);
 
-  String url = (args[0]).stringValue;
-  Map headers = (args[1]).map;
+  final String url = (args[0]).stringValue;
+  final Map headers = (args[1]).map;
   ASTNode funcDef;
   ASTNode funCall;
 
   if (args.length == 3) {
     funcDef = args[2];
-    ASTNode funcCalExpr = VariableNode();
+    final ASTNode funcCalExpr = VariableNode();
     funcCalExpr.variableName = funcDef.funcName;
 
     funCall = FuncCallNode();
@@ -31,13 +31,14 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
     funCall.funcCallExpression = funcCalExpr;
   }
 
-  Map<String, String> head = {};
+  final Map<String, String> head = {};
   headers.forEach((key, value) => head[key] = (value as ASTNode).stringValue);
 
-  Response response = await get(url, headers: head);
-  if (args.length == 3) await visitFuncCall(runtime, funCall);
+  final Response response = await get(url, headers: head);
+  if (args.length == 3)
+    await visitFuncCall(runtime, funCall);
 
-  var astObj = ClassNode();
+  final astObj = ClassNode();
   astObj.variableType = TypeNode();
   astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
@@ -59,7 +60,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast.variableType = TypeNode();
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
 
-  var astListVal = ListNode();
+  final astListVal = ListNode();
   astListVal.listElements = response.bodyBytes;
   ast.variableValue = astListVal;
 
@@ -107,7 +108,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast.variableType = TypeNode();
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
 
-  var astMapVal = MapNode();
+  final astMapVal = MapNode();
   astMapVal.map = response.headers;
   ast.variableValue = astMapVal;
 
@@ -128,16 +129,16 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     runtimeExpectArgs(
         args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
 
-  String url = (args[0]).stringValue;
-  Map bodyEarly = (args[1]).map;
-  Map head = (args[2]).map;
+  final String url = (args[0]).stringValue;
+  final Map bodyEarly = (args[1]).map;
+  final Map head = (args[2]).map;
 
   ASTNode funcDef;
   ASTNode funCall;
 
   if (args.length == 4) {
     funcDef = args[3];
-    ASTNode funcCalExpr = VariableNode();
+    final ASTNode funcCalExpr = VariableNode();
     funcCalExpr.variableName = funcDef.funcName;
 
     funCall = FuncCallNode();
@@ -145,16 +146,17 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     funCall.funcCallExpression = funcCalExpr;
   }
 
-  Map<String, String> body = {};
+  final Map<String, String> body = {};
   bodyEarly.forEach((key, value) => body[key] = (value as ASTNode).stringValue);
 
-  Map<String, String> headers = {};
+  final Map<String, String> headers = {};
   head.forEach((key, value) => headers[key] = (value as ASTNode).stringValue);
 
-  Response response = await post(url, body: body, headers: headers);
-  if (args.length == 4) await visitCompound(runtime, funCall);
+  final Response response = await post(url, body: body, headers: headers);
+  if (args.length == 4)
+    await visitCompound(runtime, funCall);
 
-  var astObj = ClassNode();
+  final astObj = ClassNode();
   astObj.variableType = TypeNode();
   astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
 
@@ -176,7 +178,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast.variableType = TypeNode();
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
 
-  var astListVal = ListNode();
+  final astListVal = ListNode();
   astListVal.listElements = response.bodyBytes;
   ast.variableValue = astListVal;
 
@@ -224,7 +226,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast.variableType = TypeNode();
   ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
 
-  var astMapVal = MapNode();
+  final astMapVal = MapNode();
   astMapVal.map = response.headers;
   ast.variableValue = astMapVal;
 

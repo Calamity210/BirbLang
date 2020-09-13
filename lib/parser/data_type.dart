@@ -19,7 +19,7 @@ class DataType {
 }
 
 DataType initDataType() {
-  var dataType = DataType()
+  final dataType = DataType()
     ..type = DATATYPE.DATA_TYPE_VOID
     ..modifiers[0] = 0
     ..modifiers[1] = 0
@@ -29,16 +29,18 @@ DataType initDataType() {
 }
 
 DataType initDataTypeAs(DATATYPE type) {
-  var dataType = initDataType()..type = type;
+  final dataType = initDataType()..type = type;
 
   return dataType;
 }
 
 bool dataTypeHasModifier(DataType dataType, int modifier) {
-  if (dataType == null) return false;
+  if (dataType == null)
+    return false;
 
   for (int i = 0; i < 2; i++) {
-    if (dataType.modifiers[i] == modifier) return true;
+    if (dataType.modifiers[i] == modifier)
+      return true;
   }
 
   return false;

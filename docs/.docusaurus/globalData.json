@@ -37,6 +37,10 @@
               "path": "/docs/Core/int"
             },
             {
+              "id": "Core/map",
+              "path": "/docs/Core/map"
+            },
+            {
               "id": "Core/string",
               "path": "/docs/Core/string"
             },

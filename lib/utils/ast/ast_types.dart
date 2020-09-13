@@ -10,7 +10,7 @@ class CompoundNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    CompoundNode node = CompoundNode()..scope = scope;
+    final CompoundNode node = CompoundNode()..scope = scope;
 
     compoundValue.forEach((child) {
       node.compoundValue.add(child?.copy());
@@ -38,7 +38,7 @@ class FuncCallNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    FuncCallNode node = FuncCallNode()
+    final FuncCallNode node = FuncCallNode()
       ..scope = scope
       ..funcName = funcName
       ..funcCallExpression = (funcCallExpression?.copy())
@@ -82,7 +82,7 @@ class FuncDefNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    FuncDefNode node = FuncDefNode()
+    final FuncDefNode node = FuncDefNode()
       ..scope = scope
       ..funcName = funcName
       ..funcDefBody = (funcDefBody?.copy())
@@ -126,14 +126,14 @@ class ClassNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ClassNode node = ClassNode()
+    final ClassNode node = ClassNode()
       ..scope = scope
       ..className = className
       ..superClass = (superClass?.copy())
       ..variableType = (variableType?.copy());
 
     classChildren.forEach((child) {
-      ASTNode copyChild = child?.copy();
+      final ASTNode copyChild = child?.copy();
       node.classChildren.add(copyChild);
     });
 
@@ -157,7 +157,7 @@ class EnumNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    EnumNode node = EnumNode()..scope = scope;
+    final EnumNode node = EnumNode()..scope = scope;
 
     enumElements.forEach((child) {
       node.enumElements.add(child?.copy());
@@ -179,7 +179,7 @@ class ListNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ListNode node = ListNode()..scope = scope;
+    final ListNode node = ListNode()..scope = scope;
 
     listElements.forEach((child) {
       if (child is ASTNode)
@@ -208,7 +208,7 @@ class MapNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    MapNode node = MapNode()..scope = scope;
+    final MapNode node = MapNode()..scope = scope;
 
     map.forEach((key, val) {
       if (val is ASTNode)
@@ -249,11 +249,12 @@ class VariableNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    var copyType;
+    TypeNode copyType;
 
-    if (variableType != null) copyType = variableType.copy();
+    if (variableType != null)
+      copyType = variableType.copy();
 
-    VariableNode node = VariableNode()
+    final VariableNode node = VariableNode()
       ..scope = scope
       ..variableType = copyType
       ..variableValue = (variableValue?.copy())
@@ -299,7 +300,7 @@ class VarModNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    VarModNode node = VarModNode()
+    final VarModNode node = VarModNode()
       ..scope = scope
       ..variableName = variableName
       ..variableValue = (variableValue?.copy())
@@ -350,7 +351,7 @@ class VarDefNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    VarDefNode node = VarDefNode()
+    final VarDefNode node = VarDefNode()
       ..scope = scope
       ..savedFuncCall = (savedFuncCall?.copy())
       ..variableAssignmentLeft = (variableAssignmentLeft?.copy())
@@ -393,7 +394,7 @@ class VarAssignmentNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    VarAssignmentNode node = VarAssignmentNode()
+    final VarAssignmentNode node = VarAssignmentNode()
       ..scope = scope
       ..variableName = variableName
       ..variableValue = (variableValue?.copy())
@@ -425,7 +426,7 @@ class StringNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    StringNode node = StringNode()..scope = scope..stringValue = stringValue;
+    final StringNode node = StringNode()..scope = scope..stringValue = stringValue;
     return node;
   }
 
@@ -448,7 +449,7 @@ class StrBufferNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    StrBufferNode node = StrBufferNode()..scope = scope..strBuffer = strBuffer;
+    final StrBufferNode node = StrBufferNode()..scope = scope..strBuffer = strBuffer;
 
     return node;
   }
@@ -472,7 +473,7 @@ class IntNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    IntNode node = IntNode()
+    final IntNode node = IntNode()
       ..scope = scope
       ..intVal = intVal
       ..doubleVal = doubleVal;
@@ -499,7 +500,7 @@ class DoubleNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    DoubleNode node = DoubleNode()
+    final DoubleNode node = DoubleNode()
       ..scope = scope
       ..intVal = intVal
       ..doubleVal = doubleVal;
@@ -526,7 +527,7 @@ class BoolNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    BoolNode node = BoolNode()
+    final BoolNode node = BoolNode()
       ..scope = scope
       ..boolVal = boolVal
       ..intVal = intVal;
@@ -572,7 +573,7 @@ class BinaryOpNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    BinaryOpNode node = BinaryOpNode()
+    final BinaryOpNode node = BinaryOpNode()
       ..scope = scope
       ..binaryOperator = binaryOperator
       ..binaryOpLeft = (binaryOpLeft?.copy())
@@ -594,7 +595,7 @@ class UnaryOpNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    UnaryOpNode node = UnaryOpNode()
+    final UnaryOpNode node = UnaryOpNode()
       ..scope = scope
       ..unaryOperator = unaryOperator
       ..unaryOpRight = (unaryOpRight?.copy());
@@ -620,7 +621,7 @@ class NewNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    NewNode node = NewNode()..scope = scope..newValue = (newValue?.copy());
+    final NewNode node = NewNode()..scope = scope..newValue = (newValue?.copy());
 
     return node;
   }
@@ -643,7 +644,7 @@ class ReturnNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ReturnNode node = ReturnNode()..scope = scope..returnValue = (returnValue?.copy());
+    final ReturnNode node = ReturnNode()..scope = scope..returnValue = (returnValue?.copy());
 
     return node;
   }
@@ -658,7 +659,7 @@ class ThrowNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ThrowNode node = ThrowNode()..scope = scope..throwValue = (throwValue?.copy());
+    final ThrowNode node = ThrowNode()..scope = scope..throwValue = (throwValue?.copy());
 
     return node;
   }
@@ -687,7 +688,7 @@ class TernaryNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    TernaryNode node = TernaryNode()
+    final TernaryNode node = TernaryNode()
       ..scope = scope
       ..ternaryExpression = (ternaryExpression?.copy())
       ..ternaryBody = (ternaryBody?.copy())
@@ -715,7 +716,7 @@ class IfNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    IfNode node = IfNode()
+    final IfNode node = IfNode()
       ..scope = scope
       ..ifExpression = (ifExpression?.copy())
       ..ifBody = (ifBody?.copy())
@@ -735,7 +736,7 @@ class ElseNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ElseNode node = ElseNode()..scope = scope..elseBody = (elseBody?.copy());
+    final ElseNode node = ElseNode()..scope = scope..elseBody = (elseBody?.copy());
 
     return node;
   }
@@ -756,7 +757,7 @@ class SwitchNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    SwitchNode node = SwitchNode()
+    final SwitchNode node = SwitchNode()
       ..scope = scope
       ..switchExpression = (switchExpression?.copy())
       ..switchDefault = (switchDefault?.copy());
@@ -781,7 +782,7 @@ class WhileNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    WhileNode node = WhileNode()
+    final WhileNode node = WhileNode()
       ..scope = scope
       ..whileExpression = (whileExpression?.copy())
       ..whileBody = (whileBody?.copy());
@@ -808,7 +809,7 @@ class ForNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ForNode node = ForNode()
+    final ForNode node = ForNode()
       ..scope = scope
       ..forInitStatement = (forInitStatement?.copy())
       ..forConditionStatement = (forConditionStatement?.copy())
@@ -837,7 +838,7 @@ class AttributeAccessNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    AttributeAccessNode node = AttributeAccessNode()
+    final AttributeAccessNode node = AttributeAccessNode()
       ..scope = scope
       ..binaryOpLeft = (binaryOpLeft?.copy())
       ..binaryOpRight = (binaryOpRight?.copy());
@@ -866,7 +867,7 @@ class ListAccessNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    ListAccessNode node = ListAccessNode()
+    final ListAccessNode node = ListAccessNode()
       ..scope = scope
       ..listAccessPointer = (listAccessPointer?.copy())
       ..binaryOpLeft = (binaryOpLeft?.copy());
@@ -887,7 +888,7 @@ class IterateNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    IterateNode node = IterateNode()
+    final IterateNode node = IterateNode()
       ..scope = scope
       ..iterateIterable = (iterateIterable?.copy())
       ..iterateFunction = (iterateFunction?.copy());
@@ -905,7 +906,7 @@ class AssertNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    AssertNode node = AssertNode()
+    final AssertNode node = AssertNode()
       ..scope = scope
       ..assertExpression = (assertExpression?.copy());
 

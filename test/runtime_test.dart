@@ -4,6 +4,10 @@ import 'package:test/test.dart' as test;
 import 'package:test_process/test_process.dart';
 
 class ExpectationsParser {
+  ExpectationsParser(this.file) {
+    _parseExpectations();
+  }
+
   final File file;
 
   final _outputs = <String>[];
@@ -11,10 +15,6 @@ class ExpectationsParser {
 
   final _errors = <String>[];
   int _matchedErrors = 0;
-
-  ExpectationsParser(this.file) {
-    _parseExpectations();
-  }
 
   void _parseExpectations() {
     final content = file.readAsStringSync();
@@ -26,7 +26,8 @@ class ExpectationsParser {
 
     lines.forEach((line) {
       final commentStart = line.indexOf('//');
-      if (commentStart == -1) return;
+      if (commentStart == -1)
+        return;
       // skip the two forward slashes
       final comment = line.substring(commentStart+2).trimLeft();
       if (comment.startsWith('output ')) {
@@ -55,7 +56,7 @@ class ExpectationsParser {
       }
     });
     if (isRepeat) {
-      print('Warning: repeat directive didn\'t find a matching endrepeat.');
+      print("Warning: repeat directive didn't find a matching endrepeat.");
     }
   }
 
@@ -78,7 +79,7 @@ class ExpectationsParser {
 
 void main() {
   test.test('Runs program correctly', () async {
-    var process = await TestProcess.start(
+    final process = await TestProcess.start(
         'dart', ['./lib/birb.dart', './test/TestPrograms/test_runtime.birb']);
 
     var line = await process.stdout.next;
@@ -95,18 +96,18 @@ void main() {
   });
 
   test.group('All testFile programs run with expected results', () {
-    Directory directory = Directory('./test/testFiles');
+    final Directory directory = Directory('./test/testFiles');
     directory.listSync().forEach((file) {
-      test.test('${file.path}', () async {
+      test.test(file.path, () async {
         await _testBirbScriptWithExpectations(file);
       });
     });
   });
 
   test.group('All example programs run with expected results', () {
-    Directory directory = Directory('./examples/');
+    final Directory directory = Directory('./examples/');
     directory.listSync().forEach((file) {
-      test.test('${file.path}', () async {
+      test.test(file.path, () async {
         await _testBirbScriptWithExpectations(file);
       });
     });
@@ -115,7 +116,7 @@ void main() {
 
 Future _testBirbScriptWithExpectations(FileSystemEntity file) async {
   final expectations = ExpectationsParser(file);
-  var process =
+  final process =
   await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
   
   // skip dart Warning for interpreting ./lib/birb.dart as package URI

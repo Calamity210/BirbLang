@@ -13,9 +13,10 @@ void registerConvert(Runtime runtime) {
 ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
-  String jsonString = (args[0]).stringValue;
+  final String jsonString = (args[0]).stringValue;
 
-  var decoded = jsonDecode(jsonString);
+  final dynamic decoded = jsonDecode(jsonString);
+
   ASTNode jsonAST;
   if (decoded is List)
     jsonAST = ListNode()..listElements = decoded;
@@ -28,12 +29,12 @@ ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
 ASTNode funcEncodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
   runtimeExpectArgs(args, [ASTType.AST_MAP]);
 
-  Map map = (args[0]).map;
+  final Map map = (args[0]).map;
 
-  Map jsonMap = {};
+  final Map jsonMap = <String, dynamic>{};
 
   map.forEach((key, value) {
-    ASTNode val = value;
+    final ASTNode val = value;
     switch (val.type) {
       case ASTType.AST_STRING:
         jsonMap[key] = val.stringValue;
@@ -56,7 +57,7 @@ ASTNode funcEncodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
     return;
   });
 
-  ASTNode jsonAST = StringNode()..stringValue = jsonEncode(jsonMap);
+  final ASTNode jsonAST = StringNode()..stringValue = jsonEncode(jsonMap);
 
   return jsonAST;
 }

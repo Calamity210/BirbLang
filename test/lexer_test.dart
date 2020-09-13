@@ -6,7 +6,7 @@ import 'package:test/test.dart' as test;
 
 void main() {
   test.test('Lexer handles empty input correctly', () {
-    Lexer lexer = initLexer('');
+    final Lexer lexer = initLexer('');
     test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_EOF));
   });
 
@@ -27,13 +27,13 @@ void main() {
 
   test.group('Lexer handles end of input correctly for', () {
     test.test('comment', () {
-      Lexer lexer = initLexer("// this is a comment that doesn't end with a new line");
+      final Lexer lexer = initLexer("// this is a comment that doesn't end with a new line");
       test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_EOF));
     });
 
     test.test('single character tokens', () {
       void testInput(String input, TokenType type, TokenType notType) {
-        Lexer lexer = initLexer(input);
+        final Lexer lexer = initLexer(input);
         final token = getNextToken(lexer);
         test.expect(token.type, test.equals(type));
         test.expect(token, test.isNot(test.equals(notType)));
@@ -50,7 +50,7 @@ void main() {
   });
 
   test.test('Lexer gets tokens correctly', () {
-    Lexer lexer =
+    final Lexer lexer =
         initLexer(File('./test/TestPrograms/test_lexer.birb').readAsStringSync());
 
     assert(lexer != null);

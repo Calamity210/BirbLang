@@ -8,7 +8,8 @@ module.exports = {
             {
                 Core: [
                 'Core/string', 
-                'Core/int'
+                'Core/int',
+                'Core/map',
               ],
             }
         ],

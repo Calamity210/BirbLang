@@ -7,7 +7,7 @@ class Scope {
   bool global;
 
   Scope copy() {
-    Scope scope = Scope();
+    final Scope scope = Scope();
 
     variableDefinitions.forEach((element) {
       scope.variableDefinitions.add(element.copy());
@@ -22,7 +22,7 @@ class Scope {
 }
 
 Scope initScope(bool global) {
-  var scope = Scope()
+  final scope = Scope()
     ..variableDefinitions = []
     ..functionDefinitions = []
     ..global = global;

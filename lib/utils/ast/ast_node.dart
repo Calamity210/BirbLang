@@ -255,7 +255,7 @@ String astToString(ASTNode ast) {
     case ASTType.AST_FUNC_DEFINITION:
       return '${ast.funcName} (${ast.funcDefArgs.length})';
     case ASTType.AST_FUNC_CALL:
-      String expressionStr = astToString(ast.funcCallExpression);
+      final String expressionStr = astToString(ast.funcCallExpression);
       return '$expressionStr (${ast.funcCallArgs.length})';
     case ASTType.AST_NULL:
       return 'null';

@@ -14,13 +14,13 @@ void registerIO(Runtime runtime) {
 ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
   runtimeExpectArgs(args, [ASTType.AST_INT]);
 
-  ASTNode exitAST = args[0];
+  final exitAST = args[0];
 
   exit(exitAST.intVal);
 }
 
 ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  Scope scope = getScope(runtime, self);
+  final Scope scope = getScope(runtime, self);
 
   args.forEach((arg) {
     if (arg is! VariableNode)

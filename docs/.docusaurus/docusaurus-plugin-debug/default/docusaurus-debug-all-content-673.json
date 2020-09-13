@@ -34,6 +34,10 @@
                       {
                         "type": "doc",
                         "id": "Core/int"
+                      },
+                      {
+                        "type": "doc",
+                        "id": "Core/map"
                       }
                     ]
                   }
@@ -55,6 +59,7 @@
           "permalinkToSidebar": {
             "/docs/contributing": "BirbLang",
             "/docs/Core/int": "BirbLang",
+            "/docs/Core/map": "BirbLang",
             "/docs/Core/string": "BirbLang",
             "/docs/": "BirbLang"
           },
@@ -75,8 +80,8 @@
               "sidebar_label": "Contributing",
               "sidebar": "BirbLang",
               "previous": {
-                "title": "int",
-                "permalink": "/docs/Core/int"
+                "title": "Map",
+                "permalink": "/docs/Core/map"
               }
             },
             {
@@ -96,6 +101,29 @@
               "previous": {
                 "title": "String",
                 "permalink": "/docs/Core/string"
+              },
+              "next": {
+                "title": "Map",
+                "permalink": "/docs/Core/map"
+              }
+            },
+            {
+              "unversionedId": "Core/map",
+              "id": "Core/map",
+              "isDocsHomePage": false,
+              "title": "Map",
+              "description": "A Map is a dictionary of key/value pairs, in which you can get a value associated with its key.",
+              "source": "@site/docs\\Core\\map.md",
+              "slug": "/Core/map",
+              "permalink": "/docs/Core/map",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/map.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "BirbLang",
+              "previous": {
+                "title": "int",
+                "permalink": "/docs/Core/int"
               },
               "next": {
                 "title": "Contributing",
