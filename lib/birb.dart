@@ -12,10 +12,11 @@ Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will
   /// start up allowing developers to write programs directly from their terminal\
 
-  if (arguments[0] != 'install') {
+  if (arguments.isEmpty) {
+    run(arguments.isEmpty, arguments);
+  } else if (arguments[0] != 'install') {
     run(arguments.isEmpty, arguments);
   } else {
-    print(arguments.length);
     if (arguments.length != 2)
       throw ArgumentError('Expected 1 argument but 0 were passed :(');
     else {

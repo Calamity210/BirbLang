@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:http/http.dart';
 
-void install(String package) async {
+Future<void> install(String package) async {
   Response content;
 
   try {
@@ -11,5 +11,10 @@ void install(String package) async {
     exit(0);
   }
 
-  print(content.body);
+  print('Installing Packages ...');
+
+  await Directory('.birb').create(recursive: true);
+  await File('.birb/' + package.split('/').last).writeAsString(content.body);
+
+  print('Done!');
 }
