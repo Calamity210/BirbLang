@@ -5,3 +5,4 @@ export 'list.dart';
 export 'map.dart';
 export 'strbuffer.dart';
 export 'string.dart';
+export 'bool.dart';
