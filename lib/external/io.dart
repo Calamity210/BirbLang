@@ -37,7 +37,8 @@ ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
 Future<MapNode> funcSystem(
     Runtime runtime, ASTNode self, List<ASTNode> args) async {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_LIST]);
+  runtimeExpectArgs(
+      args, [ASTType.AST_STRING, ASTType.AST_LIST, ASTType.AST_BOOL]);
 
   Map<String, dynamic> result = {
     'errorCode': null,
@@ -46,9 +47,11 @@ Future<MapNode> funcSystem(
   };
 
   MapNode res = MapNode();
+  bool shell = args[2].boolVal ?? false;
 
   final ProcessResult pr = await Process.run(args[0].stringValue,
-      args[1].listElements.map((e) => e.toString()).toList());
+      args[1].listElements.map((e) => e.toString()).toList(),
+      runInShell: shell);
 
   result['errorCode'] = pr.exitCode;
   result['stdout'] = pr.stdout;
