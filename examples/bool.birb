@@ -1,0 +1,7 @@
+bool isTrue = true;
+
+//PROPERTIES
+scremLn(isTrue.runtimeType); // output bool
+
+//METHODS
+scremLn(isTrue.toString()); // output true
