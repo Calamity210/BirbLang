@@ -3,7 +3,7 @@ id: map
 title: Map
 ---
 
-A map is a dictionary of key/value pairs, in which you can get a value associated with its key.
+A `Map` is a dictionary of key/value pairs, in which you can get a value associated with its key.
 
 
 ```dart
