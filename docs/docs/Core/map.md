@@ -3,7 +3,7 @@ id: map
 title: Map
 ---
 
-A collection of key/value pairs, from which you retrieve a value using its associated key.
+A map is a dictionary of key/value pairs, in which you can get a value associated with its key.
 
 
 ```dart
@@ -11,16 +11,16 @@ Map map = {
     "content": "This is a message"
 };
 
-screm(map);
+screm(map["content"]);
 ```
 
 ## Properties
 
-## isEmpty
+### isEmpty
 
 `bool isEmpty`
 
-True is this String is empty
+True is this Map is empty
 
 **Example**
 ```dart
@@ -34,7 +34,7 @@ bool isEmpty = map.isEmpty; // false
 
 `bool isNotEmpty`
 
-True if this String is not empty.
+True if this Map is not empty.
 
 **Example**
 ```dart
@@ -48,7 +48,7 @@ bool isNotEmpty = map.isNotEmpty; // true
 
 `int length`
 
-Returns an int containing the length of this String.
+Returns an int containing the length of this Map.
 
 **Example**
 ```dart
@@ -70,20 +70,6 @@ Map map = {
     "content": "This is a message"
 };
 String type = map.runtimeType; // Map
-```
-
-### hashCode
-
-`int hashCode`
-
-Returns the hash code of this
-
-**Example**
-```dart
-Map map = {
-    "content": "This is a message"
-};
-int hashCode = map.hashCode; // Hash Code
 ```
 
 ## Methods
