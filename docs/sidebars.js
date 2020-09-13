@@ -18,7 +18,8 @@ module.exports = {
          type: 'category',
          label: 'Contribute',
          items: [
-            'Contribute/contributing'
+            'Contribute/contributing',
+            'Contribute/walkthrough'
          ],
         },
     ]

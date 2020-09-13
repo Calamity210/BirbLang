@@ -17,9 +17,9 @@ There are many ways you can contribute:
 - Fork https://github.com/Calamity210/BirbLang
 - Clone the fork that you made https://github.com/{username}/BirbLang, be sure to clone the master branch
 - Navigate to the cloned directory and open it in your IDE of choice.
+- Run `pub get` to get all dependencies.
   - To work on the docs, open up the `docs/` directory and see the [docs section below](#working-on-the-docs)
-  - For working on the language itself, look within the `lib/` directory
-  - To work on the core libraries, open up the `core/` directory
+  - For working on the language itself or core libraries, read through the (walkthrough)[#walkthrough]
 - To try out your changes, run the following from the root of the birb project:
 ```shell
 $ dart lib/birb.dart
@@ -27,10 +27,10 @@ $ dart lib/birb.dart
 - Once you are confident with your changes, make sure you documented everything that is needed and that it follows our style guide.
 
 :::warning
-Our style guide is a work in progress, for now please use dartfmt
+Our style guide is a work in progress, for now please use dartfmt.
 :::
 
-- All PRs must have added tests to the `examples/` folder, if you think your change should be exempt, let Calamity210#7999 know on discord
+- All PRs must have added tests to the `examples/` folder, if you think your change should be exempt, let Calamity210#7999 know on discord.
 
 :::tip You can generate an executable by running
 ```shell

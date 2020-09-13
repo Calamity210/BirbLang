@@ -3,7 +3,7 @@ id: int
 title: int
 ---
 
-An integer number.
+A 64-bit 2s complement integer value.
 
 ```dart
 int number = 10;
@@ -28,7 +28,7 @@ bool isEven = number.isEven; // true
 
 `bool isFinite`
 
-Returns true if the integer is finite.
+Returns true if the integer is a finite value. All values aside from the two infinities and Not-A-Number (NaN) are finite.
 
 **Example**
 ```dart
