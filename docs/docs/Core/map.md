@@ -20,7 +20,7 @@ screm(map["content"]);
 
 `bool isEmpty`
 
-True is this Map is empty
+Returns a bool that is true if this Map is empty. 
 
 **Example**
 ```dart
@@ -34,7 +34,7 @@ bool isEmpty = map.isEmpty; // false
 
 `bool isNotEmpty`
 
-True if this Map is not empty.
+Returns a bool that is true if this Map is not empty. 
 
 **Example**
 ```dart
@@ -76,7 +76,7 @@ String type = map.runtimeType; // Map
 
 ### toString
 
-`String string`
+`String toString`
 
 Returns the string value of this
 
