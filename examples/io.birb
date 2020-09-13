@@ -1,6 +1,6 @@
 grab("birb:io");
 
-scremLn(cwd().runtimeType); // output String
-scremLn(system("echo", ["test"]).runtimeType); // output Map
+scremLn(cwd.runtimeType); // output String
+scremLn(system("where", ["README.md"]).runtimeType); // output Map
 
 exit(0);

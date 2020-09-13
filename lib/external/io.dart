@@ -9,7 +9,8 @@ import 'package:Birb/utils/scope.dart';
 void registerIO(Runtime runtime) {
   registerGlobalFunction(runtime, 'exit', funcExit);
   registerGlobalFunction(runtime, 'free', funcFree);
-  registerGlobalFunction(runtime, 'cwd', funcCwd);
+  registerGlobalVariable(runtime, 'cwd',
+      StringNode()..stringValue = Directory.current.absolute.path.toString());
   registerGlobalFutureFunction(runtime, 'system', funcSystem);
 }
 
@@ -34,14 +35,6 @@ ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
   return INITIALIZED_NOOP;
 }
 
-StringNode funcCwd(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  StringNode res = StringNode();
-  Directory current = Directory.current;
-
-  res.stringValue = current.path.toString();
-  return res;
-}
-
 Future<MapNode> funcSystem(
     Runtime runtime, ASTNode self, List<ASTNode> args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_LIST]);
@@ -54,7 +47,7 @@ Future<MapNode> funcSystem(
 
   MapNode res = MapNode();
 
-  ProcessResult pr = await Process.run(args[0].stringValue,
+  final ProcessResult pr = await Process.run(args[0].stringValue,
       args[1].listElements.map((e) => e.toString()).toList());
 
   result['errorCode'] = pr.exitCode;
