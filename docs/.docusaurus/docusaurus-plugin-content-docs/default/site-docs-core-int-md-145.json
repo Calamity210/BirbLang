@@ -3,12 +3,21 @@
   "id": "Core/int",
   "isDocsHomePage": false,
   "title": "int",
-  "description": "",
+  "description": "An integer number.",
   "source": "@site/docs\\Core\\int.md",
   "slug": "/Core/int",
   "permalink": "/docs/Core/int",
   "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/int.md",
   "version": "current",
   "lastUpdatedBy": "Author",
-  "lastUpdatedAt": 1539502055
+  "lastUpdatedAt": 1539502055,
+  "sidebar": "BirbLang",
+  "previous": {
+    "title": "String",
+    "permalink": "/docs/Core/string"
+  },
+  "next": {
+    "title": "Contributing",
+    "permalink": "/docs/contributing"
+  }
 }

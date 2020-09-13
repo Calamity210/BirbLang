@@ -30,6 +30,10 @@
                       {
                         "type": "doc",
                         "id": "Core/string"
+                      },
+                      {
+                        "type": "doc",
+                        "id": "Core/int"
                       }
                     ]
                   }
@@ -50,6 +54,7 @@
           },
           "permalinkToSidebar": {
             "/docs/contributing": "BirbLang",
+            "/docs/Core/int": "BirbLang",
             "/docs/Core/string": "BirbLang",
             "/docs/": "BirbLang"
           },
@@ -70,8 +75,8 @@
               "sidebar_label": "Contributing",
               "sidebar": "BirbLang",
               "previous": {
-                "title": "String",
-                "permalink": "/docs/Core/string"
+                "title": "int",
+                "permalink": "/docs/Core/int"
               }
             },
             {
@@ -79,14 +84,23 @@
               "id": "Core/int",
               "isDocsHomePage": false,
               "title": "int",
-              "description": "",
+              "description": "An integer number.",
               "source": "@site/docs\\Core\\int.md",
               "slug": "/Core/int",
               "permalink": "/docs/Core/int",
               "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/int.md",
               "version": "current",
               "lastUpdatedBy": "Author",
-              "lastUpdatedAt": 1539502055
+              "lastUpdatedAt": 1539502055,
+              "sidebar": "BirbLang",
+              "previous": {
+                "title": "String",
+                "permalink": "/docs/Core/string"
+              },
+              "next": {
+                "title": "Contributing",
+                "permalink": "/docs/contributing"
+              }
             },
             {
               "unversionedId": "Core/string",
@@ -107,8 +121,8 @@
                 "permalink": "/docs/"
               },
               "next": {
-                "title": "Contributing",
-                "permalink": "/docs/contributing"
+                "title": "int",
+                "permalink": "/docs/Core/int"
               }
             },
             {
