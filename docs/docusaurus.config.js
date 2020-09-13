@@ -84,8 +84,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} BirbLang`,
     },
     prism: {
-     additionalLanguages: ['dart', 'birb'],
-     defaultLanguage: 'birb',
+     additionalLanguages: ['dart'],
+     defaultLanguage: 'dart',
     },
     algolia: {
      apiKey: '7a1c0622f793d186564c3bc2d235068e',

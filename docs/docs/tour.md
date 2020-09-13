@@ -6,7 +6,7 @@ slug: /
 ---
 
 ## Small program
-```birb
+```dart
 void multiplyAndScrem(int a, int b) {
   var product = a * b;
   screm(a + ' * ' + b + ' = ' + product);
@@ -48,7 +48,7 @@ Supported data types yet are:
 - `var` - Allows birb to infer the type
 
 ## Primitive Types example
- ```birb
+ ```dart
 String str = "Henlo\nbirb"; // \n is taken as an escape character
 String raw = r'Henlo\nbirb'; // \n is taken literally
 
@@ -61,7 +61,7 @@ bool isGreaterThanFive = d > 5; // false
 ```
 
 ## Class example
-```birb
+```dart
 class Birb {
   String name = "Birb";
   int age = 5;
@@ -78,14 +78,14 @@ Nest is a keyword used to refer to the current instance.
 :::
 
 ## List example
-```birb
+```dart
 List list = ["Seeb",10, false];
 
 int length = list.length; // 3
 ```
 
 ## Map example
-```birb
+```dart
 Map food = {
   "veg": ["carrot", "lettuce"]
 };
@@ -100,7 +100,7 @@ screm(i[0]); // carrot
 Variables in Birb are *Explicitly Typed* meaning its type must be declared. 
 To define a variable, specify the type, followed by its name and value.
 
-```birb
+```dart
 String foo = "henlo";
 ```
 :::info What if I don't want to specify a type
@@ -111,7 +111,7 @@ Descendant scopes in birb will access the most recent declared variable.
 ## Loops
 
 While loop:
-```birb
+```dart
 int i = 0;
 
 while(i < 9) {
@@ -122,7 +122,7 @@ while(i < 9) {
 `continue` is used to jump to the next iteration of a loop, while `break` is used to stop a loop.
 A for loop requires an `initialization, condition, and change`. Separate them with a semicolon `;`.
 
-```birb
+```dart
 for (int i = 0; i < 9; i++) {
     screm(i);
 }
@@ -138,7 +138,7 @@ If statements in Birb work just like they would in other languages. Just as loop
 
 A switch requires the default case, even if it is empty.
 
-```birb
+```dart
 int i = 10;
 
 // if/else
@@ -170,7 +170,7 @@ screm("i is not 10");
 Comments are similar to a majority of other languages;
 `//` For single-line and `/* */` for multi-line.
 
-```birb
+```dart
 // This is a single-line comment.
 
 /*

@@ -1,4 +1,3 @@
-import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
@@ -13,6 +12,7 @@ ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
         return stringAST;
       }
     default:
+      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'bool');
   }
 }
 
@@ -26,5 +26,6 @@ ASTNode visitBoolMethods(ASTNode node, ASTNode left) {
         return stringAST;
       }
     default:
+      throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'bool');
   }
 }

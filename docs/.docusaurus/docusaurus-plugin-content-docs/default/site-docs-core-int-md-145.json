@@ -3,7 +3,7 @@
   "id": "Core/int",
   "isDocsHomePage": false,
   "title": "int",
-  "description": "An integer number.",
+  "description": "A 64-bit 2s complement integer value.",
   "source": "@site/docs\\Core\\int.md",
   "slug": "/Core/int",
   "permalink": "/docs/Core/int",

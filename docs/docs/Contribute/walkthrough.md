@@ -2,6 +2,7 @@
 id: walkthrough
 title: Walkthrough
 sidebar_label: Walkthrough
+slug: /walkthrough
 ---
 
 This document should give you a quick overview to get you started on contributing to birb.
@@ -12,7 +13,7 @@ An AST or abstract syntax tree is an approximate representation of a program as 
 The ASTNode is an abstract class implemented by the subclasses such as `VariableNode` or `StringNode`.
 
 Consider the following:
-```birb
+```dart
 String greetings = 'Henlo!';
 ```
 
@@ -54,7 +55,7 @@ The parser walks through those tokens and parses them into an ASTNode (see (ASTN
 In short, a lexer's job is to take a program as an input and output a sequence of tokens.
 
 Let's take the following code as an example:
-```birb
+```dart
 double i = 0.5;
 ```
 

@@ -103,12 +103,14 @@ ASTNode mapRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
 }
 
 void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
-  if (scope == runtime.scope) return;
+  if (scope == runtime.scope)
+    return;
 
   final List<ASTNode> garbage = [];
 
   for (final ASTNode newDef in scope.variableDefinitions)
-    if (!oldDefList.contains(newDef)) scope.variableDefinitions.remove(newDef);
+    if (!oldDefList.contains(newDef))
+      scope.variableDefinitions.remove(newDef);
 
   garbage.forEach((garb) => scope.variableDefinitions.remove(garb));
 }
@@ -134,7 +136,8 @@ Future<ASTNode> runtimeFuncCall(
       final vDef = await getVarDefByName(
           runtime, getScope(runtime, astArg), astArg.variableName);
 
-      if (vDef != null) newVariableDef.variableValue = vDef.variableValue;
+      if (vDef != null)
+        newVariableDef.variableValue = vDef.variableValue;
     }
 
     newVariableDef.variableValue ??= await visit(runtime, astArg);
@@ -184,7 +187,8 @@ ASTNode registerGlobalVariable(
 }
 
 Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
-  if (node == null) return null;
+  if (node == null)
+    return null;
 
   switch (node.type) {
     case ASTType.AST_CLASS:

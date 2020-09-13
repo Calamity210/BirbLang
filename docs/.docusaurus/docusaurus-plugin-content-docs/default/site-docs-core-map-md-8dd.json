@@ -3,7 +3,7 @@
   "id": "Core/map",
   "isDocsHomePage": false,
   "title": "Map",
-  "description": "A Map is a dictionary of key/value pairs, in which you can get a value associated with its key.",
+  "description": "A Map is a dictionary of key/value pairs, from which you can get a value associated with its key. A Map cannot contain duplicate keys, nor can a key hold more than one value.",
   "source": "@site/docs\\Core\\map.md",
   "slug": "/Core/map",
   "permalink": "/docs/Core/map",

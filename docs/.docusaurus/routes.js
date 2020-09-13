@@ -44,7 +44,7 @@ export default [
 },
 {
   path: '/search',
-  component: ComponentCreator('/search','53f'),
+  component: ComponentCreator('/search','722'),
   exact: true,
 },
 {
@@ -61,7 +61,7 @@ export default [
 },
 {
   path: '/docs',
-  component: ComponentCreator('/docs','1b4'),
+  component: ComponentCreator('/docs','497'),
   
   routes: [
 {
@@ -87,6 +87,11 @@ export default [
 {
   path: '/docs/Core/string',
   component: ComponentCreator('/docs/Core/string','788'),
+  exact: true,
+},
+{
+  path: '/docs/walkthrough',
+  component: ComponentCreator('/docs/walkthrough','99c'),
   exact: true,
 },
 ]

@@ -16,5 +16,9 @@
   "previous": {
     "title": "Map",
     "permalink": "/docs/Core/map"
+  },
+  "next": {
+    "title": "Walkthrough",
+    "permalink": "/docs/walkthrough"
   }
 }
