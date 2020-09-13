@@ -8,8 +8,8 @@
           "versionPath": "/docs",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
-          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\docs",
+          "sidebarFilePath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebars.js",
+          "docsDirPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\docs",
           "mainDocId": "tour",
           "sidebars": {
             "BirbLang": [
@@ -75,6 +75,20 @@
               }
             },
             {
+              "unversionedId": "Core/int",
+              "id": "Core/int",
+              "isDocsHomePage": false,
+              "title": "int",
+              "description": "",
+              "source": "@site/docs\\Core\\int.md",
+              "slug": "/Core/int",
+              "permalink": "/docs/Core/int",
+              "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/int.md",
+              "version": "current",
+              "lastUpdatedBy": "Author",
+              "lastUpdatedAt": 1539502055
+            },
+            {
               "unversionedId": "Core/string",
               "id": "Core/string",
               "isDocsHomePage": false,
@@ -129,8 +143,8 @@
           "versionPath": "/community",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
-          "docsDirPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\community",
+          "sidebarFilePath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
+          "docsDirPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\community",
           "mainDocId": "support",
           "sidebars": {
             "community": [

@@ -25,8 +25,8 @@
   "/__docusaurus/debug/routes-244": {
     "component": "component---theme-debug-routes-946-699"
   },
-  "/search-722": {
-    "component": "component---c-users-user-projects-birb-lang-docs-node-modules-docusaurus-theme-search-algolia-src-theme-search-page-index-js-817-c42"
+  "/search-53f": {
+    "component": "component---c-users-user-desktop-andy-projects-birb-lang-docs-node-modules-docusaurus-theme-search-algolia-src-theme-search-page-index-js-390-2cd"
   },
   "/community-ee3": {
     "component": "component---theme-doc-page-1-be-9be",
@@ -36,7 +36,7 @@
     "component": "component---theme-doc-item-178-a40",
     "content": "content---community-supportf-9-f-7f2"
   },
-  "/docs-cda": {
+  "/docs-5f4": {
     "component": "component---theme-doc-page-1-be-9be",
     "versionMetadata": "versionMetadata---docsf-97-b71"
   },
@@ -47,6 +47,10 @@
   "/docs/contributing-024": {
     "component": "component---theme-doc-item-178-a40",
     "content": "content---docs-contributing-14-d-d29"
+  },
+  "/docs/Core/int-d0a": {
+    "component": "component---theme-doc-item-178-a40",
+    "content": "content---docs-core-int-145-bbe"
   },
   "/docs/Core/string-788": {
     "component": "component---theme-doc-item-178-a40",
