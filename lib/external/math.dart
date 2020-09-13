@@ -165,5 +165,5 @@ ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args){
     default:
   }
   
-  throw const UnexpectedTypeException('The atan2 method only takes [double, int] argument types for argument 1 and 2');
+  throw const UnexpectedTypeException('The atan2 method only takes [double, int] argument types for argument y and x');
 }
