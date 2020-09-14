@@ -152,7 +152,7 @@ Future<ASTNode> runtimeFuncCall(
       throw UnexpectedTypeException('[Line ${fCall.lineNum}] Invalid type');
     }
 
-    funcDefBodyScope.variableDefinitions.add(newVariableDef);
+    funcDefBodyScope.variableDefinitions.insert(0, newVariableDef);
   }
 
   return await visit(runtime, fDef.funcDefBody);
@@ -163,7 +163,7 @@ ASTNode registerGlobalFunction(
   final fDef = FuncDefNode();
   fDef.funcName = fName;
   fDef.funcPointer = funcPointer;
-  runtime.scope.functionDefinitions.add(fDef);
+  runtime.scope.functionDefinitions.insert(0, fDef);
   return fDef;
 }
 
@@ -172,7 +172,7 @@ ASTNode registerGlobalFutureFunction(
   final fDef = FuncDefNode()
     ..funcName = fName
     ..futureFuncPointer = funcPointer;
-  runtime.scope.functionDefinitions.add(fDef);
+  runtime.scope.functionDefinitions.insert(0, fDef);
   return fDef;
 }
 
@@ -182,7 +182,7 @@ ASTNode registerGlobalVariable(
     ..variableName = varName
     ..variableType = StringNode()
     ..variableValue = varVal;
-  runtime.scope.variableDefinitions.add(varDef);
+  runtime.scope.variableDefinitions.insert(0, varDef);
   return varDef;
 }
 
@@ -428,23 +428,6 @@ Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
-  if (node.scope == runtime.scope) {
-    final varDefGlobal =
-        await getVarDefByName(runtime, runtime.scope, node.variableName);
-
-    if (varDefGlobal != null) {
-      multipleVariableDefinitionsError(node.lineNum, node.variableName);
-    }
-  }
-
-  if (node.scope != null) {
-    final varDefLocal =
-        await getVarDefByName(runtime, node.scope, node.variableName);
-
-    if (varDefLocal != null) {
-      multipleVariableDefinitionsError(node.lineNum, node.variableName);
-    }
-  }
 
   if (node.savedFuncCall != null) {
     node.variableValue = await visit(runtime, node.savedFuncCall);
@@ -459,7 +442,7 @@ Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
       node.variableValue = NullNode();
     }
   }
-  getScope(runtime, node).variableDefinitions.add(node);
+  getScope(runtime, node).variableDefinitions.insert(0, node);
 
   return node.variableValue ?? node;
 }
@@ -786,7 +769,7 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
 
 Future<ASTNode> visitFuncDef(Runtime runtime, ASTNode node) async {
   final scope = getScope(runtime, node);
-  scope.functionDefinitions.add(node);
+  scope.functionDefinitions.insert(0, node);
 
   return node;
 }
@@ -838,7 +821,8 @@ Future<ASTNode> runtimeFuncLookup(
         final vDef = await getVarDefByName(
             runtime, getScope(runtime, astArg), astArg.variableName);
 
-        if (vDef != null) visited = vDef.variableValue;
+        if (vDef != null)
+          visited = vDef.variableValue;
       }
 
       visited = visited ?? await visit(runtime, astArg);
@@ -950,7 +934,8 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
   for (int i = 0; i < node.compoundValue.length; i++) {
     final ASTNode child = node.compoundValue[i];
 
-    if (child == null) continue;
+    if (child == null)
+      continue;
 
     final ASTNode visited = await visit(runtime, child);
     if (visited != null) {
@@ -1257,7 +1242,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
               getScope(runtime, child.funcDefBody)
                   .variableDefinitions
-                  .add(newVarDef);
+                  .insert(0, newVarDef);
             }
 
             return await visit(runtime, child.funcDefBody);
@@ -2253,7 +2238,7 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
     indexVar.variableValue.intVal = i;
     indexVar.variableName = (fDef.funcDefArgs[0]).variableName;
 
-    fDefBodyScope.variableDefinitions.add(indexVar);
+    fDefBodyScope.variableDefinitions.insert(0, indexVar);
   }
 
   if (astIterable.type == ASTType.AST_STRING) {
@@ -2262,7 +2247,7 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
     newVarDef.variableValue.stringValue = astIterable.stringValue[i];
     newVarDef.variableName = iterableVarName;
 
-    fDefBodyScope.variableDefinitions.add(newVarDef);
+    fDefBodyScope.variableDefinitions.insert(0, newVarDef);
 
     for (; i < astIterable.stringValue.length; i++) {
       newVarDef.variableValue.stringValue = astIterable.stringValue[i];
@@ -2276,7 +2261,7 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
     newVarDef.variableValue = await visit(runtime, astIterable.listElements[i]);
     newVarDef.variableName = iterableVarName;
 
-    fDefBodyScope.variableDefinitions.add(newVarDef);
+    fDefBodyScope.variableDefinitions.insert(0, newVarDef);
 
     for (; i < astIterable.listElements.length; i++) {
       newVarDef.variableValue =
