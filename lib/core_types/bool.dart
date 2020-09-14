@@ -1,5 +1,6 @@
 import 'package:Birb/utils/ast/ast_node.dart';
 import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `Bool`s
 ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
@@ -11,8 +12,10 @@ ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
         return stringAST;
       }
     default:
+      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'bool');
   }
-  return null;
+
+
 }
 
 /// Visits methods for `Bool`s
@@ -25,6 +28,6 @@ ASTNode visitBoolMethods(ASTNode node, ASTNode left) {
         return stringAST;
       }
     default:
+      throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'bool');
   }
-  return null;
 }

@@ -14,6 +14,9 @@ void registerMath(Runtime runtime) {
   registerGlobalFunction(runtime, 'acos', funcACos);
   registerGlobalFunction(runtime, 'atan', funcATan);
   registerGlobalFunction(runtime, 'atan2', funcATan2);
+  registerGlobalFunction(runtime, 'exp', funcExp);
+  registerGlobalFunction(runtime, 'log', funcLog);
+  registerGlobalFunction(runtime, 'ln', funcLn);
 }
 
 ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
@@ -53,12 +56,9 @@ ASTNode funcSin(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
   
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = sin(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = sin(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The sin method only accept [double, int] argument types');
@@ -68,12 +68,9 @@ ASTNode funcCos(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
      
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = cos(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = cos(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The cos method only accept [double, int] argument types');
@@ -83,12 +80,9 @@ ASTNode funcTan(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
      
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = tan(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = tan(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The tan method only accept [double, int] argument types');
@@ -98,12 +92,9 @@ ASTNode funcASin(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
      
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = asin(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = asin(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The asin method only accept [double, int] argument types');
@@ -113,12 +104,9 @@ ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
      
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = acos(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = acos(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The acos method only accept [double, int] argument types');
@@ -128,12 +116,9 @@ ASTNode funcATan(Runtime runtime, ASTNode self, List<ASTNode> args){
   runtimeExpectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
      
-  switch(radian.type){
-    case ASTType.AST_INT: 
-    case ASTType.AST_DOUBLE: 
-      final DoubleNode result = DoubleNode()..doubleVal = atan(radian is DoubleNode ? radian.doubleVal : radian.intVal);
-      return result;
-    default: 
+  if(radian is IntNode || radian is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = atan(radian is DoubleNode ? radian.doubleVal : radian.intVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The atan method only accept [double, int] argument types');
@@ -145,25 +130,48 @@ ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args){
   final yVal = y is DoubleNode ? y.doubleVal : y.intVal;
   final xVal = x is DoubleNode ? x.doubleVal : x.intVal;
 
-  switch(y.type) {
-    case ASTType.AST_INT: 
-      switch(x.type) {
-        case ASTType.AST_INT: 
-        case ASTType.AST_DOUBLE: 
-          final DoubleNode result = DoubleNode()..doubleVal = atan2(yVal, xVal);
-          return result;
-        default:
-      } break;
-    case ASTType.AST_DOUBLE: 
-      switch(x.type) {
-        case ASTType.AST_INT: 
-        case ASTType.AST_DOUBLE: 
-          final DoubleNode result = DoubleNode()..doubleVal = atan2(yVal, xVal);
-          return result;
-        default:
-      } break;
-    default:
+  if((x is IntNode || x is DoubleNode) && (y is IntNode || y is DoubleNode)){
+    final DoubleNode result = DoubleNode()..doubleVal = atan2(yVal, xVal);
+    return result;
   }
   
   throw const UnexpectedTypeException('The atan2 method only takes [double, int] argument types for argument y and x');
+}
+
+ASTNode funcExp(Runtime runtime, ASTNode self, List<ASTNode> args){
+  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  final val = args[0];
+
+  if(val is IntNode || val is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = exp(val is DoubleNode ? val.doubleVal : val.intVal);
+    return result;
+  }
+
+  throw const UnexpectedTypeException('The exp method only takes [double, int] argument types for argument val');
+}
+
+ASTNode funcLog(Runtime runtime, ASTNode self, List<ASTNode> args){
+  runtimeExpectArgs(args, [ASTType.AST_ANY, ASTType.AST_ANY]);
+  final base = args[0], val = args[1];
+
+  if((base is IntNode || base is DoubleNode) && (val is IntNode || val is DoubleNode)){
+    final double up = log(val is DoubleNode ? val.doubleVal : val.intVal);
+    final double down = log(base is DoubleNode ? base.doubleVal : base.intVal);
+    final DoubleNode result = DoubleNode()..doubleVal = up / down;
+    return result;
+  }
+
+  throw const UnexpectedTypeException('The log method only takes [double, int] argument types for argument base and val');
+}
+
+ASTNode funcLn(Runtime runtime, ASTNode self, List<ASTNode> args){
+  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  final val = args[0];
+
+  if(val is IntNode || val is DoubleNode){
+    final DoubleNode result = DoubleNode()..doubleVal = log(val is DoubleNode ? val.doubleVal : val.intVal);
+    return result;
+  }
+
+  throw const UnexpectedTypeException('The ln method only takes [double, int] argument types for argument val');
 }
