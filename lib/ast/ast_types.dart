@@ -166,7 +166,7 @@ class ListNode extends ASTNode {
   ASTType type = ASTType.AST_LIST;
 
   @override
-  List listElements = [];
+  List listElements;
 
   @override
   List funcDefinitions = [];
@@ -195,7 +195,7 @@ class MapNode extends ASTNode {
   ASTType type = ASTType.AST_MAP;
 
   @override
-  Map<String, dynamic> map = {};
+  Map<String, dynamic> map;
 
   @override
   List funcDefinitions = [];
@@ -416,7 +416,7 @@ class StringNode extends ASTNode {
   ASTType type = ASTType.AST_STRING;
 
   @override
-  String stringValue = '';
+  String stringValue;
 
   @override
   ASTNode copy() {
@@ -460,17 +460,13 @@ class IntNode extends ASTNode {
   ASTType type = ASTType.AST_INT;
 
   @override
-  int intVal = 0;
-
-  @override
-  double doubleVal = 0;
+  int intVal;
 
   @override
   ASTNode copy() {
     final IntNode node = IntNode()
       ..scope = scope
-      ..intVal = intVal
-      ..doubleVal = doubleVal;
+      ..intVal = intVal;
 
     return node;
   }
@@ -487,17 +483,13 @@ class DoubleNode extends ASTNode {
   ASTType type = ASTType.AST_DOUBLE;
 
   @override
-  double doubleVal = 0;
-
-  @override
-  int intVal = 0;
+  double doubleVal;
 
   @override
   ASTNode copy() {
     final DoubleNode node = DoubleNode()
       ..scope = scope
-      ..intVal = intVal
-      ..doubleVal = doubleVal;
+      ..intVal = intVal;
 
     return node;
   }

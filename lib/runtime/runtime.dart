@@ -303,17 +303,17 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
 bool boolEval(ASTNode node) {
   switch (node.runtimeType) {
     case IntNode:
-      return node.intVal > 0;
+      return node.intVal != null;
     case DoubleNode:
-      return node.doubleVal > 0;
+      return node.doubleVal != null;
     case BoolNode:
       return node.boolVal;
     case StringNode:
-      return node.stringValue.isNotEmpty;
+      return node.stringValue != null;
     case MapNode:
-      return node.map.isNotEmpty;
+      return node.map != null;
     case ListNode:
-      return node.listElements.isNotEmpty;
+      return node.listElements != null;
     default:
       return false;
   }
@@ -687,21 +687,14 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           break;
         case TokenType.TOKEN_PLUS_EQUAL:
           {
-            if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_INT) {
-              astVarDef.variableValue.intVal +=
-                  value.intVal ?? value.doubleVal.toInt();
+            if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_INT) {
 
-              astVarDef.variableValue.doubleVal +=
-                  astVarDef.variableValue.intVal;
-            } else if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_DOUBLE) {
-              astVarDef.variableValue.doubleVal +=
-                  value.doubleVal ?? value.intVal;
-              astVarDef.variableValue.intVal +=
-                  astVarDef.variableValue.doubleVal.toInt();
-            } else if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_STRING) {
+              astVarDef.variableValue.intVal +=value.intVal ?? value.doubleVal.toInt();
+
+            } else if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_DOUBLE) {
+              astVarDef.variableValue.doubleVal += value.doubleVal ?? value.intVal;
+
+            } else if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_STRING) {
               astVarDef.variableValue.stringValue += value.stringValue;
             }
             return astVarDef.variableValue;

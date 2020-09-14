@@ -8,7 +8,7 @@ ASTNode visitClassProperties(ASTNode node, ASTNode left) {
       final StringNode stringNode = StringNode()..stringValue = left.className;
       return stringNode;
     case 'variableDefinitions':
-      final MapNode ast = MapNode();
+      final MapNode ast = MapNode()..map = {};
 
       left.classChildren.whereType<VarDefNode>().forEach((varDef) {
         ast.map[varDef.variableName] = varDef;

@@ -273,7 +273,7 @@ ASTNode parseStatements(Parser parser, Scope scope) {
   compound.compoundValue.add(statement);
 
   while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-      parser.prevToken.type == TokenType.TOKEN_RBRACE &&
+      parser.prevToken?.type == TokenType.TOKEN_RBRACE &&
           statement.type != ASTType.AST_NOOP) {
     if (parser.curToken.type == TokenType.TOKEN_SEMI)
       eat(parser, TokenType.TOKEN_SEMI);
