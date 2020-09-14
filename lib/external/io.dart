@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:Birb/runtime/runtime.dart';
 import 'package:Birb/runtime/standards.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_node.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/scope.dart';
 
 void registerIO(Runtime runtime) {

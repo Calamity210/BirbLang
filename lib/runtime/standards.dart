@@ -6,11 +6,11 @@ import 'package:Birb/external/convert.dart';
 import 'package:Birb/external/http.dart';
 import 'package:Birb/external/io.dart';
 import 'package:Birb/external/math.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:http/http.dart';
 
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/ast/ast_node.dart';
 import 'package:test/test.dart' as test;
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
 
 class CompoundNode extends ASTNode {
@@ -119,9 +119,6 @@ class ClassNode extends ASTNode {
   ASTNode superClass;
 
   @override
-  List funcDefinitions = [];
-
-  @override
   ASTNode variableType;
 
   @override
@@ -141,9 +138,6 @@ class ClassNode extends ASTNode {
       child.parent = node;
     });
 
-    funcDefinitions.forEach((child) {
-      node.funcDefinitions.add(child?.copy());
-    });
     return node;
   }
 }

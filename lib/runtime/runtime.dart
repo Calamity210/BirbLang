@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:Birb/core_types/core_types.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_node.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/utils/scope.dart';
 import 'package:Birb/parser/data_type.dart';
@@ -1086,7 +1086,7 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
       if (node.binaryOpRight.funcCallExpression.type == ASTType.AST_VARIABLE) {
         final funcCallName = node.binaryOpRight.funcCallExpression.variableName;
 
-        if (left.funcDefinitions != null) {
+        if (left is! ClassNode && left.funcDefinitions != null) {
           for (int i = 0; i < left.funcDefinitions.length; i++) {
             final ASTNode fDef = left.funcDefinitions[i];
 

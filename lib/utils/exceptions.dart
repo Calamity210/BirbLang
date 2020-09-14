@@ -1,4 +1,4 @@
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/ast/ast_node.dart';
 
 abstract class BirbException implements Exception {}
 

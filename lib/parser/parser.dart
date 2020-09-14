@@ -1,6 +1,6 @@
 import 'package:Birb/parser/data_type.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_node.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/constants.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/lexer/lexer.dart';
