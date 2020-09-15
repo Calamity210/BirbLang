@@ -2,10 +2,6 @@ grab("birb:io");
 
 scremLn(getCwd().runtimeType); // output String
 
-var output = system("echo", ["Henlo"], true);
-
-scremLn(output["errorCode"].runtimeType); // output String
-scremLn(output["stdout"].runtimeType); // output String
-scremLn(output["sterr"].runtimeType); // output String
+var echo = Process.run("echo", ["Henlo"], true);
 
 exit(0); 
