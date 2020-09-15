@@ -21,8 +21,7 @@ ASTNode INITIALIZED_NOOP;
 
 Future<void> initStandards(Runtime runtime, String path) async {
   if (path != null) {
-    filePath = path.replaceAllMapped(
-        RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
+    filePath = path.replaceAllMapped(RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
   }
   registerGlobalVariable(
       runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
@@ -45,28 +44,24 @@ Future<void> initStandards(Runtime runtime, String path) async {
   registerGlobalFunction(runtime, 'mock', funcMock);
 
   registerGlobalFutureFunction(runtime, 'grab', funcGrab);
-  registerGlobalFutureFunction(
-      runtime, 'variableFromString', funcVarFromString);
+  registerGlobalFutureFunction(runtime, 'variableFromString', funcVarFromString);
 }
 
-Future<ASTNode> funcGrab(
-    Runtime runtime, ASTNode self, List<ASTNode> args) async {
+Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
   final ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
     final String fileName = astStr.stringValue.split(':')[1];
 
-    final Lexer lexer = initLexer(
-        File('${Directory.current.path}/core/$fileName/$fileName.birb')
-            .readAsStringSync());
+    final Lexer lexer = initLexer(File('${Directory.current.path}/core/$fileName/$fileName.birb').readAsStringSync());
     final Parser parser = initParser(lexer);
     final ASTNode node = parse(parser);
     await visit(runtime, node);
 
     return AnyNode();
   } else if (astStr.stringValue.startsWith('dart:')) {
-    final String fileName = astStr.stringValue.replaceAll('dart:', '');
+  final String fileName = astStr.stringValue.replaceAll('dart:', '');
 
     switch (fileName) {
       case 'convert':
@@ -82,8 +77,7 @@ Future<ASTNode> funcGrab(
         registerMath(runtime);
         break;
       default:
-        throw UnexpectedTokenException(
-            'Error [Line ${self.lineNum}]:Dart file $fileName no found.');
+        throw UnexpectedTokenException('Error [Line ${self.lineNum}]:Dart file $fileName no found.');
     }
 
     return INITIALIZED_NOOP;
@@ -99,8 +93,7 @@ Future<ASTNode> funcGrab(
 
     return AnyNode();
   }
-  final String filename =
-      '$filePath${Platform.pathSeparator}${astStr.stringValue}';
+  final String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
 
   final Lexer lexer = initLexer(File(filename).readAsStringSync());
   final Parser parser = initParser(lexer);
@@ -115,15 +108,13 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg)
-          .then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString +=
-            '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stdout.write(classToString);
@@ -133,8 +124,7 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
     final str = astToString(astArg);
 
     if (str == null)
-      throw const UnexpectedTokenException(
-          'Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stdout.write(str);
   }
@@ -147,15 +137,13 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg)
-          .then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString +=
-            '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       print(classToString);
@@ -165,8 +153,7 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
     final str = astToString(astArg);
 
     if (str == null)
-      throw const UnexpectedTokenException(
-          'Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     print(str);
   }
@@ -176,25 +163,23 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
 ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
   if (args[0] is! StringNode)
-    throw UnexpectedTypeException(
-        'Error [Line ${self.lineNum}]: scremF expects the first parameter to be a String');
+    throw UnexpectedTypeException('Error [Line ${self.lineNum}]: scremF expects the first parameter to be a String');
 
   final StringNode strAST = args[0];
 
-  String str = astToString(strAST);
+    String str = astToString(strAST);
+    
+    str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
+      final int index = int.parse(match.group(1));
+      return astToString(args[index + 1]);
+    });
 
-  str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
-    final int index = int.parse(match.group(1));
-    return astToString(args[index + 1]);
-  });
+    str = str.replaceAll(r'\{', '\{').replaceAll(r'\}', r'}');
 
-  str = str.replaceAll(r'\{', '\{').replaceAll(r'\}', r'}');
+    if (str == null)
+      throw UnexpectedTokenException('Error [Line ${self.lineNum}]: Screm must contain non-null arguments');
 
-  if (str == null)
-    throw UnexpectedTokenException(
-        'Error [Line ${self.lineNum}]: Screm must contain non-null arguments');
-
-  stdout.write(str);
+    stdout.write(str);
 
   return INITIALIZED_NOOP;
 }
@@ -204,15 +189,13 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg)
-          .then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString +=
-            '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stderr.write(classToString);
@@ -222,8 +205,7 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
     final str = astToString(astArg);
 
     if (str == null)
-      throw const UnexpectedTokenException(
-          'Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stderr.write(str);
   }
@@ -236,15 +218,13 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg)
-          .then((value) => astArg = value);
+      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString +=
-            '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
       });
 
       stderr.write('$classToString\n');
@@ -254,8 +234,7 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
     final str = astToString(astArg);
 
     if (str == null)
-      throw const UnexpectedTokenException(
-          'Screm must contain non-null arguments');
+      throw const UnexpectedTokenException('Screm must contain non-null arguments');
 
     stderr.write('$str\n');
   }
@@ -454,10 +433,8 @@ ASTNode doubleClass(Runtime runtime) {
   return astObj;
 }
 
-Future<ASTNode> funcVarFromString(
-    Runtime runtime, ASTNode self, List<ASTNode> args) async {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
+    runtimeExpectArgs(args, [ASTType.AST_STRING]);
 
-  return await getVarDefByName(
-      runtime, getScope(runtime, args[0]), args[0].stringValue);
+    return await getVarDefByName(runtime, getScope(runtime, args[0]), args[0].stringValue);
 }
