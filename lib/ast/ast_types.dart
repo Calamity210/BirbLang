@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
 
@@ -113,7 +115,7 @@ class ClassNode extends ASTNode {
   String className;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode superClass;
@@ -236,7 +238,7 @@ class VariableNode extends ASTNode {
   bool isFinal;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   List<ASTNode> enumElements = [];
@@ -287,7 +289,7 @@ class VarModNode extends ASTNode {
   ASTNode binaryOpRight;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   List<ASTNode> enumElements = [];
@@ -384,7 +386,7 @@ class VarAssignmentNode extends ASTNode {
   bool isFinal;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode copy() {
@@ -811,7 +813,7 @@ class AttributeAccessNode extends ASTNode {
   ASTType type = ASTType.AST_ATTRIBUTE_ACCESS;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode binaryOpRight;

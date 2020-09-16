@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/ast/ast_types.dart';
@@ -469,7 +471,7 @@ ASTNode parseClass(Parser parser, Scope scope) {
   final ASTNode ast = initASTWithLine(ClassNode(), parser.lexer.lineNum)
     ..scope = scope
     ..className = parser.prevToken.value
-    ..classChildren = [];
+    ..classChildren = ListQueue();
 
   final newScope = initScope(false);
 

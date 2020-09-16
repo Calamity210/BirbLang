@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
@@ -47,8 +49,8 @@ abstract class ASTNode {
   String get className => throw Exception('Not part of $runtimeType => $type');
   set className(String _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get classChildren => throw Exception('Not part of $runtimeType => $type');
-  set classChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  ListQueue<ASTNode> get classChildren => throw Exception('Not part of $runtimeType => $type');
+  set classChildren(ListQueue<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   List<ASTNode> get compChildren => throw Exception('Not part of $runtimeType => $type');
   set compChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
