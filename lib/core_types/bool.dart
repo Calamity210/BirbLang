@@ -1,5 +1,5 @@
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_node.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `Bool`s
@@ -14,8 +14,6 @@ ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
     default:
       throw NoSuchPropertyException(node.binaryOpRight.variableName, 'bool');
   }
-
-
 }
 
 /// Visits methods for `Bool`s
