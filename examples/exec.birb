@@ -1,0 +1,3 @@
+String toExec = "screm('Henlo exec!')";
+
+exec(toExec); // output Henlo exec!

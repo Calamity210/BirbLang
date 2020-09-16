@@ -44,7 +44,19 @@ Future<void> initStandards(Runtime runtime, String path) async {
   registerGlobalFunction(runtime, 'mock', funcMock);
 
   registerGlobalFutureFunction(runtime, 'grab', funcGrab);
+  registerGlobalFutureFunction(runtime, 'exec', funcExec);
   registerGlobalFutureFunction(runtime, 'variableFromString', funcVarFromString);
+}
+
+Future<ASTNode> funcExec(Runtime runtime, ASTNode self, List<ASTNode> args) async {
+  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+
+  final Lexer lexer = initLexer(args[0].stringValue);
+  final Parser parser = initParser(lexer);
+  final ASTNode node = parse(parser);
+  await visit(runtime, node);
+
+  return AnyNode();
 }
 
 Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
