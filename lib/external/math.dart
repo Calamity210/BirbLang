@@ -61,7 +61,7 @@ ASTNode funcSin(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The sin method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The sin method only accept either double or int argument types');
 }
 
 ASTNode funcCos(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -73,7 +73,7 @@ ASTNode funcCos(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The cos method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The cos method only accept either double or int argument types');
 }
 
 ASTNode funcTan(Runtime runtime, ASTNode self, List<ASTNode> args){  
@@ -85,7 +85,7 @@ ASTNode funcTan(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The tan method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The tan method only accept either double or int argument types');
 }
 
 ASTNode funcASin(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -97,7 +97,7 @@ ASTNode funcASin(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The asin method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The asin method only accept either double or int argument types');
 }
 
 ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -109,7 +109,7 @@ ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The acos method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The acos method only accept either double or int argument types');
 }
 
 ASTNode funcATan(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -121,7 +121,7 @@ ASTNode funcATan(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The atan method only accept [double, int] argument types');
+  throw const UnexpectedTypeException('The atan method only accept either double or int argument types');
 }
 
 ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -135,7 +135,7 @@ ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
   
-  throw const UnexpectedTypeException('The atan2 method only takes [double, int] argument types for argument y and x');
+  throw const UnexpectedTypeException('The atan2 method only takes either double or int argument types for argument y and x');
 }
 
 ASTNode funcExp(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -147,7 +147,7 @@ ASTNode funcExp(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
 
-  throw const UnexpectedTypeException('The exp method only takes [double, int] argument types for argument val');
+  throw const UnexpectedTypeException('The exp method only takes either double or int argument types for argument val');
 }
 
 ASTNode funcLog(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -161,7 +161,7 @@ ASTNode funcLog(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
 
-  throw const UnexpectedTypeException('The log method only takes [double, int] argument types for argument base and val');
+  throw const UnexpectedTypeException('The log method only takes either double or int argument types for argument base and val');
 }
 
 ASTNode funcLn(Runtime runtime, ASTNode self, List<ASTNode> args){
@@ -173,5 +173,5 @@ ASTNode funcLn(Runtime runtime, ASTNode self, List<ASTNode> args){
     return result;
   }
 
-  throw const UnexpectedTypeException('The ln method only takes [double, int] argument types for argument val');
+  throw const UnexpectedTypeException('The ln method only takes either double or int argument types for argument val');
 }
