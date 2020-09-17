@@ -29,7 +29,7 @@ function Home() {
               <ul>
                 <li>Clone the repo from https://github.com/Calamity210/BirbLang</li>
                 <li>Navigate to the new directory and install birb by running:
-                  <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight language-shell"><code class=" language-shell">$ dart2native lib/Birb.dart
+                  <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight language-shell"><code class=" language-shell">$ dart2native lib/birb.dart
               </code></pre></div>    </div>
                   </li>
                 <li>When ready, open and pull request and request a review from a contributor.</li>
