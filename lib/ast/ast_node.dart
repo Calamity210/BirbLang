@@ -292,7 +292,11 @@ String astToString(ASTNode ast) {
     case ASTType.AST_RETURN:
       return astToString(ast.returnValue);
     case ASTType.AST_ENUM:
-      return ast.variableName;
+      String enumStr = 'enum {\n';
+      ast.enumElements.forEach((element) => enumStr += ' ${astToString(element)},\n');
+      enumStr += '}';
+
+      return enumStr;
     default:
       print('Could not convert ast of type ${ast.type} to String');
       return null;

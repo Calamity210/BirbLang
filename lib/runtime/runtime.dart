@@ -362,9 +362,8 @@ Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
         if (variable.ast != null) {
           return variable.ast;
         } else {
-          final intAST = IntNode();
-          intAST.intVal = i;
-          variable.ast = intAST;
+          final listAST = ListNode()..listElements = [i, variable.variableName];
+          variable.ast = listAST;
 
           return variable.ast;
         }
@@ -934,6 +933,8 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
   final scope = getScope(runtime, node);
   final List<ASTNode> oldDefList = [];
 
+
+
   for (int i = 0; i < scope.variableDefinitions.length; i++) {
     final ASTNode varDef = scope.variableDefinitions.elementAt(i);
     oldDefList.add(varDef);
@@ -949,14 +950,12 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
     if (visited != null) {
       if (visited.type == ASTType.AST_RETURN) {
         if (visited.returnValue != null) {
-          final ASTNode retVal = await visit(runtime, visited.returnValue);
-
           collectAndSweepGarbage(runtime, oldDefList, scope);
-          return retVal;
-        } else {
-          collectAndSweepGarbage(runtime, oldDefList, scope);
-          return null;
+          return await visit(runtime, visited.returnValue);
         }
+
+        collectAndSweepGarbage(runtime, oldDefList, scope);
+        return null;
       } else if (visited.type == ASTType.AST_BREAK ||
           visited.type == ASTType.AST_NEXT) {
         return visited;

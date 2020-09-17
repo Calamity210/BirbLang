@@ -226,6 +226,9 @@ class VariableNode extends ASTNode {
   ASTType type = ASTType.AST_VARIABLE;
 
   @override
+  ASTNode ast;
+
+  @override
   String variableName;
 
   @override
