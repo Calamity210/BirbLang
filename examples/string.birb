@@ -14,7 +14,7 @@ List colors = ['c', 'o', 'l', 'o', 'r', 's'];
 String colorStr = '';
 
 for (int i = 0; i < colors.length; i++) {
-colorStr += '$' + (90 + i) + 'm' + colors[i];
+  colorStr += '$' + (90 + i) + 'm' + colors[i];
 }
 
 scremLn(colorStr); // output [90mc[91mo[92ml[93mo[94mr[95ms
