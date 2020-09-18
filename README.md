@@ -12,7 +12,7 @@
 - Navigate to the new directory and install birb by running:
 ```shell
 $ pub get
-$ dart2native lib/Birb.dart
+$ dart2native lib/birb.dart
 ```
 
 - When ready, open and pull request and request a review from me - Calamity210.
