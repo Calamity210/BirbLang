@@ -47,7 +47,7 @@ Runtime initRuntime(String path) {
 
   final MAP_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
   MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
+  MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapRemoveFuncPointer;
   runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
 
   return runtime;
