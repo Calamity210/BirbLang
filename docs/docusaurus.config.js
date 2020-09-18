@@ -1,12 +1,13 @@
 module.exports = {
   title: 'BirbLang',
   tagline: 'Smol Programming Language',
-  url: 'https://Calamity210.github.io',
+  url: 'https://birbolang.web.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
   themes: ['@docusaurus/theme-live-codeblock'],
   plugins: [
+        require.resolve('@cmfcmf/docusaurus-search-local'),
       [
         '@docusaurus/plugin-content-docs',
         {
@@ -86,13 +87,6 @@ module.exports = {
     prism: {
      additionalLanguages: ['dart'],
      defaultLanguage: 'dart',
-    },
-    algolia: {
-     apiKey: '7a1c0622f793d186564c3bc2d235068e',
-     indexName: 'BIRB_DOCS',
-     searchParameters: {
-      facetFilters: [`version:latest`],
-     },
     },
   },
   presets: [
