@@ -10,16 +10,13 @@
 # Contribution
 
 - Join the discord - https://discord.gg/9dq6YB2
-- Make a fork of this repo.
-- Clone the fork.
-- Navigate to the cloned directory and build birb by running:
+- Clone the repository
+- Navigate to the new directory and install birb by running:
 ```shell
 $ pub get
 $ dart2native lib/birb.dart
 ```
 - When ready, open and pull request and request a review from me - Calamity210.
-
-More info about contributing can be found here: https://birbolang.web.app/docs/contributing
 
 # Docs
 https://birbolang.web.app/
