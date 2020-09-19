@@ -443,7 +443,8 @@ ASTNode parseVariable(Parser parser, Scope scope) {
       parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
+      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_NOSEEB_ASSIGNMENT) {
     final Token operator = parser.curToken;
 
     eat(parser, operator.type);

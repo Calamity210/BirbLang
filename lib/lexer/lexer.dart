@@ -282,6 +282,13 @@ Token getNextToken(Lexer lexer) {
           type = TokenType.TOKEN_NOSEEB_OPERATOR;
           value += lexer.currentChar;
           advance(lexer);
+
+          // ??=
+          if (lexer.currentChar == '=') {
+            type = TokenType.TOKEN_NOSEEB_ASSIGNMENT;
+            value += lexer.currentChar;
+            advance(lexer);
+          }
         }
 
         return initToken(type, value);

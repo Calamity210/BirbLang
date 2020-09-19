@@ -686,6 +686,12 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           }
           break;
 
+        case TokenType.TOKEN_NOSEEB_ASSIGNMENT:
+          {
+            // TODO: (Andy-Python-Programmer) Handel no seeb assignments!
+          }
+          break;
+
         case TokenType.TOKEN_SUB_EQUAL:
           {
             if (astVarDef.variableType.typeValue.type ==
@@ -1617,13 +1623,11 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_NOSEEB_OPERATOR:
       {
-        if (left.type == ASTType.AST_NULL){
+        if (left is NullNode){
           return right;
         }
-
-        else{
-          return left;
-        }
+        
+        return left;
       }
       break;
 
