@@ -1615,6 +1615,18 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
       }
       break;
 
+    case TokenType.TOKEN_NOSEEB_OPERATOR:
+      {
+        if (left.type == ASTType.AST_NULL){
+          return right;
+        }
+
+        else{
+          return left;
+        }
+      }
+      break;
+
     case TokenType.TOKEN_BITWISE_OR:
       {
         if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {

@@ -1,0 +1,7 @@
+int? age;
+
+scremLn(age ?? 10); // output 10
+
+age = 10;
+
+scremLn(age ?? 20); // output 10
