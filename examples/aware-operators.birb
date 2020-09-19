@@ -15,3 +15,7 @@ scremLn(name); // output Grey
 name ??= "Beeper";
 
 scremLn(name); // output Grey
+
+String? undefined;
+
+scremLn(undefined?.toString())
