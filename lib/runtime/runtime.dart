@@ -688,7 +688,11 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
 
         case TokenType.TOKEN_NOSEEB_ASSIGNMENT:
           {
-            // TODO: (Andy-Python-Programmer) Handel no seeb assignments!
+            if (astVarDef.variableValue is NullNode){
+              return astVarDef.variableValue = value;
+            }
+
+            return value;
           }
           break;
 
