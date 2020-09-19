@@ -1,7 +1,9 @@
 <p align="center"><img src="misc/logo.png" height="150px"></p>
 <h1 align="center">Birb</h1>
 <p align="center">
-<img src="https://github.com/Calamity210/BirbLang/workflows/Dart CI/badge.svg">
+    <img alt="Dart CI" src="https://github.com/Calamity210/BirbLang/workflows/Dart CI/badge.svg">
+    <img alt="Deploy" src="https://github.com/Calamity210/BirbLang/workflows/Deploy/badge.svg">
+    <img alt="Discord" src="https://img.shields.io/discord/733507194560970783">
 </p>
 <p align="center">Minimal Birb programming language!</p>
 
@@ -14,7 +16,6 @@
 $ pub get
 $ dart2native lib/birb.dart
 ```
-
 - When ready, open and pull request and request a review from me - Calamity210.
 
 # Docs
