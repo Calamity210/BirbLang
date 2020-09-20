@@ -1539,29 +1539,28 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_LESS_THAN_EQUAL:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal <= right.intVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE &&
-            right.type == ASTType.AST_DOUBLE) {
+        if (left is DoubleNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal <= right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
+        if (left is IntNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal <= right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
+        if (left is DoubleNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal <= right.intVal;
@@ -1573,29 +1572,28 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_GREATER_THAN_EQUAL:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal >= right.intVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE &&
-            right.type == ASTType.AST_DOUBLE) {
+        if (left is DoubleNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal >= right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_DOUBLE) {
+        if (left is IntNode && right is DoubleNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal >= right.doubleVal;
 
           return retVal;
         }
-        if (left.type == ASTType.AST_DOUBLE && right.type == ASTType.AST_INT) {
+        if (left is DoubleNode && right is IntNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal >= right.intVal;
@@ -1607,7 +1605,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_AND:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = IntNode()..intVal = left.intVal & right.intVal;
 
           return retVal;
@@ -1617,7 +1615,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_OR:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = IntNode()..intVal = left.intVal | right.intVal;
 
           return retVal;
@@ -1627,7 +1625,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_BITWISE_XOR:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = IntNode()..intVal = left.intVal ^ right.intVal;
 
           return retVal;
@@ -1637,7 +1635,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_LSHIFT:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = IntNode()..intVal = left.intVal << right.intVal;
 
           return retVal;
@@ -1647,7 +1645,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
     case TokenType.TOKEN_RSHIFT:
       {
-        if (left.type == ASTType.AST_INT && right.type == ASTType.AST_INT) {
+        if (left is IntNode && right is IntNode) {
           retVal = IntNode()..intVal = left.intVal >> right.intVal;
 
           return retVal;
