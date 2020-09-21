@@ -25,9 +25,10 @@ Token getNextToken(Lexer lexer) {
   while (
       lexer.currentIndex < lexer.program.length && lexer.currentChar != null) {
     // Skip
-    if (lexer.currentChar == ' ' ||
-        lexer.currentChar == '\n' ||
-        lexer.currentChar == '\r') skipWhitespace(lexer);
+    if (lexer.currentChar == ' '
+        || lexer.currentChar == '\n'
+        || lexer.currentChar == '\r')
+      skipWhitespace(lexer);
 
     // Collect a num
     if (isNumeric(lexer.currentChar)) {
@@ -39,7 +40,8 @@ Token getNextToken(Lexer lexer) {
 
       if (lexer.currentChar == '"')
         collectString(lexer, true);
-      else if (lexer.currentChar == "'") collectSingleQuoteString(lexer, true);
+      else if (lexer.currentChar == "'")
+        collectSingleQuoteString(lexer, true);
 
       if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
         return collectId(lexer, 'r');
@@ -277,7 +279,7 @@ Token getNextToken(Lexer lexer) {
 
         // ??
         if (lexer.currentChar == '?') {
-          type = TokenType.NOSEEB_AWARE_OPERATOR;
+          type = TokenType.TOKEN_NOSEEB_OPERATOR;
           value += lexer.currentChar;
           advance(lexer);
 
@@ -350,9 +352,12 @@ void skipWhitespace(Lexer lexer) {
   while (lexer.currentChar == ' ' ||
       lexer.currentChar == '\n' ||
       lexer.currentChar == '\r') {
-    if (lexer.currentChar == '') return;
 
-    if (lexer.currentChar == '\n') ++lexer.lineNum;
+    if (lexer.currentChar == '')
+      return;
+
+    if (lexer.currentChar == '\n')
+      ++lexer.lineNum;
     advance(lexer);
   }
 }
@@ -397,10 +402,8 @@ Token collectString(Lexer lexer, [bool isRaw = false]) {
     advance(lexer);
   }
 
-  final String value =
-      lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token =
-      initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -422,10 +425,8 @@ Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
     advance(lexer);
   }
 
-  final String value =
-      lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token =
-      initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
+  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -504,12 +505,12 @@ Token collectId(Lexer lexer, [String prefix = '']) {
   if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
     advance(lexer);
 
-    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar)) advance(lexer);
+    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar))
+      advance(lexer);
   }
 
   // Nullable?
-  if (lexer.currentChar == '?' &&
-      RegExp(r'\s').hasMatch(lexer.program[lexer.currentIndex + 1])) {
+  if (lexer.currentChar == '?' && RegExp(r'\s').hasMatch(lexer.program[lexer.currentIndex + 1])) {
     advance(lexer);
   }
 
@@ -531,18 +532,17 @@ extension on String {
     String escapedString = this;
 
     escapedString = escapedString
-        .replaceAll(r'\f', '\x0C')
-        .replaceAll(r'\n', '\x0A')
-        .replaceAll(r'\r', '\x0D')
-        .replaceAll(r'\t', '\x09')
-        .replaceAll(r'\v', '\x0B')
-        .replaceAll(r'\\', '\x5C')
-        .replaceAll(r"\'", '\x27')
-        .replaceAll(r'\"', '\x22')
-        .replaceAllMapped(RegExp(r'\\x(.){2}'),
-            (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
-        .replaceAll(r'\$', '\$')
-        .replaceAll(r'$', '\x1B[');
+    .replaceAll(r'\f', '\x0C')
+    .replaceAll(r'\n', '\x0A')
+    .replaceAll(r'\r', '\x0D')
+    .replaceAll(r'\t', '\x09')
+    .replaceAll(r'\v', '\x0B')
+    .replaceAll(r'\\', '\x5C')
+    .replaceAll(r"\'", '\x27')
+    .replaceAll(r'\"', '\x22')
+    .replaceAllMapped(RegExp(r'\\x(.){2}'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
+    .replaceAll(r'\$', '\$')
+    .replaceAll(r'$', '\x1B[');
 
     return escapedString;
   }

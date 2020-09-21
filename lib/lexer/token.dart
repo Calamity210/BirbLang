@@ -37,7 +37,7 @@ enum TokenType {
   TOKEN_GREATER_THAN,
   TOKEN_LESS_THAN_EQUAL,
   TOKEN_GREATER_THAN_EQUAL,
-  NOSEEB_AWARE_OPERATOR,
+  TOKEN_NOSEEB_OPERATOR,
   TOKEN_NOSEEB_ASSIGNMENT,
   TOKEN_NOSEEB_ACCESS,
   TOKEN_AND,
@@ -65,3 +65,4 @@ Token initToken(TokenType type, String value) {
     ..value = value;
   return token;
 }
+

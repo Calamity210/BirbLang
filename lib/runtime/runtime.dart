@@ -103,12 +103,14 @@ ASTNode mapRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
 }
 
 void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
-  if (scope == runtime.scope) return;
+  if (scope == runtime.scope)
+    return;
 
   final List<ASTNode> garbage = [];
 
   for (final ASTNode newDef in scope.variableDefinitions)
-    if (!oldDefList.contains(newDef)) scope.variableDefinitions.remove(newDef);
+    if (!oldDefList.contains(newDef))
+      scope.variableDefinitions.remove(newDef);
 
   garbage.forEach((garb) => scope.variableDefinitions.remove(garb));
 }
@@ -134,7 +136,8 @@ Future<ASTNode> runtimeFuncCall(
       final vDef = await getVarDefByName(
           runtime, getScope(runtime, astArg), astArg.variableName);
 
-      if (vDef != null) newVariableDef.variableValue = vDef.variableValue;
+      if (vDef != null)
+        newVariableDef.variableValue = vDef.variableValue;
     }
 
     newVariableDef.variableValue ??= await visit(runtime, astArg);
@@ -184,7 +187,8 @@ ASTNode registerGlobalVariable(
 }
 
 Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
-  if (node == null) return null;
+  if (node == null)
+    return null;
 
   switch (node.type) {
     case ASTType.AST_CLASS:
@@ -372,7 +376,8 @@ Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
         await getVarDefByName(runtime, localScope, node.variableName);
 
     if (varDef != null) {
-      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION) return varDef;
+      if (varDef.type != ASTType.AST_VARIABLE_DEFINITION)
+        return varDef;
 
       final value = await visit(runtime, varDef.variableValue);
       value.typeValue = varDef.variableType.typeValue;
@@ -423,6 +428,7 @@ Future<ASTNode> visitVariable(Runtime runtime, ASTNode node) async {
 }
 
 Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
+
   if (node.savedFuncCall != null) {
     node.variableValue = await visit(runtime, node.savedFuncCall);
   } else {
@@ -526,7 +532,8 @@ Future<ASTNode> visitVarAssignment(
     if (varDef != null) {
       final value = await visit(runtime, node.variableValue);
 
-      if (value == null) return null;
+      if (value == null)
+        return null;
       if (value.type == ASTType.AST_DOUBLE) {
         value.intVal = value.doubleVal.toInt();
       }
@@ -568,7 +575,8 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
       for (int i = 0; i < node.classChildren.length; i++) {
         final ASTNode objectVarDef = node.classChildren.elementAt(i);
 
-        if (objectVarDef.type != ASTType.AST_VARIABLE_DEFINITION) continue;
+        if (objectVarDef.type != ASTType.AST_VARIABLE_DEFINITION)
+          continue;
 
         if (objectVarDef.variableName == left.variableName) {
           astVarDef = objectVarDef;
@@ -664,16 +672,14 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           break;
         case TokenType.TOKEN_PLUS_EQUAL:
           {
-            if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_INT) {
-              astVarDef.variableValue.intVal +=
-                  value.intVal ?? value.doubleVal.toInt();
-            } else if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_DOUBLE) {
-              astVarDef.variableValue.doubleVal +=
-                  value.doubleVal ?? value.intVal;
-            } else if (astVarDef.variableType.typeValue.type ==
-                DATATYPE.DATA_TYPE_STRING) {
+            if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_INT) {
+
+              astVarDef.variableValue.intVal +=value.intVal ?? value.doubleVal.toInt();
+
+            } else if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_DOUBLE) {
+              astVarDef.variableValue.doubleVal += value.doubleVal ?? value.intVal;
+
+            } else if (astVarDef.variableType.typeValue.type == DATATYPE.DATA_TYPE_STRING) {
               astVarDef.variableValue.stringValue += value.stringValue;
             }
             return astVarDef.variableValue;
@@ -682,7 +688,7 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
 
         case TokenType.TOKEN_NOSEEB_ASSIGNMENT:
           {
-            if (astVarDef.variableValue is NullNode) {
+            if (astVarDef.variableValue is NullNode){
               return astVarDef.variableValue = value;
             }
 
@@ -786,9 +792,11 @@ Future<ASTNode> runtimeFuncLookup(
 
   final ASTNode visitedExpr = await visit(runtime, node.funcCallExpression);
 
-  if (visitedExpr.type == ASTType.AST_FUNC_DEFINITION) funcDef = visitedExpr;
+  if (visitedExpr.type == ASTType.AST_FUNC_DEFINITION)
+    funcDef = visitedExpr;
 
-  if (funcDef == null) return null;
+  if (funcDef == null)
+    return null;
 
   if (funcDef.futureFuncPointer != null) {
     final List<ASTNode> visitedFuncPointerArgs = [];
@@ -801,7 +809,8 @@ Future<ASTNode> runtimeFuncLookup(
         final vDef = await getVarDefByName(
             runtime, getScope(runtime, astArg), astArg.variableName);
 
-        if (vDef != null) visited = vDef.variableValue;
+        if (vDef != null)
+          visited = vDef.variableValue;
       }
 
       visited = visited ?? await visit(runtime, astArg);
@@ -827,7 +836,8 @@ Future<ASTNode> runtimeFuncLookup(
         final vDef = await getVarDefByName(
             runtime, getScope(runtime, astArg), astArg.variableName);
 
-        if (vDef != null) visited = vDef.variableValue;
+        if (vDef != null)
+          visited = vDef.variableValue;
       }
 
       visited = visited ?? await visit(runtime, astArg);
@@ -910,12 +920,14 @@ Future<ASTNode> visitFuncCall(Runtime runtime, ASTNode node) async {
     final localScopeFuncDef =
         await runtimeFuncLookup(runtime, node.scope, node);
 
-    if (localScopeFuncDef != null) return localScopeFuncDef;
+    if (localScopeFuncDef != null)
+      return localScopeFuncDef;
   }
 
   final globalScopeFuncDef =
       await runtimeFuncLookup(runtime, runtime.scope, node);
-  if (globalScopeFuncDef != null) return globalScopeFuncDef;
+  if (globalScopeFuncDef != null)
+    return globalScopeFuncDef;
 
   String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 
@@ -931,6 +943,8 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
   final scope = getScope(runtime, node);
   final List<ASTNode> oldDefList = [];
 
+
+
   for (int i = 0; i < scope.variableDefinitions.length; i++) {
     final ASTNode varDef = scope.variableDefinitions.elementAt(i);
     oldDefList.add(varDef);
@@ -939,7 +953,8 @@ Future<ASTNode> visitCompound(Runtime runtime, ASTNode node) async {
   for (int i = 0; i < node.compoundValue.length; i++) {
     final ASTNode child = node.compoundValue[i];
 
-    if (child == null) continue;
+    if (child == null)
+      continue;
 
     final ASTNode visited = await visit(runtime, child);
     if (visited != null) {
@@ -1026,7 +1041,8 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
             binOpRight.type == ASTType.AST_ATTRIBUTE_ACCESS) {
           final ASTNode classPropertyNode = visitClassProperties(node, left);
 
-          if (classPropertyNode != null) return classPropertyNode;
+          if (classPropertyNode != null)
+            return classPropertyNode;
 
           binOpRight.classChildren = left.classChildren;
           binOpRight.scope = left.scope;
@@ -1093,11 +1109,9 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
           for (int i = 0; i < left.classChildren.length; i++) {
             final ASTNode objChild = left.classChildren.elementAt(i);
 
-            if (objChild.type == ASTType.AST_FUNC_DEFINITION) if (objChild
-                    .funcName ==
-                funcCallName)
-              return await runtimeFuncCall(
-                  runtime, node.binaryOpRight, objChild);
+            if (objChild.type == ASTType.AST_FUNC_DEFINITION)
+              if (objChild.funcName == funcCallName)
+              return await runtimeFuncCall(runtime, node.binaryOpRight, objChild);
           }
         }
       }
@@ -1203,9 +1217,11 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
   if (node.binaryOperator.type == TokenType.TOKEN_DOT) {
     String accessName;
 
-    if (right.type == ASTType.AST_VARIABLE) accessName = right.variableName;
+    if (right.type == ASTType.AST_VARIABLE)
+      accessName = right.variableName;
 
-    if (right.type == ASTType.AST_BINARYOP) right = await visit(runtime, right);
+    if (right.type == ASTType.AST_BINARYOP)
+      right = await visit(runtime, right);
 
     if (left.type == ASTType.AST_CLASS) {
       for (int i = 0; i < left.classChildren.length; i++) {
@@ -1242,9 +1258,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
               newVarDef.variableValue = await visit(runtime, astArg);
               newVarDef.variableName = argName;
 
-              getScope(runtime, child.funcDefBody)
-                  .variableDefinitions
-                  .addFirst(newVarDef);
+              getScope(runtime, child.funcDefBody).variableDefinitions.addFirst(newVarDef);
             }
 
             return await visit(runtime, child.funcDefBody);
@@ -1611,12 +1625,15 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
       }
       break;
 
-    case TokenType.NOSEEB_AWARE_OPERATOR:
-      if (left is NullNode) {
-        return right;
+    case TokenType.TOKEN_NOSEEB_OPERATOR:
+      {
+        if (left is NullNode){
+          return right;
+        }
+        
+        return left;
       }
-
-      return left;
+      break;
 
     case TokenType.TOKEN_BITWISE_OR:
       {
@@ -2083,17 +2100,21 @@ Future<ASTNode> visitIf(Runtime runtime, ASTNode node) async {
         false) {
       return await visit(runtime, node.ifBody);
     } else {
-      if (node.ifElse != null) return await visit(runtime, node.ifElse);
+      if (node.ifElse != null)
+        return await visit(runtime, node.ifElse);
 
-      if (node.elseBody != null) return await visit(runtime, node.elseBody);
+      if (node.elseBody != null)
+        return await visit(runtime, node.elseBody);
     }
   } else {
     if (boolEval(await visit(runtime, node.ifExpression))) {
       return await visit(runtime, node.ifBody);
     } else {
-      if (node.ifElse != null) return await visit(runtime, node.ifElse);
+      if (node.ifElse != null)
+        return await visit(runtime, node.ifElse);
 
-      if (node.elseBody != null) return await visit(runtime, node.elseBody);
+      if (node.elseBody != null)
+        return await visit(runtime, node.elseBody);
     }
   }
   return node;
@@ -2171,7 +2192,8 @@ Future<ASTNode> visitWhile(Runtime runtime, ASTNode node) async {
 
     if (visited.type == ASTType.AST_BREAK)
       break;
-    else if (visited.type == ASTType.AST_NEXT) continue;
+    else if (visited.type == ASTType.AST_NEXT)
+      continue;
   }
 
   return node;
@@ -2261,7 +2283,8 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
     for (; i < astIterable.stringValue.length; i++) {
       newVarDef.variableValue.stringValue = astIterable.stringValue[i];
 
-      if (indexVar != null) indexVar.variableValue.intVal = i;
+      if (indexVar != null)
+        indexVar.variableValue.intVal = i;
 
       await visit(runtime, fDef.funcDefBody);
     }
@@ -2276,7 +2299,8 @@ Future<ASTNode> visitIterate(Runtime runtime, ASTNode node) async {
       newVarDef.variableValue =
           await visit(runtime, astIterable.listElements[i] as ASTNode);
 
-      if (indexVar != null) indexVar.variableValue.intVal = i;
+      if (indexVar != null)
+        indexVar.variableValue.intVal = i;
 
       await visit(runtime, fDef.funcDefBody);
     }
@@ -2322,7 +2346,8 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
   }
 
   for (int i = 0; i < args.length; i++) {
-    if (args[i] == ASTType.AST_ANY) continue;
+    if (args[i] == ASTType.AST_ANY)
+      continue;
 
     final ASTNode ast = inArgs[i];
 
