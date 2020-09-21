@@ -53,8 +53,9 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   final ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
     final String fileName = astStr.stringValue.split(':')[1];
+    final String ps = Platform.pathSeparator;
 
-    final Lexer lexer = initLexer(File('${Directory.current.path}/core/$fileName/$fileName.birb').readAsStringSync());
+    final Lexer lexer = initLexer(File('${Directory.current.path}${ps}core$ps$fileName$ps$fileName.birb').readAsStringSync());
     final Parser parser = initParser(lexer);
     final ASTNode node = parse(parser);
     await visit(runtime, node);
