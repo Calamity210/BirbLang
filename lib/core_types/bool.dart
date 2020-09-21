@@ -6,11 +6,8 @@ import 'package:Birb/utils/exceptions.dart';
 ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'runtimeType':
-      {
-        final StringNode stringAST = StringNode()
+        return StringNode()
           ..stringValue = left.boolVal.runtimeType.toString();
-        return stringAST;
-      }
     default:
       throw NoSuchPropertyException(node.binaryOpRight.variableName, 'bool');
   }
@@ -20,11 +17,7 @@ ASTNode visitBoolProperties(ASTNode node, ASTNode left) {
 ASTNode visitBoolMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'toString':
-      {
-        final StringNode stringAST = StringNode()
-          ..stringValue = left.boolVal.toString();
-        return stringAST;
-      }
+        return StringNode()..stringValue = left.boolVal.toString();
     default:
       throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'bool');
   }

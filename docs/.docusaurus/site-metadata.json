@@ -17,9 +17,9 @@
       "name": "@docusaurus/plugin-content-pages",
       "version": "2.0.0-alpha.63"
     },
-    "docusaurus-plugin-debug": {
+    "docusaurus-plugin-sitemap": {
       "type": "package",
-      "name": "@docusaurus/plugin-debug",
+      "name": "@docusaurus/plugin-sitemap",
       "version": "2.0.0-alpha.63"
     },
     "docusaurus-theme-classic": {
@@ -27,10 +27,10 @@
       "name": "@docusaurus/theme-classic",
       "version": "2.0.0-alpha.63"
     },
-    "docusaurus-theme-search-algolia": {
+    "@cmfcmf/docusaurus-search-local": {
       "type": "package",
-      "name": "@docusaurus/theme-search-algolia",
-      "version": "2.0.0-alpha.63"
+      "name": "@cmfcmf/docusaurus-search-local",
+      "version": "0.3.0"
     },
     "docusaurus-theme-live-codeblock": {
       "type": "package",

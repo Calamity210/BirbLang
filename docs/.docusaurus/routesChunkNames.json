@@ -1,67 +1,42 @@
 {
   "/-d7d": {
-    "component": "component---site-src-pages-index-jsece-a18",
-    "config": "config---5-e-9-4f3"
-  },
-  "/__docusaurus/debug-3d6": {
-    "component": "component---theme-debug-config-23-a-2ff"
-  },
-  "/__docusaurus/debug/config-914": {
-    "component": "component---theme-debug-config-23-a-2ff"
-  },
-  "/__docusaurus/debug/content-d12": {
-    "component": "component---theme-debug-contentba-8-ce7",
-    "allContent": "allContent---docusaurus-debug-content-4-c-9-f03"
-  },
-  "/__docusaurus/debug/globalData-3cf": {
-    "component": "component---theme-debug-global-dataede-0fa"
-  },
-  "/__docusaurus/debug/metadata-31b": {
-    "component": "component---theme-debug-site-metadata-68-e-3d4"
-  },
-  "/__docusaurus/debug/registry-0da": {
-    "component": "component---theme-debug-registry-679-501"
-  },
-  "/__docusaurus/debug/routes-244": {
-    "component": "component---theme-debug-routes-946-699"
-  },
-  "/search-722": {
-    "component": "component---c-users-user-projects-birb-lang-docs-node-modules-docusaurus-theme-search-algolia-src-theme-search-page-index-js-817-c42"
+    "component": "ece76bd1",
+    "config": "5e9f5e1a"
   },
   "/community-ee3": {
-    "component": "component---theme-doc-page-1-be-9be",
-    "versionMetadata": "versionMetadata---communityd-9-c-6f3"
+    "component": "1be78505",
+    "versionMetadata": "d9c7e11f"
   },
   "/community/support-361": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---community-supportf-9-f-7f2"
+    "component": "17896441",
+    "content": "f9fead57"
   },
   "/docs-497": {
-    "component": "component---theme-doc-page-1-be-9be",
-    "versionMetadata": "versionMetadata---docsf-97-b71"
+    "component": "1be78505",
+    "versionMetadata": "f976f453"
   },
   "/docs/-9a0": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-520-e6f"
+    "component": "17896441",
+    "content": "520233c7"
   },
   "/docs/contributing-024": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-contributing-14-d-d29"
+    "component": "17896441",
+    "content": "14dadce4"
   },
   "/docs/Core/int-d0a": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-core-int-145-bbe"
+    "component": "17896441",
+    "content": "1453b95d"
   },
   "/docs/Core/map-5a1": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-core-map-8-dd-2f9"
+    "component": "17896441",
+    "content": "8dd53def"
   },
   "/docs/Core/string-788": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-core-string-4-f-6-c9c"
+    "component": "17896441",
+    "content": "4f673955"
   },
   "/docs/walkthrough-99c": {
-    "component": "component---theme-doc-item-178-a40",
-    "content": "content---docs-walkthrough-5-e-0-df4"
+    "component": "17896441",
+    "content": "5e060f01"
   }
 }

@@ -8,295 +8,183 @@ import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `String`
 ASTNode visitStringProperties(ASTNode node, ASTNode left) {
-  switch (node.binaryOpRight.variableName) {
+  final binaryOpRight = node.binaryOpRight;
+
+  switch (binaryOpRight.variableName) {
     case 'codeUnits':
-      {
-        final ListNode astList = ListNode()
-          ..listElements = left.stringValue.codeUnits;
-        return astList;
-      }
+        return ListNode()..listElements = left.stringValue.codeUnits;
 
     case 'isEmpty':
-      {
-        final BoolNode astBool = BoolNode()..boolVal = left.stringValue.isEmpty;
-        return astBool;
-      }
+        return BoolNode()..boolVal = left.stringValue.isEmpty;
 
     case 'isNotEmpty':
-      {
-        final BoolNode astBool = BoolNode()..boolVal = left.stringValue.isNotEmpty;
-        return astBool;
-      }
+        return BoolNode()..boolVal = left.stringValue.isNotEmpty;
 
     case 'length':
-      {
-        final IntNode intAST = IntNode()..intVal = left.stringValue.length;
-
-        return intAST;
-      }
+        return IntNode()..intVal = left.stringValue.length;
 
     case 'mock':
-      {
         print(left.stringValue);
-        final StringNode astString = StringNode()
-          ..stringValue =
-              stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
 
-        return astString;
-      }
+        return StringNode()..stringValue
+        = stdin.readLineSync(encoding: Encoding.getByName('utf-8')).trim();
+
     case 'toBinary':
-      {
-        final ListNode astList = ListNode()
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(2))
-              .toList();
+        return ListNode()..listElements
+        = left.stringValue.codeUnits.map((e) => e.toRadixString(2)).toList();
 
-        return astList;
-      }
     case 'toOct':
-      {
-        final ListNode astList = ListNode()
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(8))
-              .toList();
-
-        return astList;
-      }
+        return ListNode()..listElements = left.stringValue.codeUnits
+            .map((e) => e.toRadixString(8))
+            .toList();
     case 'toHex':
-      {
-        final ListNode astList = ListNode()
-          ..listElements = left.stringValue.codeUnits
-              .map((e) => e.toRadixString(16))
-              .toList();
-
-        return astList;
-      }
+        return ListNode()..listElements = left.stringValue.codeUnits
+            .map((e) => e.toRadixString(16))
+            .toList();
 
     case 'runtimeType':
-      {
-        final StringNode stringAST = StringNode()
-          ..stringValue = left.stringValue.runtimeType.toString();
-        return stringAST;
-      }
+        return StringNode()..stringValue = left.stringValue.runtimeType.toString();
 
     default:
-      throw NoSuchPropertyException(node.binaryOpRight.variableName, 'String');
+      throw NoSuchPropertyException(binaryOpRight.variableName, 'String');
   }
 }
 
 /// Visits methods for `String`
 ASTNode visitStringMethods(ASTNode node, ASTNode left) {
-  switch (node.binaryOpRight.funcCallExpression.variableName) {
+  final binaryOpRight = node.binaryOpRight;
+
+  switch (binaryOpRight.funcCallExpression.variableName) {
     case 'codeUnitAt':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+        runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
-        final IntNode ast = IntNode()
-          ..intVal = left.stringValue
-              .codeUnitAt(node.binaryOpRight.funcCallArgs[0].intVal);
-
-        return ast;
-      }
+        return IntNode()..intVal = left.stringValue
+            .codeUnitAt(binaryOpRight.funcCallArgs[0].intVal);
 
     case 'compareTo':
-      {
         runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+            binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        final IntNode ast = IntNode()
-          ..intVal = left.stringValue
-              .compareTo(node.binaryOpRight.funcCallArgs[0].stringValue);
 
-        return ast;
-      }
+        return IntNode()..intVal = left.stringValue
+              .compareTo(binaryOpRight.funcCallArgs[0].stringValue);
 
     case 'contains':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        final BoolNode ast = BoolNode()
-          ..boolVal = left.stringValue.contains(
-              node.binaryOpRight.funcCallArgs[0].stringValue,
-              node.binaryOpRight.funcCallArgs[1].intVal);
-
-        return ast;
-      }
+        return BoolNode()..boolVal = left.stringValue
+            .contains(
+              binaryOpRight.funcCallArgs[0].stringValue,
+              binaryOpRight.funcCallArgs[1].intVal);
 
     case 'endsWith':
-      {
         runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+            binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        final BoolNode ast = BoolNode()
-          ..boolVal = left.stringValue
-              .endsWith(node.binaryOpRight.funcCallArgs[0].stringValue);
-
-        return ast;
-      }
+        return BoolNode()..boolVal = left.stringValue
+              .endsWith(binaryOpRight.funcCallArgs[0].stringValue);
 
     case 'indexOf':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
-        final IntNode ast = IntNode()
-          ..intVal =
-              left.stringValue.indexOf(args[0].stringValue, args[1].intVal);
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        return ast;
-      }
+        return IntNode()..intVal = left.stringValue
+              .indexOf(args[0].stringValue, args[1].intVal);
 
     case 'lastIndexOf':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
-        final IntNode ast = IntNode()
-          ..intVal =
-              left.stringValue.lastIndexOf(args[0].stringValue, args[1].intVal);
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        return ast;
-      }
+        return IntNode()
+          ..intVal = left.stringValue
+              .lastIndexOf(args[0].stringValue, args[1].intVal);
 
     case 'padLeft':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        left.stringValue =
-            left.stringValue.padLeft(args[0].intVal, args[1].stringValue);
+        return left..stringValue = left.stringValue
+            .padLeft(args[0].intVal, args[1].stringValue);
 
-        return left;
-      }
     case 'padRight':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_STRING]);
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
 
-        left.stringValue =
-            left.stringValue.padRight(args[0].intVal, args[1].stringValue);
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        return left;
-      }
+        return left..stringValue = left.stringValue
+            .padRight(args[0].intVal, args[1].stringValue);
 
     case 'replaceAll':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        left.stringValue = left.stringValue
+        return left..stringValue = left.stringValue
             .replaceAll(args[0].stringValue, args[1].stringValue);
 
-        return left;
-      }
-
     case 'replaceFirst':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_STRING, ASTType.AST_INT]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        left.stringValue = left.stringValue.replaceFirst(
+        return left..stringValue = left.stringValue.replaceFirst(
             args[0].stringValue, args[1].stringValue, args[2].intVal);
 
-        return left;
-      }
-
     case 'replaceRange':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_STRING]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
-        left.stringValue
-            .replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        return left;
-      }
+        return left..stringValue.replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
 
     case 'split':
-      {
-        runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+        runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
 
-        final ListNode ast = ListNode();
-        ast.listElements = left.stringValue
-            .split(node.binaryOpRight.funcCallArgs[0].stringValue);
-
-        return ast;
-      }
+        return ListNode()..listElements = left.stringValue
+            .split(binaryOpRight.funcCallArgs[0].stringValue);
 
     case 'startsWith':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(binaryOpRight.funcCallArgs,
             [ASTType.AST_STRING, ASTType.AST_INT]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        final BoolNode ast = BoolNode();
-        ast.boolVal =
-            left.stringValue.startsWith(args[0].stringValue, args[1].intVal);
-
-        return ast;
-      }
+        return BoolNode()..boolVal = left.stringValue
+            .startsWith(args[0].stringValue, args[1].intVal);
 
     case 'substring':
-      {
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
-            [ASTType.AST_INT, ASTType.AST_INT]);
+        runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_INT, ASTType.AST_INT]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
-        final StringNode ast = StringNode();
-        ast.stringValue =
-            left.stringValue.substring(args[0].intVal, args[1].intVal);
-
-        return ast;
-      }
+        return StringNode()..stringValue = left.stringValue.substring(args[0].intVal, args[1].intVal);
 
     case 'toLowerCase':
-      {
-        left.stringValue = left.stringValue.toLowerCase();
-
-        return left;
-      }
+        return left..stringValue = left.stringValue.toLowerCase();
 
     case 'toUpperCase':
-      {
-        left.stringValue = left.stringValue.toUpperCase();
-
-        return left;
-      }
+        return left..stringValue = left.stringValue.toUpperCase();
 
     case 'trim':
-      {
-        left.stringValue = left.stringValue.trim();
-
-        return left;
-      }
+        return left..stringValue = left.stringValue.trim();
 
     case 'trimLeft':
-      {
-        left.stringValue = left.stringValue.trimLeft();
-        return left;
-      }
+        return left..stringValue = left.stringValue.trimLeft();
 
     case 'trimRight':
-      {
-        left.stringValue = left.stringValue.trimRight();
-        return left;
-      }
+        return left..stringValue = left.stringValue.trimRight();
 
     default:
-      throw NoSuchMethodException(
-          node.binaryOpRight.funcCallExpression.variableName, 'String');
+      throw NoSuchMethodException(binaryOpRight.funcCallExpression.variableName, 'String');
   }
 }
