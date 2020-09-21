@@ -19,5 +19,7 @@ for (int i = 0; i < colors.length; i++) {
 
 scremLn(colorStr); // output [90mc[91mo[92ml[93mo[94mr[95ms
 
-String birb = ' birbo';
+String birb = ' birbo\n';
 scremF('henlo{0}', birb); // output henlo birbo
+
+scremLn('\u221E;'); // output ∞
