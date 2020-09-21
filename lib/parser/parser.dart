@@ -649,7 +649,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
-      parser.curToken.type == TokenType.TOKEN_NOSEEB_OPERATOR ||
+      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
       parser.curToken.type == TokenType.TOKEN_LSHIFT ||
       parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     eat(parser, parser.curToken.type);
@@ -818,7 +818,7 @@ ASTNode parseExpression(Parser parser, Scope scope,
       parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
       parser.curToken.type == TokenType.TOKEN_LSHIFT ||
-      parser.curToken.type == TokenType.TOKEN_NOSEEB_OPERATOR ||
+      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
       parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
         parser.curToken.type == TokenType.TOKEN_SUB_SUB) {

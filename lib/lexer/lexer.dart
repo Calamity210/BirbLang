@@ -279,7 +279,7 @@ Token getNextToken(Lexer lexer) {
 
         // ??
         if (lexer.currentChar == '?') {
-          type = TokenType.TOKEN_NOSEEB_OPERATOR;
+          type = TokenType.NOSEEB_AWARE_OPERATOR;
           value += lexer.currentChar;
           advance(lexer);
 
