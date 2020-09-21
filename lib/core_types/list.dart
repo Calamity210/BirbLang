@@ -50,7 +50,13 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_ANY]);
 
-      return left..listElements.insert(0, args[0]);
+      final List elements = left.listElements;
+
+      left.listElements = elements
+          .getRange(0, args[0].intVal)
+          .followedBy([args[1], ...elements.getRange(args[0].intVal, elements.length)]).toList();
+
+      return left;
 
     case 'appendAllFrom':
       final List<ASTNode> args = binaryOpRight.funcCallArgs;
@@ -63,15 +69,14 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
 
       return left.listElements.elementAt(binaryOpRight.funcCallArgs[0].intVal);
-      
+
     case 'atRange':
       final List<ASTNode> args = binaryOpRight.funcCallArgs;
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_INT]);
 
-      return ListNode()
-        ..listElements = left.listElements.getRange(args[0].intVal, args[1].intVal).toList();
-      
+      return ListNode()..listElements = left.listElements.getRange(args[0].intVal, args[1].intVal).toList();
+
     case 'clear':
       return left..listElements.clear();
 
@@ -90,15 +95,14 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
 
       for (int i = 0; i < binaryOpRight.funcCallArgs[0].listElements.length; i++)
-      left.listElements.remove(binaryOpRight.funcCallArgs[i]);
+        left.listElements.remove(binaryOpRight.funcCallArgs[i]);
 
       return left;
 
     case 'toMap':
       final Map map = {};
 
-      for (int i = 0; i < left.listElements.length; i++)
-        map['$i'] = left.listElements[i];
+      for (int i = 0; i < left.listElements.length; i++) map['$i'] = left.listElements[i];
 
       return MapNode()..map = map;
 
@@ -110,6 +114,6 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       return ListNode()..listElements = left.listElements.followedBy(binaryOpRight.funcCallArgs[0].listElements);
 
     default:
-    throw NoSuchMethodException(binaryOpRight.funcCallExpression.variableName, 'List');
+      throw NoSuchMethodException(binaryOpRight.funcCallExpression.variableName, 'List');
   }
 }
