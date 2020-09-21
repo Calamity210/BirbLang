@@ -273,7 +273,31 @@ Token getNextToken(Lexer lexer) {
       case '@':
         return advanceWithToken(lexer, TokenType.TOKEN_ANON_ID);
       case '?':
-        return advanceWithToken(lexer, TokenType.TOKEN_QUESTION);
+        String value = lexer.currentChar;
+        TokenType type = TokenType.TOKEN_QUESTION;
+        advance(lexer);
+
+        // ??
+        if (lexer.currentChar == '?') {
+          type = TokenType.NOSEEB_AWARE_OPERATOR;
+          value += lexer.currentChar;
+          advance(lexer);
+
+          // ??=
+          if (lexer.currentChar == '=') {
+            type = TokenType.TOKEN_NOSEEB_ASSIGNMENT;
+            value += lexer.currentChar;
+            advance(lexer);
+          }
+        }
+
+        if (lexer.currentChar == '.') {
+          type = TokenType.TOKEN_NOSEEB_ACCESS;
+          value += lexer.currentChar;
+          advance(lexer);
+        }
+
+        return initToken(type, value);
       case ':':
         return advanceWithToken(lexer, TokenType.TOKEN_COLON);
       default:
