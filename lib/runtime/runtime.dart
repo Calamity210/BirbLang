@@ -692,7 +692,7 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
               return astVarDef.variableValue = value;
             }
 
-            return value;
+            return astVarDef.variableValue;
           }
           break;
 
