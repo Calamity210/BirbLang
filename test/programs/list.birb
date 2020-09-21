@@ -1,0 +1,13 @@
+List list = [10];
+
+scremLn(list[0]); // output 10
+scremLn(list.isEmpty); // output false
+scremLn(list.isNotEmpty); // output true
+scremLn(list.runtimeType); // output List
+
+// Methods
+scremLn(list.toString()); // output [10]
+
+list.append(12);
+
+scremLn(list.toString()); // output [10, 12]

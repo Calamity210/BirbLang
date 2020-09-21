@@ -105,7 +105,7 @@ void main() {
   });
 
   test.group('All example programs run with expected results', () {
-    final Directory directory = Directory('./examples/');
+    final Directory directory = Directory('./test/programs/');
     directory.listSync().forEach((file) {
       test.test(file.path, () async {
         await _testBirbScriptWithExpectations(file);

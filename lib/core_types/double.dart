@@ -7,44 +7,24 @@ import 'package:Birb/utils/exceptions.dart';
 ASTNode visitDoubleProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'isFinite':
-      {
-        final BoolNode boolAST = BoolNode()..boolVal = left.doubleVal.isFinite;
-        return boolAST;
-      }
+        return BoolNode()..boolVal = left.doubleVal.isFinite;
 
     case 'isInfinite':
-      {
-        final BoolNode boolAST = BoolNode()
-          ..boolVal = left.doubleVal.isInfinite;
-        return boolAST;
-      }
+        return BoolNode()..boolVal = left.doubleVal.isInfinite;
 
     case 'isNaN':
-      {
-        final BoolNode boolAST = BoolNode()..boolVal = left.doubleVal.isNaN;
-        return boolAST;
-      }
+        return BoolNode()..boolVal = left.doubleVal.isNaN;
 
     case 'isNegative':
-      {
-        final BoolNode boolAST = BoolNode()
+        return BoolNode()
           ..boolVal = left.doubleVal.isNegative;
-        return boolAST;
-      }
 
     case 'sign':
-      {
-        final DoubleNode doubleAST = DoubleNode()
+        return DoubleNode()
           ..doubleVal = left.doubleVal.sign;
-        return doubleAST;
-      }
 
     case 'runtimeType':
-      {
-        final StringNode stringAST = StringNode()
-          ..stringValue = left.doubleVal.runtimeType.toString();
-        return stringAST;
-      }
+          return StringNode()..stringValue = left.doubleVal.runtimeType.toString();
   }
 
   throw NoSuchPropertyException(node.binaryOpRight.variableName, 'double');
@@ -54,136 +34,86 @@ ASTNode visitDoubleProperties(ASTNode node, ASTNode left) {
 ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'abs':
-      {
-        final DoubleNode doubleAST = DoubleNode()
-          ..doubleVal = left.doubleVal.abs();
-        return doubleAST;
-      }
+        return DoubleNode()..doubleVal = left.doubleVal.abs();
 
     case 'ceil':
-      {
-        final IntNode intAST = IntNode()..intVal = left.doubleVal.ceil();
-        return intAST;
-      }
+        return IntNode()..intVal = left.doubleVal.ceil();
 
     case 'ceilToDouble':
-      {
-        final DoubleNode doubleAST = DoubleNode()
-          ..doubleVal = left.doubleVal.ceilToDouble();
-        return doubleAST;
-      }
+        return DoubleNode()..doubleVal = left.doubleVal.ceilToDouble();
 
     case 'clamp':
-      {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
             [ASTType.AST_DOUBLE, ASTType.AST_DOUBLE]);
+
         final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
-        final DoubleNode doubleAST = DoubleNode()
+
+        return DoubleNode()
           ..doubleVal = left.doubleVal
               .clamp(args[0].doubleVal, args[1].doubleVal)
               .toDouble();
 
-        return doubleAST;
-      }
-
     case 'compareTo':
-      {
         runtimeExpectArgs(
             node.binaryOpRight.funcCallArgs, [ASTType.AST_DOUBLE]);
-        final IntNode intAST = IntNode()
+
+        return IntNode()
           ..intVal = left.doubleVal
               .compareTo(node.binaryOpRight.funcCallArgs[0].doubleVal);
-        return intAST;
-      }
 
     case 'floor':
-      {
-        final IntNode intAST = IntNode()..intVal = left.doubleVal.floor();
-        return intAST;
-      }
+        return IntNode()..intVal = left.doubleVal.floor();
 
     case 'floorToDouble':
-      {
-        final DoubleNode doubleAST = DoubleNode()
+        return DoubleNode()
           ..doubleVal = left.doubleVal.floorToDouble();
-        return doubleAST;
-      }
 
     case 'remainder':
-      {
-        runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_DOUBLE]);
-        final DoubleNode doubleAST = DoubleNode()
+        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_DOUBLE]);
+
+        return DoubleNode()
           ..doubleVal = left.doubleVal
               .remainder(node.binaryOpRight.funcCallArgs[0].doubleVal);
-        return doubleAST;
-      }
 
     case 'round':
-      {
-        final IntNode intAST = IntNode()..intVal = left.doubleVal.round();
-        return intAST;
-      }
+        return IntNode()..intVal = left.doubleVal.round();
 
     case 'roundToDouble':
-      {
-        final DoubleNode doubleAST = DoubleNode()
-          ..doubleVal = left.doubleVal.roundToDouble();
-        return doubleAST;
-      }
+        return DoubleNode()..doubleVal = left.doubleVal.roundToDouble();
 
     case 'toInt':
-      {
-        final IntNode intAST = IntNode()..intVal = left.doubleVal.toInt();
-        return intAST;
-      }
+        return IntNode()..intVal = left.doubleVal.toInt();
 
     case 'toString':
-      {
-        final StringNode stringAST = StringNode()
-          ..stringValue = left.doubleVal.toString();
-        return stringAST;
-      }
+        return StringNode()..stringValue = left.doubleVal.toString();
 
     case 'toStringAsExponential':
-      {
         final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
-        final StringNode stringAST = StringNode()
+
+        return StringNode()
           ..stringValue = left.doubleVal
               .toStringAsExponential(args.isEmpty ? 0 : args[0].intVal);
-        return stringAST;
-      }
 
     case 'toStringAsFixed':
-      {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        final StringNode stringAST = StringNode()
+
+        return StringNode()
           ..stringValue = left.doubleVal
               .toStringAsFixed(node.binaryOpRight.funcCallArgs[0].intVal);
-        return stringAST;
-      }
 
     case 'toStringAsPrecision':
-      {
         runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
-        final StringNode stringAST = StringNode()
+
+        return StringNode()
           ..stringValue = left.doubleVal
               .toStringAsPrecision(node.binaryOpRight.funcCallArgs[0].intVal);
-        return stringAST;
-      }
 
     case 'truncate':
-      {
-        final IntNode intAST = IntNode()..intVal = left.doubleVal.truncate();
-        return intAST;
-      }
+        return IntNode()..intVal = left.doubleVal.truncate();
 
     case 'truncateToDouble':
-      {
-        final DoubleNode doubleAST = DoubleNode()
+        return DoubleNode()
           ..doubleVal = left.doubleVal.truncateToDouble();
-        return doubleAST;
-      }
 
     default:
       throw NoSuchMethodException(

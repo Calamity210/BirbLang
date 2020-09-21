@@ -5,8 +5,7 @@ import 'package:Birb/ast/ast_types.dart';
 ASTNode visitClassProperties(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.variableName) {
     case 'runtimeType':
-      final StringNode stringNode = StringNode()..stringValue = left.className;
-      return stringNode;
+      return StringNode()..stringValue = left.className;
     case 'variableDefinitions':
       final MapNode ast = MapNode()..map = {};
 
