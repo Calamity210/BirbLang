@@ -30,29 +30,29 @@ ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
       return left..strBuffer.clear();
 
     case 'write':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
 
-      return left..strBuffer.write((node.binaryOpRight.funcCallArgs[0]).stringValue);
+      return left..strBuffer.write((node.binaryOpRight.functionCallArgs[0]).stringValue);
 
     case 'writeAll':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
+      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_LIST]);
 
-      node.binaryOpRight.funcCallArgs[0].listElements.forEach((dynamic e) {
+      node.binaryOpRight.functionCallArgs[0].listElements.forEach((dynamic e) {
         left.strBuffer.write((e as ASTNode).stringValue);
       });
 
       return left;
 
     case 'writeAsciiCode':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
 
-      return left..strBuffer.writeCharCode((node.binaryOpRight.funcCallArgs[0]).intVal);
+      return left..strBuffer.writeCharCode((node.binaryOpRight.functionCallArgs[0]).intVal);
 
     case 'writeLine':
-      runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_STRING]);
+      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
 
       return left..strBuffer.write(
-  '${(node.binaryOpRight.funcCallArgs[0]).stringValue}\n');
+  '${(node.binaryOpRight.functionCallArgs[0]).stringValue}\n');
   }
 
   throw NoSuchMethodException(

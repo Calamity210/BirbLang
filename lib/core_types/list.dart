@@ -38,15 +38,15 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
 
   switch (binaryOpRight.funcCallExpression.variableName) {
     case 'append':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_ANY]);
-      return left..listElements.add(binaryOpRight.funcCallArgs[0]);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_ANY]);
+      return left..listElements.add(binaryOpRight.functionCallArgs[0]);
 
     case 'appendAll':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
-      return left..listElements.addAll(binaryOpRight.funcCallArgs[0].listElements);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_LIST]);
+      return left..listElements.addAll(binaryOpRight.functionCallArgs[0].listElements);
 
     case 'appendAt':
-      final List<ASTNode> args = binaryOpRight.funcCallArgs;
+      final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_ANY]);
 
@@ -59,19 +59,19 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       return left;
 
     case 'appendAllFrom':
-      final List<ASTNode> args = binaryOpRight.funcCallArgs;
+      final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_LIST]);
 
       return left..listElements.insertAll(0, args[0].listElements);
 
     case 'at':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
 
-      return left.listElements.elementAt(binaryOpRight.funcCallArgs[0].intVal);
+      return left.listElements.elementAt(binaryOpRight.functionCallArgs[0].intVal);
 
     case 'atRange':
-      final List<ASTNode> args = binaryOpRight.funcCallArgs;
+      final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_INT]);
 
@@ -81,21 +81,21 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       return left..listElements.clear();
 
     case 'fillRange':
-      final List<ASTNode> args = binaryOpRight.funcCallArgs;
+      final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
       runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_ANY]);
 
       return left..listElements.fillRange(args[0].intVal, args[1].intVal, args[2]);
 
     case 'remove':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_ANY]);
-      return left..listElements.remove(binaryOpRight.funcCallArgs[0]);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_ANY]);
+      return left..listElements.remove(binaryOpRight.functionCallArgs[0]);
 
     case 'removeAll':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_LIST]);
 
-      for (int i = 0; i < binaryOpRight.funcCallArgs[0].listElements.length; i++)
-        left.listElements.remove(binaryOpRight.funcCallArgs[i]);
+      for (int i = 0; i < binaryOpRight.functionCallArgs[0].listElements.length; i++)
+        left.listElements.remove(binaryOpRight.functionCallArgs[i]);
 
       return left;
 
@@ -110,8 +110,8 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       return StringNode()..stringValue = left.listElements.toString();
 
     case 'with':
-      runtimeExpectArgs(binaryOpRight.funcCallArgs, [ASTType.AST_LIST]);
-      return ListNode()..listElements = left.listElements.followedBy(binaryOpRight.funcCallArgs[0].listElements);
+      runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_LIST]);
+      return ListNode()..listElements = left.listElements.followedBy(binaryOpRight.functionCallArgs[0].listElements);
 
     default:
       throw NoSuchMethodException(binaryOpRight.funcCallExpression.variableName, 'List');

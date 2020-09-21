@@ -43,10 +43,10 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
         return DoubleNode()..doubleVal = left.doubleVal.ceilToDouble();
 
     case 'clamp':
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs,
+        runtimeExpectArgs(node.binaryOpRight.functionCallArgs,
             [ASTType.AST_DOUBLE, ASTType.AST_DOUBLE]);
 
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
 
         return DoubleNode()
           ..doubleVal = left.doubleVal
@@ -55,11 +55,11 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
 
     case 'compareTo':
         runtimeExpectArgs(
-            node.binaryOpRight.funcCallArgs, [ASTType.AST_DOUBLE]);
+            node.binaryOpRight.functionCallArgs, [ASTType.AST_DOUBLE]);
 
         return IntNode()
           ..intVal = left.doubleVal
-              .compareTo(node.binaryOpRight.funcCallArgs[0].doubleVal);
+              .compareTo(node.binaryOpRight.functionCallArgs[0].doubleVal);
 
     case 'floor':
         return IntNode()..intVal = left.doubleVal.floor();
@@ -69,11 +69,11 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
           ..doubleVal = left.doubleVal.floorToDouble();
 
     case 'remainder':
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_DOUBLE]);
+        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_DOUBLE]);
 
         return DoubleNode()
           ..doubleVal = left.doubleVal
-              .remainder(node.binaryOpRight.funcCallArgs[0].doubleVal);
+              .remainder(node.binaryOpRight.functionCallArgs[0].doubleVal);
 
     case 'round':
         return IntNode()..intVal = left.doubleVal.round();
@@ -88,25 +88,25 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
         return StringNode()..stringValue = left.doubleVal.toString();
 
     case 'toStringAsExponential':
-        final List<ASTNode> args = node.binaryOpRight.funcCallArgs;
+        final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
 
         return StringNode()
           ..stringValue = left.doubleVal
               .toStringAsExponential(args.isEmpty ? 0 : args[0].intVal);
 
     case 'toStringAsFixed':
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
 
         return StringNode()
           ..stringValue = left.doubleVal
-              .toStringAsFixed(node.binaryOpRight.funcCallArgs[0].intVal);
+              .toStringAsFixed(node.binaryOpRight.functionCallArgs[0].intVal);
 
     case 'toStringAsPrecision':
-        runtimeExpectArgs(node.binaryOpRight.funcCallArgs, [ASTType.AST_INT]);
+        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
 
         return StringNode()
           ..stringValue = left.doubleVal
-              .toStringAsPrecision(node.binaryOpRight.funcCallArgs[0].intVal);
+              .toStringAsPrecision(node.binaryOpRight.functionCallArgs[0].intVal);
 
     case 'truncate':
         return IntNode()..intVal = left.doubleVal.truncate();
