@@ -686,6 +686,16 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
           }
           break;
 
+        case TokenType.TOKEN_NOSEEB_ASSIGNMENT:
+          {
+            if (astVarDef.variableValue is NullNode){
+              return astVarDef.variableValue = value;
+            }
+
+            return astVarDef.variableValue;
+          }
+          break;
+
         case TokenType.TOKEN_SUB_EQUAL:
           {
             if (astVarDef.variableType.typeValue.type ==
@@ -1614,6 +1624,13 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
         }
       }
       break;
+
+    case TokenType.NOSEEB_AWARE_OPERATOR:
+      if (left is NullNode){
+        return right;
+      }
+      
+      return left;
 
     case TokenType.TOKEN_BITWISE_OR:
       {
