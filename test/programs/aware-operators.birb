@@ -1,0 +1,19 @@
+int? age;
+
+scremLn(age ?? 10); // output 10
+
+age = 10;
+
+scremLn(age ?? 20); // output 10
+
+String? name;
+
+name ??= "Grey";
+
+scremLn(name); // output Grey
+
+name ??= "Beeper";
+
+scremLn(name); // output Grey
+
+String? undefined;

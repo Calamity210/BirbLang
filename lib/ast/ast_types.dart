@@ -33,7 +33,10 @@ class FuncCallNode extends ASTNode {
   ASTNode funcCallExpression;
 
   @override
-  List<ASTNode> funcCallArgs = [];
+  List<ASTNode> functionCallArgs = [];
+
+  @override
+  List<ASTNode> namedFunctionCallArgs = [];
 
   @override
   String variableName;
@@ -46,8 +49,8 @@ class FuncCallNode extends ASTNode {
       ..funcCallExpression = (funcCallExpression?.copy())
       ..variableName = variableName;
 
-    funcCallArgs.forEach((child) {
-      node.funcCallArgs.add(child?.copy());
+    functionCallArgs.forEach((child) {
+      node.functionCallArgs.add(child?.copy());
     });
 
     return node;
@@ -62,13 +65,16 @@ class FuncDefNode extends ASTNode {
   String funcName;
 
   @override
-  ASTNode funcDefBody;
+  ASTNode functionDefBody;
 
   @override
   ASTNode funcDefType;
 
   @override
-  List<ASTNode> funcDefArgs = [];
+  List<ASTNode> functionDefArgs = [];
+
+  @override
+  List<ASTNode> namedFunctionDefArgs = [];
 
   @override
   AstFuncPointer funcPointer;
@@ -87,16 +93,16 @@ class FuncDefNode extends ASTNode {
     final FuncDefNode node = FuncDefNode()
       ..scope = scope
       ..funcName = funcName
-      ..funcDefBody = (funcDefBody?.copy())
+      ..functionDefBody = (functionDefBody?.copy())
       ..funcDefType = (funcDefType?.copy())
-      ..funcDefArgs = []
+      ..functionDefArgs = []
       ..funcPointer = funcPointer
       ..futureFuncPointer = futureFuncPointer
       ..compChildren = []
       ..isSuperseding = isSuperseding;
 
-    funcDefArgs.forEach((child) {
-      node.funcDefArgs.add(child?.copy());
+    functionDefArgs.forEach((child) {
+      node.functionDefArgs.add(child?.copy());
     });
 
     compChildren.forEach((child) {

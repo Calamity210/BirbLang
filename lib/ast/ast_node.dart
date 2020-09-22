@@ -79,17 +79,17 @@ abstract class ASTNode {
   ASTNode get forInitStatement => throw Exception('Not part of $runtimeType => $type');
   set forInitStatement(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get funcCallArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get functionCallArgs => throw Exception('Not part of $runtimeType => $type');
+  set functionCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcCallExpression => throw Exception('Not part of $runtimeType => $type');
   set funcCallExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get funcDefArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get functionDefArgs => throw Exception('Not part of $runtimeType => $type');
+  set functionDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
-  ASTNode get funcDefBody => throw Exception('Not part of $runtimeType => $type');
-  set funcDefBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
+  ASTNode get functionDefBody => throw Exception('Not part of $runtimeType => $type');
+  set functionDefBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcDefType => throw Exception('Not part of $runtimeType => $type');
   set funcDefType(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -141,6 +141,12 @@ abstract class ASTNode {
 
   Map<String, dynamic> get map => throw Exception('Not part of $runtimeType => $type');
   set map(Map<String, dynamic> _) => throw Exception('Not part of $runtimeType => $type');
+
+  List<ASTNode> get namedFunctionDefArgs => throw Exception('Not part of $runtimeType => $type');
+  set namedFunctionDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+
+  List<ASTNode> get namedFunctionCallArgs => throw Exception('Not part of $runtimeType => $type');
+  set namedFunctionCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get newValue => throw Exception('Not part of $runtimeType => $type');
   set newValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -255,10 +261,10 @@ String astToString(ASTNode ast) {
     case ASTType.AST_VARIABLE:
       return ast.variableName;
     case ASTType.AST_FUNC_DEFINITION:
-      return '${ast.funcName} (${ast.funcDefArgs.length})';
+      return '${ast.funcName} (${ast.functionDefArgs.length})';
     case ASTType.AST_FUNC_CALL:
       final String expressionStr = astToString(ast.funcCallExpression);
-      return '$expressionStr (${ast.funcCallArgs.length})';
+      return '$expressionStr (${ast.functionCallArgs.length})';
     case ASTType.AST_NULL:
       return 'null';
     case ASTType.AST_STRING:

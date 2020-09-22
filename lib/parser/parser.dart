@@ -170,7 +170,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
         var a = parseVariable(parser, scope);
 
         while (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-          a = parseFuncCall(parser, scope, a);
+          a = parseFunctionCall(parser, scope, a);
         }
 
         while (parser.curToken.type == TokenType.TOKEN_DOT) {
@@ -183,7 +183,7 @@ ASTNode parseStatement(Parser parser, Scope scope) {
           final varAST = parseVariable(parser, scope);
 
           ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-              ? parseFuncCall(parser, scope, varAST)
+              ? parseFunctionCall(parser, scope, varAST)
               : varAST;
           a = ast;
         }
@@ -443,7 +443,8 @@ ASTNode parseVariable(Parser parser, Scope scope) {
       parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
       parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL) {
+      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL ||
+      parser.curToken.type == TokenType.TOKEN_NOSEEB_ASSIGNMENT) {
     final Token operator = parser.curToken;
 
     eat(parser, operator.type);
@@ -648,6 +649,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
+      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
       parser.curToken.type == TokenType.TOKEN_LSHIFT ||
       parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     eat(parser, parser.curToken.type);
@@ -661,7 +663,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       eat(parser, TokenType.TOKEN_ID);
       final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFuncCall(parser, scope, varAST)
+          ? parseFunctionCall(parser, scope, varAST)
           : varAST;
       a = ast;
     }
@@ -673,7 +675,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       eat(parser, TokenType.TOKEN_ID);
       final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFuncCall(parser, scope, varAST)
+          ? parseFunctionCall(parser, scope, varAST)
           : varAST;
       a = ast;
     }
@@ -691,7 +693,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     }
 
     while (parser.curToken.type == TokenType.TOKEN_LPAREN)
-      a = parseFuncCall(parser, scope, a);
+      a = parseFunctionCall(parser, scope, a);
 
     if (a != null)
       return a;
@@ -709,7 +711,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       eat(parser, TokenType.TOKEN_ID);
       final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFuncCall(parser, scope, varAST)
+          ? parseFunctionCall(parser, scope, varAST)
           : varAST;
       a = ast;
     }
@@ -727,7 +729,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     }
 
     while (parser.curToken.type == TokenType.TOKEN_LPAREN)
-      a = parseFuncCall(parser, scope, a);
+      a = parseFunctionCall(parser, scope, a);
 
     if (a != null)
       return a;
@@ -778,7 +780,7 @@ ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
   ASTNode astBinaryOp;
 
   if (parser.curToken.type == TokenType.TOKEN_LPAREN)
-    node = parseFuncCall(parser, scope, node);
+    node = parseFunctionCall(parser, scope, node);
 
   while (parser.curToken.type == TokenType.TOKEN_DIV ||
       parser.curToken.type == TokenType.TOKEN_MUL ||
@@ -816,6 +818,7 @@ ASTNode parseExpression(Parser parser, Scope scope,
       parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
       parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
       parser.curToken.type == TokenType.TOKEN_LSHIFT ||
+      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
       parser.curToken.type == TokenType.TOKEN_RSHIFT) {
     if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
         parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
@@ -1110,7 +1113,7 @@ ASTNode parseFor(Parser parser, Scope scope) {
   return ast;
 }
 
-ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
+ASTNode parseFunctionCall(Parser parser, Scope scope, ASTNode expr) {
   final ast = initASTWithLine(FuncCallNode(), parser.lexer.lineNum);
   ast.funcCallExpression = expr;
   eat(parser, TokenType.TOKEN_LPAREN);
@@ -1122,31 +1125,47 @@ ASTNode parseFuncCall(Parser parser, Scope scope, ASTNode expr) {
 
     while (parser.curToken.type == TokenType.TOKEN_DOT) {
       eat(parser, TokenType.TOKEN_DOT);
-      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
+      final AttributeAccessNode ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
       ast.binaryOpLeft = astExpr;
       eat(parser, TokenType.TOKEN_ID);
-      final varAST = parseVariable(parser, scope);
+      final ASTNode varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFuncCall(parser, scope, varAST)
+          ? parseFunctionCall(parser, scope, varAST)
           : varAST;
       astExpr = ast;
     }
 
-    if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
-      astExpr.scope = initScope(false);
-    }
+    if (parser.curToken.type == TokenType.TOKEN_COLON) {
+      eat(parser, TokenType.TOKEN_COLON);
+      astExpr.variableValue = parseExpression(parser, scope);
 
-    ast.funcCallArgs.add(astExpr);
+      ast.namedFunctionCallArgs.add(astExpr);
+    }
+    else {
+      if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
+        astExpr.scope = initScope(false);
+      }
+
+      ast.functionCallArgs.add(astExpr);
+    }
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
       eat(parser, TokenType.TOKEN_COMMA);
       astExpr = parseExpression(parser, scope);
 
-      if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
-        astExpr.scope = initScope(false);
-      }
+      if (parser.curToken.type == TokenType.TOKEN_COLON) {
+        eat(parser, TokenType.TOKEN_COLON);
+        astExpr.variableValue = parseExpression(parser, scope);
 
-      ast.funcCallArgs.add(astExpr);
+        ast.namedFunctionCallArgs.add(astExpr);
+      }
+      else {
+        if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
+          astExpr.scope = initScope(false);
+        }
+
+        ast.functionCallArgs.add(astExpr);
+      }
     }
   }
 
@@ -1244,18 +1263,44 @@ ASTNode parseFunctionDefinition(
   final ast = initASTWithLine(FuncDefNode(), parser.lexer.lineNum)
     ..funcName = funcName
     ..funcDefType = astType
-    ..funcDefArgs = [];
+    ..functionDefArgs = [];
 
   final newScope = initScope(false)..owner = ast;
 
   eat(parser, TokenType.TOKEN_LPAREN);
 
   if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
-    ast.funcDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+
+    if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
+      eat(parser, TokenType.TOKEN_LBRACE);
+      ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+
+      while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
+        eat(parser, TokenType.TOKEN_COMMA);
+        ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+      }
+      eat(parser, TokenType.TOKEN_RBRACE);
+    }
+    else
+    ast.functionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
 
     while (parser.curToken.type == TokenType.TOKEN_COMMA) {
       eat(parser, TokenType.TOKEN_COMMA);
-      ast.funcDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+
+      // Named parameters
+      if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
+        eat(parser, TokenType.TOKEN_LBRACE);
+        ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+
+        while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
+          eat(parser, TokenType.TOKEN_COMMA);
+          ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+        }
+        eat(parser, TokenType.TOKEN_RBRACE);
+      } else {
+        ast.functionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+      }
+
     }
   }
 
@@ -1263,8 +1308,8 @@ ASTNode parseFunctionDefinition(
 
   if (parser.curToken.type == TokenType.TOKEN_INLINE) {
     eat(parser, TokenType.TOKEN_INLINE);
-    ast.funcDefBody = parseOneStatementCompound(parser, newScope);
-    ast.funcDefBody.scope = newScope;
+    ast.functionDefBody = parseOneStatementCompound(parser, newScope);
+    ast.functionDefBody.scope = newScope;
 
     return ast;
   }
@@ -1360,8 +1405,8 @@ ASTNode parseFunctionDefinition(
     return ast;
   }
   eat(parser, TokenType.TOKEN_LBRACE);
-  ast.funcDefBody = parseStatements(parser, newScope);
-  ast.funcDefBody.scope = newScope;
+  ast.functionDefBody = parseStatements(parser, newScope);
+  ast.functionDefBody.scope = newScope;
   eat(parser, TokenType.TOKEN_RBRACE);
 
   return ast;
@@ -1446,7 +1491,7 @@ ASTNode parseVariableDefinition(
       eat(parser, TokenType.TOKEN_ID);
       final varAST = parseVariable(parser, scope);
       ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFuncCall(parser, scope, varAST)
+          ? parseFunctionCall(parser, scope, varAST)
           : varAST;
       astVarDef.variableValue = ast;
     }

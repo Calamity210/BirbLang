@@ -1,0 +1,25 @@
+List list = [1, 2];
+
+scremLn(list[0]); // output 1
+scremLn(list.first); // output 1
+scremLn(list.isEmpty); // output false
+scremLn(list.isNotEmpty); // output true
+scremLn(list.last); // output 2
+scremLn(list.length); // output 2
+scremLn(list.reversed.toString()); // output [2, 1]
+scremLn(list.runtimeType); // output List
+
+// Methods
+scremLn(list.toString()); // output [1, 2]
+
+list.append(3);
+
+scremLn(list.toString()); // output [1, 2, 3]
+
+list.appendAll([4, 6]);
+
+scremLn(list.toString()); // output [1, 2, 3, 4, 6]
+
+list.appendAt(4, 5);
+
+scremLn(list.toString()); // output [1, 2, 3, 4, 5, 6]
