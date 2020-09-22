@@ -212,6 +212,9 @@ abstract class ASTNode {
   set whileExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode copy();
+
+  @override
+  String toString();
 }
 
 enum ASTType {
@@ -252,59 +255,4 @@ enum ASTType {
   AST_LIST_ACCESS,
   AST_ITERATE,
   AST_ASSERT
-}
-
-String astToString(ASTNode ast) {
-  switch (ast.type) {
-    case ASTType.AST_CLASS:
-      return '{ class }';
-    case ASTType.AST_VARIABLE:
-      return ast.variableName;
-    case ASTType.AST_FUNC_DEFINITION:
-      return '${ast.funcName} (${ast.functionDefArgs.length})';
-    case ASTType.AST_FUNC_CALL:
-      final String expressionStr = astToString(ast.funcCallExpression);
-      return '$expressionStr (${ast.functionCallArgs.length})';
-    case ASTType.AST_NULL:
-      return 'null';
-    case ASTType.AST_STRING:
-      return ast.stringValue;
-    case ASTType.AST_STRING_BUFFER:
-      return '[ StrBuffer ]';
-    case ASTType.AST_DOUBLE:
-      return ast.doubleVal.toString();
-    case ASTType.AST_LIST:
-      return ast.listElements.toString();
-    case ASTType.AST_MAP:
-      return ast.map.toString();
-    case ASTType.AST_BOOL:
-      return ast.boolVal.toString();
-    case ASTType.AST_INT:
-      return ast.intVal.toString();
-    case ASTType.AST_TYPE:
-      return '< Type >';
-    case ASTType.AST_ATTRIBUTE_ACCESS:
-      return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
-    case ASTType.AST_LIST_ACCESS:
-      return 'list[access]';
-    case ASTType.AST_BINARYOP:
-      ASTNode visitedBiOp;
-      visitBinaryOp(initRuntime(null), ast).then((value) => visitedBiOp = value);
-      return astToString(visitedBiOp);
-    case ASTType.AST_NOOP:
-      return '{{NO-OP}}';
-    case ASTType.AST_BREAK:
-      return 'break';
-    case ASTType.AST_RETURN:
-      return astToString(ast.returnValue);
-    case ASTType.AST_ENUM:
-      String enumStr = 'enum {\n';
-      ast.enumElements.forEach((element) => enumStr += ' ${astToString(element)},\n');
-      enumStr += '}';
-
-      return enumStr;
-    default:
-      print('Could not convert ast of type ${ast.type} to String');
-      return null;
-  }
 }

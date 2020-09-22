@@ -396,7 +396,7 @@ ASTNode parseBool(Parser parser, Scope scope) {
 }
 
 ASTNode parseNull(Parser parser, Scope scope) {
-  final ast = initASTWithLine(NullNode(), parser.lexer.lineNum)..scope = scope;
+  final ast = initASTWithLine(NoSeebNode(), parser.lexer.lineNum)..scope = scope;
 
   eat(parser, TokenType.TOKEN_ID);
 
@@ -896,7 +896,7 @@ ASTNode parseReturn(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
   final ast = initASTWithLine(ReturnNode(), parser.lexer.lineNum)
     ..scope = scope
-    ..returnValue = parseExpression(parser, scope) ?? NullNode();
+    ..returnValue = parseExpression(parser, scope) ?? NoSeebNode();
 
   return ast;
 }
@@ -905,7 +905,7 @@ ASTNode parseThrow(Parser parser, Scope scope) {
   eat(parser, TokenType.TOKEN_ID);
   final ast = initASTWithLine(ThrowNode(), parser.lexer.lineNum)
     ..scope = scope
-    ..throwValue = parseExpression(parser, scope) ?? NullNode();
+    ..throwValue = parseExpression(parser, scope) ?? NoSeebNode();
 
   return ast;
 }
@@ -1221,7 +1221,7 @@ ASTNode parseDefinition(Parser parser, Scope scope,
     if (isNullable) {
       strBuffer.isNullable = true;
     } else if (!isFuncDefArgs && strBuffer.variableValue == null ||
-        strBuffer.variableValue is NullNode) {
+        strBuffer.variableValue is NoSeebNode) {
       throw UnexpectedTypeException(
           'Error [Line: ${parser.lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
     }
@@ -1249,7 +1249,7 @@ ASTNode parseDefinition(Parser parser, Scope scope,
     if (isNullable) {
       varDef.isNullable = true;
     } else if (!isFuncDefArgs && varDef.variableValue == null ||
-        varDef.variableValue is NullNode) {
+        varDef.variableValue is NoSeebNode) {
       throw UnexpectedTypeException(
           'Error [Line ${parser.lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
     }

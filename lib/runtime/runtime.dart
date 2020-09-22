@@ -153,7 +153,7 @@ Future<ASTNode> runtimeFunctionCall(Runtime runtime, ASTNode fCall, ASTNode fDef
   }
 
   fDef.namedFunctionDefArgs.forEach((e) {
-    funcDefBodyScope.variableDefinitions.addFirst(e..variableValue = NullNode());
+    funcDefBodyScope.variableDefinitions.addFirst(e..variableValue = NoSeebNode());
   });
 
   for (int i = 0; i < fCall.namedFunctionCallArgs.length; i++) {
@@ -290,7 +290,7 @@ Future<ASTNode> visit(Runtime runtime, ASTNode node) async {
       String classToString = '';
 
       throwArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '\t${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '\t${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stderr.write('${throwArg.className}:\n$classToString');
@@ -461,7 +461,7 @@ Future<ASTNode> visitVarDef(Runtime runtime, ASTNode node) async {
 
       node.variableValue = await visit(runtime, node.variableValue);
     } else {
-      node.variableValue = NullNode();
+      node.variableValue = NoSeebNode();
     }
   }
   getScope(runtime, node).variableDefinitions.addFirst(node);
@@ -499,7 +499,7 @@ Future<ASTNode> visitVarAssignment(Runtime runtime, VarAssignmentNode node) asyn
               'Error [Line ${node.lineNum}] Cannot reassign final variable `${node.variableAssignmentLeft.variableName}`$stacktrace');
         }
 
-        if (!objectVarDef.isNullable && node.variableValue == null || node.variableValue is NullNode) {
+        if (!objectVarDef.isNullable && node.variableValue == null || node.variableValue is NoSeebNode) {
           String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 
           for (final Map item in runtime.stack.reversed.take(5))
@@ -685,7 +685,7 @@ Future<ASTNode> visitVarMod(Runtime runtime, ASTNode node) async {
 
         case TokenType.TOKEN_NOSEEB_ASSIGNMENT:
           {
-            if (astVarDef.variableValue is NullNode) {
+            if (astVarDef.variableValue is NoSeebNode) {
               return astVarDef.variableValue = value;
             }
 
@@ -1567,7 +1567,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
       break;
 
     case TokenType.NOSEEB_AWARE_OPERATOR:
-      if (left is NullNode) {
+      if (left is NoSeebNode) {
         return right;
       }
 
@@ -1638,7 +1638,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           return retVal;
         }
 
-        if (left is BoolNode && right is NullNode) {
+        if (left is BoolNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.boolVal == null;
@@ -1684,7 +1684,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
           return retVal;
         }
-        if (left is IntNode && right is NullNode) {
+        if (left is IntNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.intVal == 0 || left.intVal == null;
@@ -1698,7 +1698,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
 
           return retVal;
         }
-        if (left is DoubleNode && right is NullNode) {
+        if (left is DoubleNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.doubleVal == 0 || left.doubleVal == null;
@@ -1713,7 +1713,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           return retVal;
         }
 
-        if (left is StringNode && right is NullNode) {
+        if (left is StringNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.stringValue == null;
@@ -1739,7 +1739,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           return retVal;
         }
 
-        if (left is ClassNode && right is NullNode) {
+        if (left is ClassNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.classChildren.isEmpty;
@@ -1747,7 +1747,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           return retVal;
         }
 
-        if (left is NullNode && right is NullNode) {
+        if (left is NoSeebNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = true;
@@ -1783,7 +1783,7 @@ Future<ASTNode> visitBinaryOp(Runtime runtime, ASTNode node) async {
           return retVal;
         }
 
-        if (left is BoolNode && right is NullNode) {
+        if (left is BoolNode && right is NoSeebNode) {
           retVal = BoolNode();
 
           retVal.boolVal = left.boolVal == null;
@@ -2217,15 +2217,14 @@ Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
     String str;
 
     if (node.assertExpression.type == ASTType.AST_BINARYOP) {
-      final left = astToString(await visit(runtime, node.assertExpression.binaryOpLeft));
-      final right = astToString(await visit(runtime, node.assertExpression.binaryOpRight));
+      final left = (await visit(runtime, node.assertExpression.binaryOpLeft)).toString();
+      final right = (await visit(runtime, node.assertExpression.binaryOpRight)).toString();
       str = 'ASSERT($left, $right)';
 
       print(str);
     } else {
-      final val = astToString(await visit(runtime, node.assertExpression));
-      str = val;
-      print(val);
+      str = (await visit(runtime, node.assertExpression)).toString();
+      print(str);
     }
     String stacktrace = '\nThe stacktrace when the error was thrown was:\n';
 

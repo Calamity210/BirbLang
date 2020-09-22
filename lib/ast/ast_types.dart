@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
+import 'package:Birb/runtime/runtime.dart';
 
 class CompoundNode extends ASTNode {
   @override
@@ -19,6 +20,12 @@ class CompoundNode extends ASTNode {
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ compound }';
   }
 }
 
@@ -54,6 +61,13 @@ class FuncCallNode extends ASTNode {
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return '${funcCallExpression.toString()}(${functionCallArgs.length})';
   }
 }
 
@@ -111,6 +125,13 @@ class FuncDefNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return '$funcName (${functionDefArgs.length})';
+  }
 }
 
 class ClassNode extends ASTNode {
@@ -148,6 +169,12 @@ class ClassNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ class }';
+  }
 }
 
 class EnumNode extends ASTNode {
@@ -166,6 +193,17 @@ class EnumNode extends ASTNode {
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+
+    String enumStr = 'enum {\n';
+    enumElements.forEach((element) => enumStr += ' ${element.toString()},\n');
+    enumStr += '}';
+
+    return enumStr;
   }
 }
 
@@ -196,6 +234,13 @@ class ListNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return listElements.toString();
+  }
 }
 
 class MapNode extends ASTNode {
@@ -224,6 +269,13 @@ class MapNode extends ASTNode {
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return map.toString();
   }
 }
 
@@ -269,6 +321,12 @@ class VariableNode extends ASTNode {
     enumElements.forEach((element) => node.enumElements.add(element?.copy()));
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return variableName;
   }
 }
 
@@ -412,14 +470,22 @@ class VarAssignmentNode extends ASTNode {
 
     return node;
   }
+
 }
 
-class NullNode extends ASTNode {
+class NoSeebNode extends ASTNode {
   @override
   ASTType type = ASTType.AST_NULL;
 
   @override
-  ASTNode copy() => NullNode();
+  ASTNode copy() => NoSeebNode();
+
+  @override
+  String toString() {
+    super.toString();
+
+    return 'noSeeb';
+  }
 }
 
 class StringNode extends ASTNode {
@@ -431,13 +497,12 @@ class StringNode extends ASTNode {
 
   @override
   ASTNode copy() {
-    final StringNode node = StringNode()..scope = scope..stringValue = stringValue;
-    return node;
+    return StringNode()..scope = scope..stringValue = stringValue;
   }
 
   @override
   String toString() {
-   super.toString();
+    super.toString();
    return stringValue;
   }
 }
@@ -535,6 +600,7 @@ class BoolNode extends ASTNode {
   @override
   String toString() {
     super.toString();
+
     return boolVal.toString();
   }
 }
@@ -553,6 +619,12 @@ class TypeNode extends ASTNode {
 
   @override
   ASTNode copy() => TypeNode();
+
+  @override
+  String toString() {
+    super.toString();
+    return '< Type >';
+  }
 }
 
 class BinaryOpNode extends ASTNode {
@@ -578,6 +650,15 @@ class BinaryOpNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    ASTNode visitedBiOp;
+    visitBinaryOp(initRuntime(null), this).then((value) => visitedBiOp = value);
+    return visitedBiOp.toString();
+  }
 }
 
 class UnaryOpNode extends ASTNode {
@@ -599,6 +680,15 @@ class UnaryOpNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    ASTNode visitedUnaryOp;
+    visitUnaryOp(initRuntime(null), this).then((value) => visitedUnaryOp = value);
+    return visitedUnaryOp.toString();
+  }
 }
 
 class NoopNode extends ASTNode {
@@ -607,6 +697,12 @@ class NoopNode extends ASTNode {
 
   @override
   ASTNode copy() => NoopNode();
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ NO-OP }';
+  }
 }
 
 class NewNode extends ASTNode {
@@ -644,6 +740,12 @@ class ReturnNode extends ASTNode {
     final ReturnNode node = ReturnNode()..scope = scope..returnValue = (returnValue?.copy());
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return returnValue.toString();
   }
 }
 
@@ -693,6 +795,7 @@ class TernaryNode extends ASTNode {
 
     return node;
   }
+
 }
 
 class IfNode extends ASTNode {
@@ -850,6 +953,12 @@ class AttributeAccessNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return '${binaryOpLeft.toString()}.${binaryOpRight.toString()}';
+  }
 }
 
 class ListAccessNode extends ASTNode {
@@ -870,6 +979,12 @@ class ListAccessNode extends ASTNode {
       ..binaryOpLeft = (binaryOpLeft?.copy());
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return 'list[access]';
   }
 }
 

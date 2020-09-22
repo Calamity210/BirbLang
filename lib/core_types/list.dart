@@ -102,7 +102,8 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
     case 'toMap':
       final Map map = {};
 
-      for (int i = 0; i < left.listElements.length; i++) map['$i'] = left.listElements[i];
+      for (int i = 0; i < left.listElements.length; i++)
+        map['$i'] = left.listElements[i];
 
       return MapNode()..map = map;
 

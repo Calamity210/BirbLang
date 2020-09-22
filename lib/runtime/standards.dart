@@ -115,14 +115,14 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stdout.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -144,14 +144,14 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       print(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -168,11 +168,11 @@ ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
   final StringNode strAST = args[0];
 
-    String str = astToString(strAST);
+    String str = strAST.toString();
     
     str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
       final int index = int.parse(match.group(1));
-      return astToString(args[index + 1]);
+      return args[index + 1].toString();
     });
 
     str = str.replaceAll(r'\{', '\{').replaceAll(r'\}', r'}');
@@ -196,14 +196,14 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stderr.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -225,14 +225,14 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stderr.write('$classToString\n');
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
