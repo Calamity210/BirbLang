@@ -1,7 +1,6 @@
 analyzer:
   errors:
     missing_required_param: warning
-    missing_return: warning
     todo: ignore
     deprecated_member_use_from_same_package: ignore
     sdk_version_async_exported_from_core: ignore
