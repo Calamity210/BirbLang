@@ -10,21 +10,31 @@ import 'package:Birb/runtime/runtime.dart';
 Future<void> main(List<String> arguments) async {
   /// If no file path is specified the birb shell will
   /// start up allowing developers to write programs directly from their terminal
-  final isInteractive = arguments.isEmpty;
-
-  /// Runtime visitor
-  final Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
-
-  Lexer lexer;
-
-  Parser parser;
-
-  /// Parsed program
-  ASTNode node;
 
   // No file path is specified, Initiate the birb shell
-  if (isInteractive) {
-    print('<<<<< Birb Shell Initiated >>>>>');
+  if (arguments.isEmpty) {
+    shell();
+  }
+
+  else {
+    if (arguments[0] == '-v' || arguments[0] == '--version') {
+      print('Birb 0.0.1');
+      exit(0);
+    }
+    /// A file is specified so read and run the file
+    runFile(arguments);
+  }
+}
+
+Future<void> shell() async {
+  /// Runtime visitor
+  final Runtime runtime = initRuntime('');
+
+  Lexer lexer;
+  Parser parser;
+  ASTNode node;
+
+  print('<<<<< Birb Shell Initiated >>>>>');
 
     while (true) {
       stdout.write('> ');
@@ -64,12 +74,20 @@ Future<void> main(List<String> arguments) async {
 
     print('<<<<< Birb Shell Terminated >>>>>');
     return;
-  }
+}
 
+Future<void> runFile(arguments) async {
   // Initialize and run program
   final String program = File(arguments[0]).readAsStringSync().trim();
 
+  /// Runtime visitor
+  final Runtime runtime = initRuntime('');
+  Lexer lexer;
+  Parser parser;
+  ASTNode node;
+
   try {
+
     if (RegExp('{').allMatches(program).length !=
         RegExp('}').allMatches(program).length) {
       final int lParenCount = RegExp('{').allMatches(program).length;
