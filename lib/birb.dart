@@ -19,11 +19,29 @@ Future<void> main(List<String> arguments) async {
   else {
     if (arguments[0] == '-v' || arguments[0] == '--version') {
       print('Birb 0.0.1');
-      exit(0);
     }
+    else if (arguments[0] == '-c' || arguments[0] == '--cmd') {
+      runString(arguments[1]);
+    }
+
     /// A file is specified so read and run the file
-    runFile(arguments);
+    else {
+      runFile(arguments);
+    }
   }
+}
+
+Future<void> runString(str) async {
+  final Runtime runtime = initRuntime('');
+
+  Lexer lexer;
+  Parser parser;
+  ASTNode node;
+
+  lexer = initLexer(str);
+  parser = initParser(lexer);
+  node = parse(parser);
+  await visit(runtime, node);
 }
 
 Future<void> shell() async {
