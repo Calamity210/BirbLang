@@ -4,7 +4,9 @@ import 'package:test_process/test_process.dart';
 void main() {
   test.test('No analysis issues', () async {
     final process = await TestProcess.start('dartanalyzer', ['.'], runInShell: true);
-    
+
+    print('running');
+
     test.expect(await process.stdout.next, 'Analyzing BirbLang...');
     test.expect(await process.stdout.next, 'No issues found!');
   });
