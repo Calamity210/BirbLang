@@ -5,8 +5,10 @@ analyzer:
     todo: ignore
     deprecated_member_use_from_same_package: ignore
     sdk_version_async_exported_from_core: ignore
+
   exclude:
     - "examples/**"
+    - "docs/**"
 
 linter:
   rules:

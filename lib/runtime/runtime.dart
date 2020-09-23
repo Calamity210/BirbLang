@@ -2240,9 +2240,8 @@ Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
 
 /// Expect arguments for a function
 void runtimeExpectArgs(List inArgs, List<ASTType> args) {
-  if (inArgs.length < args.length) {
+  if (inArgs.length < args.length)
     throw InvalidArgumentsException('${inArgs.length} argument(s) were provided, while ${args.length} were expected');
-  }
 
   for (int i = 0; i < args.length; i++) {
     if (args[i] == ASTType.AST_ANY)
