@@ -3,5 +3,6 @@ grab('birb:math');
 scremLn(min(10, 5.5).runtimeType); // output double
 
 scremLn(pi); // output 3.141592653589793
+scremLn(tau); // output 6.283185307179586
 
 scremLn(remap(8, 0, 10, 0, 100)); // output 80.0
