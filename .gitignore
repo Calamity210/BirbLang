@@ -13,6 +13,7 @@ doc/api/
 .vscode/
 
 docs/node_modules/
+docs/build/
 docs/.idea/
 node_modules/
 
