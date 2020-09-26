@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'file:///C:/Users/User/Projects/BirbLang/lib/core_types.dart';
+import 'package:Birb/core_types.dart';
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
