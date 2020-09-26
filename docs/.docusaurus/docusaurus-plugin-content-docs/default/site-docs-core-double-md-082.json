@@ -1,0 +1,14 @@
+{
+  "unversionedId": "Core/double",
+  "id": "Core/double",
+  "isDocsHomePage": false,
+  "title": "Double",
+  "description": "A 64-bit double-precision floating-point number as specified in the IEEE 754 standard.",
+  "source": "@site/docs\\Core\\double.md",
+  "slug": "/Core/double",
+  "permalink": "/docs/Core/double",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Core/double.md",
+  "version": "current",
+  "lastUpdatedBy": "Calamity210",
+  "lastUpdatedAt": 1601136899
+}

@@ -1,4 +1,3 @@
-
 ---
 id: tour
 title: Tour
