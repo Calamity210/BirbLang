@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Birb/external/convert.dart';
-import 'package:Birb/external/http.dart';
-import 'package:Birb/external/io.dart';
-import 'package:Birb/external/math.dart';
-import 'package:Birb/ast/ast_types.dart';
-import 'package:Birb/utils/exceptions.dart';
 import 'package:http/http.dart';
 
+import 'package:Birb/core_types.dart';
+import 'package:Birb/external.dart';
+import 'package:Birb/ast/ast_types.dart';
+import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/lexer/lexer.dart';
@@ -23,19 +21,16 @@ Future<void> initStandards(Runtime runtime, String path) async {
   if (path != null) {
     filePath = path.replaceAllMapped(RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
   }
-  registerGlobalVariable(
-      runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
 
-  // Date class
+
+  registerGlobalVariable(runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
+
   registerGlobalVariable(runtime, 'Date', dateClass(runtime));
-
-  // Double class
   registerGlobalVariable(runtime, 'double', doubleClass(runtime));
-
-  // Time class
+  registerGlobalVariable(runtime, 'List', listClass(runtime));
   registerGlobalVariable(runtime, 'Time', timeClass(runtime));
 
-  // functions
+  // Functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'scremLn', funcScremLn);
   registerGlobalFunction(runtime, 'scremF', funcScremF);
@@ -253,7 +248,6 @@ ASTNode funcMock(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 /// DATE AND TIME
-
 ASTNode dateClass(Runtime runtime) {
   final astObj = ClassNode();
 
@@ -430,6 +424,24 @@ ASTNode doubleClass(Runtime runtime) {
   astVarMinPositive.variableValue = astMinPositive;
 
   astObj.classChildren.add(astVarMinPositive);
+
+  return astObj;
+}
+
+ASTNode listClass(Runtime runtime) {
+  final ClassNode astObj = ClassNode();
+
+  astObj.classChildren.add(
+      FuncDefNode()
+        ..funcName = 'filled'
+        ..funcPointer = listFilled
+  );
+
+  astObj.classChildren.add(
+      FuncDefNode()
+        ..funcName = 'empty'
+        ..funcPointer = listEmpty
+  );
 
   return astObj;
 }

@@ -118,3 +118,14 @@ ASTNode visitListMethods(ASTNode node, ASTNode left) {
       throw NoSuchMethodException(binaryOpRight.funcCallExpression.variableName, 'List');
   }
 }
+
+ASTNode listEmpty(Runtime runtime, ASTNode self, List<ASTNode> args) {
+  return ListNode()..listElements = List.empty();
+}
+
+ASTNode listFilled(Runtime runtime, ASTNode self, List<ASTNode> args) {
+  runtimeExpectArgs(args, [ASTType.AST_INT, ASTType.AST_ANY]);
+
+  return ListNode()..listElements = List.filled(args[0].intVal, args[1]);
+}
+

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Birb/core_types/core_types.dart';
+import 'file:///C:/Users/User/Projects/BirbLang/lib/core_types.dart';
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
@@ -197,6 +197,14 @@ ASTNode registerGlobalFunction(Runtime runtime, String fName, AstFuncPointer fun
   fDef.funcName = fName;
   fDef.funcPointer = funcPointer;
   runtime.scope.functionDefinitions.addFirst(fDef);
+  return fDef;
+}
+
+ASTNode registerLocalFunction(Runtime runtime, String fName, AstFuncPointer funcPointer, Scope scope) {
+  final fDef = FuncDefNode()
+    ..funcName = fName
+    ..funcPointer = funcPointer;
+  scope.functionDefinitions.addFirst(fDef);
   return fDef;
 }
 
@@ -1070,8 +1078,21 @@ Future<ASTNode> visitAttAccess(Runtime runtime, ASTNode node) async {
             final ASTNode objChild = left.classChildren.elementAt(i);
 
             if (objChild.type == ASTType.AST_FUNC_DEFINITION)
-              if (objChild.funcName == funcCallName)
-              return await runtimeFunctionCall(runtime, node.binaryOpRight, objChild);
+              if (objChild.funcName == funcCallName) {
+                if (objChild.funcPointer != null) {
+                  final List<ASTNode> visitedFuncPointerArgs = [];
+
+                  for (int j = 0; j < node.binaryOpRight.functionCallArgs.length; j++) {
+                    final ASTNode astArg = node.binaryOpRight.functionCallArgs[j];
+                    final visited = await visit(runtime, astArg);
+                    visitedFuncPointerArgs.add(visited);
+                  }
+
+                  return await visit(runtime, objChild.funcPointer(runtime, left, visitedFuncPointerArgs));
+                }
+
+                return await runtimeFunctionCall(runtime, node.binaryOpRight, objChild);
+              }
           }
         }
       }

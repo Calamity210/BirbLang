@@ -476,8 +476,7 @@ ASTNode parseClass(Parser parser, Scope scope) {
 
   final newScope = initScope(false);
 
-  if (scope != null)
-    if (scope.owner != null)
+  if (scope != null && scope.owner != null)
       newScope.owner = scope.owner;
 
   eat(parser, TokenType.TOKEN_LBRACE);

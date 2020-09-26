@@ -31,8 +31,6 @@ ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
   final exitAST = args[0];
 
   exit(exitAST.intVal);
-
-  return INITIALIZED_NOOP;
 }
 
 ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
