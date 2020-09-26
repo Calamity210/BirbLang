@@ -120,3 +120,18 @@ Returns the minimum number of bits required to store this integer.
 int number = 10;
 bool bitLength = number.bitLength;
 ```
+
+## Operators
+
+|Operator|Description|
+| -- | -- |
+|+|Adds the left value with the right|
+|-|Subtracts the left value with the right|
+|*|Multiplies the left value by the right|
+|/|Divides the left value by the right|
+|<|True if the left value is less than the right|
+|>|True if the left value is greater than the right|
+|<=|True if the left value is less than or equal to the right|
+|>=|True if the left value is greater or equal to than the right|
+|==|True if the left value is equal to than the right|
+|!=|True if the left value is not equal to than the right|
