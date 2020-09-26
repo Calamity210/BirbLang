@@ -10,6 +10,7 @@ module.exports = {
                 'Core/string', 
                 'Core/int',
                 'Core/map',
+                'Core/double'
               ],
             }
         ],
