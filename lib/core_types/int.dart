@@ -70,132 +70,101 @@ ASTNode visitIntProperties(ASTNode node, ASTNode left) {
 ASTNode visitIntMethods(ASTNode node, ASTNode left) {
   switch (node.binaryOpRight.funcCallExpression.variableName) {
     case 'abs':
-      {
-        final IntNode intAST = IntNode()..intVal = left.intVal.abs();
-        return intAST;
-      }
+        return IntNode()..intVal = left.intVal.abs();
 
     case 'clamp':
-      {
-        runtimeExpectArgs(node.binaryOpRight.functionCallArgs,
-            [ASTType.AST_INT, ASTType.AST_INT]);
+        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT, ASTType.AST_INT]);
+
         final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
-        final IntNode intAST = IntNode()
+
+       return IntNode()
           ..intVal = left.intVal.clamp(args[0].intVal, args[1].intVal).toInt();
-        return intAST;
-      }
 
     case 'compareTo':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
-        final IntNode intAST = IntNode()
+
+        return IntNode()
           ..intVal =
               left.intVal.compareTo(node.binaryOpRight.functionCallArgs[0].intVal);
-        return intAST;
-      }
 
     case 'gcd':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
-        final IntNode intAST = IntNode()
+
+        return IntNode()
           ..intVal = left.intVal.gcd(node.binaryOpRight.functionCallArgs[0].intVal);
-        return intAST;
-      }
 
     case 'modInverse':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final IntNode intAST = IntNode()
           ..intVal =
               left.intVal.modInverse(node.binaryOpRight.functionCallArgs[0].intVal);
         return intAST;
-      }
 
     case 'modPow':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs,
             [ASTType.AST_INT, ASTType.AST_INT]);
         final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
         final IntNode intAST = IntNode()
           ..intVal = left.intVal.modPow(args[0].intVal, args[1].intVal);
         return intAST;
-      }
 
     case 'remainder':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final IntNode intAST = IntNode()
           ..intVal =
               left.intVal.remainder(node.binaryOpRight.functionCallArgs[0].intVal).toInt();
         return intAST;
-      }
 
     case 'toDouble':
-      {
         final DoubleNode doubleAST = DoubleNode()..doubleVal = left.intVal.toDouble();
         return doubleAST;
-      }
 
     case 'toRadixString':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toRadixString(node.binaryOpRight.functionCallArgs[0].intVal);
         return stringAST;
-      }
 
     case 'toSigned':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final IntNode intAST = IntNode()
           ..intVal =
               left.intVal.toSigned(node.binaryOpRight.functionCallArgs[0].intVal);
         return intAST;
-      }
 
     case 'toString':
-      {
         final StringNode stringAST = StringNode()
           ..stringValue = left.intVal.toString();
         return stringAST;
-      }
 
     case 'toStringAsExponential':
-      {
         final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
         final StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsExponential(args.isEmpty ? 0 : args[0].intVal);
         return stringAST;
-      }
 
     case 'toStringAsFixed':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsFixed(node.binaryOpRight.functionCallArgs[0].intVal);
         return stringAST;
-      }
 
     case 'toStringAsPrecision':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final StringNode stringAST = StringNode()
           ..stringValue = left.intVal
               .toStringAsPrecision(node.binaryOpRight.functionCallArgs[0].intVal);
         return stringAST;
-      }
 
     case 'toUnsigned':
-      {
         runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
         final IntNode intAST = IntNode()
           ..intVal =
               left.intVal.toUnsigned(node.binaryOpRight.functionCallArgs[0].intVal);
         return intAST;
-      }
 
     default:
       throw NoSuchMethodException(

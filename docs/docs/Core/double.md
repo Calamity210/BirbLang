@@ -1,6 +1,6 @@
 ---
 id: double
-title: Double
+title: double
 ---
 
 A 64-bit double-precision floating-point number as specified in the IEEE 754 standard.
