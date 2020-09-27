@@ -1,0 +1,19 @@
+# the high level policy
+policy:
+  approval:
+    and:
+        - changes are documented
+        - changes are tested
+
+# the list of rules
+approval_rules:
+  - name: changes are documented
+    if:
+      changed_files:
+        paths:
+          - "docs/docs/**/*.md"
+  - name: changes are tested
+    if:
+      changed_files:
+        paths:
+          - "test/programs/**/*.birb"
