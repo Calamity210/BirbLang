@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
-=======
 import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/ast/ast_types.dart';
->>>>>>> upstream/master
 import 'package:Birb/utils/exceptions.dart';
 
 /// Visits properties for `Bool`s
@@ -24,11 +19,6 @@ ASTNode visitBoolMethods(ASTNode node, ASTNode left) {
     case 'toString':
         return StringNode()..stringValue = left.boolVal.toString();
     default:
-<<<<<<< HEAD
-      throw NoSuchMethodException(
-          node.binaryOpRight.funcCallExpression.variableName, 'bool');
-=======
       throw NoSuchMethodException(node.binaryOpRight.funcCallExpression.variableName, 'bool');
->>>>>>> upstream/master
   }
 }
