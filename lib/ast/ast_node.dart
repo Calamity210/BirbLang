@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:Birb/lexer/token.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/runtime/runtime.dart';
@@ -47,8 +49,8 @@ abstract class ASTNode {
   String get className => throw Exception('Not part of $runtimeType => $type');
   set className(String _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get classChildren => throw Exception('Not part of $runtimeType => $type');
-  set classChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  ListQueue<ASTNode> get classChildren => throw Exception('Not part of $runtimeType => $type');
+  set classChildren(ListQueue<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   List<ASTNode> get compChildren => throw Exception('Not part of $runtimeType => $type');
   set compChildren(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
@@ -77,17 +79,17 @@ abstract class ASTNode {
   ASTNode get forInitStatement => throw Exception('Not part of $runtimeType => $type');
   set forInitStatement(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get funcCallArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get functionCallArgs => throw Exception('Not part of $runtimeType => $type');
+  set functionCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcCallExpression => throw Exception('Not part of $runtimeType => $type');
   set funcCallExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
-  List<ASTNode> get funcDefArgs => throw Exception('Not part of $runtimeType => $type');
-  set funcDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+  List<ASTNode> get functionDefArgs => throw Exception('Not part of $runtimeType => $type');
+  set functionDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
-  ASTNode get funcDefBody => throw Exception('Not part of $runtimeType => $type');
-  set funcDefBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
+  ASTNode get functionDefBody => throw Exception('Not part of $runtimeType => $type');
+  set functionDefBody(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get funcDefType => throw Exception('Not part of $runtimeType => $type');
   set funcDefType(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -139,6 +141,12 @@ abstract class ASTNode {
 
   Map<String, dynamic> get map => throw Exception('Not part of $runtimeType => $type');
   set map(Map<String, dynamic> _) => throw Exception('Not part of $runtimeType => $type');
+
+  List<ASTNode> get namedFunctionDefArgs => throw Exception('Not part of $runtimeType => $type');
+  set namedFunctionDefArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
+
+  List<ASTNode> get namedFunctionCallArgs => throw Exception('Not part of $runtimeType => $type');
+  set namedFunctionCallArgs(List<ASTNode> _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode get newValue => throw Exception('Not part of $runtimeType => $type');
   set newValue(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
@@ -204,6 +212,9 @@ abstract class ASTNode {
   set whileExpression(ASTNode _) => throw Exception('Not part of $runtimeType => $type');
 
   ASTNode copy();
+
+  @override
+  String toString();
 }
 
 enum ASTType {
@@ -244,55 +255,4 @@ enum ASTType {
   AST_LIST_ACCESS,
   AST_ITERATE,
   AST_ASSERT
-}
-
-String astToString(ASTNode ast) {
-  switch (ast.type) {
-    case ASTType.AST_CLASS:
-      return '{ class }';
-    case ASTType.AST_VARIABLE:
-      return ast.variableName;
-    case ASTType.AST_FUNC_DEFINITION:
-      return '${ast.funcName} (${ast.funcDefArgs.length})';
-    case ASTType.AST_FUNC_CALL:
-      final String expressionStr = astToString(ast.funcCallExpression);
-      return '$expressionStr (${ast.funcCallArgs.length})';
-    case ASTType.AST_NULL:
-      return 'null';
-    case ASTType.AST_STRING:
-      return ast.stringValue;
-    case ASTType.AST_STRING_BUFFER:
-      return '[ StrBuffer ]';
-    case ASTType.AST_DOUBLE:
-      return ast.doubleVal.toString();
-    case ASTType.AST_LIST:
-      return ast.listElements.toString();
-    case ASTType.AST_MAP:
-      return ast.map.toString();
-    case ASTType.AST_BOOL:
-      return ast.boolVal.toString();
-    case ASTType.AST_INT:
-      return ast.intVal.toString();
-    case ASTType.AST_TYPE:
-      return '< Type >';
-    case ASTType.AST_ATTRIBUTE_ACCESS:
-      return '$astToString(ast.binaryOpLeft).$astToString(ast.binaryOpRight)';
-    case ASTType.AST_LIST_ACCESS:
-      return 'list[access]';
-    case ASTType.AST_BINARYOP:
-      ASTNode visitedBiOp;
-      visitBinaryOp(initRuntime(null), ast).then((value) => visitedBiOp = value);
-      return astToString(visitedBiOp);
-    case ASTType.AST_NOOP:
-      return '{{NO-OP}}';
-    case ASTType.AST_BREAK:
-      return 'break';
-    case ASTType.AST_RETURN:
-      return astToString(ast.returnValue);
-    case ASTType.AST_ENUM:
-      return ast.variableName;
-    default:
-      print('Could not convert ast of type ${ast.type} to String');
-      return null;
-  }
 }

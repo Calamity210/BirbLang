@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';

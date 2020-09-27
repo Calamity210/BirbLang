@@ -1,0 +1,11 @@
+int add(int a, int b) {
+    return a + b;
+}
+
+scremLn(add(0xA, 6)); // output 16
+
+void henlo(String a, {String b, String c}) {
+    scremF('{0} {1}{2}\n', a, b, c ?? '!');
+}
+
+henlo('Henlo', b: 'Birb'); // output Henlo Birb!

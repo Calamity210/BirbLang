@@ -2,15 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:Birb/external/convert.dart';
-import 'package:Birb/external/http.dart';
-import 'package:Birb/external/io.dart';
-import 'package:Birb/external/math.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
-import 'package:Birb/utils/exceptions.dart';
 import 'package:http/http.dart';
 
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'package:Birb/core_types.dart';
+import 'package:Birb/external.dart';
+import 'package:Birb/ast/ast_types.dart';
+import 'package:Birb/utils/exceptions.dart';
+import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/parser/data_type.dart';
 import 'package:Birb/lexer/lexer.dart';
 import 'package:Birb/parser/parser.dart';
@@ -23,19 +21,16 @@ Future<void> initStandards(Runtime runtime, String path) async {
   if (path != null) {
     filePath = path.replaceAllMapped(RegExp(r'(.+(?:/|\\))+.+\.birb'), (m) => m.group(1));
   }
-  registerGlobalVariable(
-      runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
 
-  // Date class
+
+  registerGlobalVariable(runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
+
   registerGlobalVariable(runtime, 'Date', dateClass(runtime));
-
-  // Double class
   registerGlobalVariable(runtime, 'double', doubleClass(runtime));
-
-  // Time class
+  registerGlobalVariable(runtime, 'List', listClass(runtime));
   registerGlobalVariable(runtime, 'Time', timeClass(runtime));
 
-  // functions
+  // Functions
   registerGlobalFunction(runtime, 'screm', funcScrem);
   registerGlobalFunction(runtime, 'scremLn', funcScremLn);
   registerGlobalFunction(runtime, 'scremF', funcScremF);
@@ -53,8 +48,9 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   final ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
     final String fileName = astStr.stringValue.split(':')[1];
+    final String ps = Platform.pathSeparator;
 
-    final Lexer lexer = initLexer(File('${Directory.current.path}/core/$fileName/$fileName.birb').readAsStringSync());
+    final Lexer lexer = initLexer(File('${Directory.current.path}${ps}core$ps$fileName$ps$fileName.birb').readAsStringSync());
     final Parser parser = initParser(lexer);
     final ASTNode node = parse(parser);
     await visit(runtime, node);
@@ -114,14 +110,14 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stdout.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -143,14 +139,14 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       print(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -167,11 +163,11 @@ ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
   final StringNode strAST = args[0];
 
-    String str = astToString(strAST);
+    String str = strAST.toString();
     
     str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
       final int index = int.parse(match.group(1));
-      return astToString(args[index + 1]);
+      return args[index + 1].toString();
     });
 
     str = str.replaceAll(r'\{', '\{').replaceAll(r'\}', r'}');
@@ -195,14 +191,14 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stderr.write(classToString);
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -224,14 +220,14 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
       String classToString = '';
 
       astArg.classChildren.whereType<VarDefNode>().forEach((varDef) {
-        classToString += '${varDef.variableName}: ${astToString(varDef.variableValue)}\n';
+        classToString += '${varDef.variableName}: ${varDef.variableValue.toString()}\n';
       });
 
       stderr.write('$classToString\n');
       return INITIALIZED_NOOP;
     }
 
-    final str = astToString(astArg);
+    final str = astArg.toString();
 
     if (str == null)
       throw const UnexpectedTokenException('Screm must contain non-null arguments');
@@ -252,7 +248,6 @@ ASTNode funcMock(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 /// DATE AND TIME
-
 ASTNode dateClass(Runtime runtime) {
   final astObj = ClassNode();
 
@@ -429,6 +424,24 @@ ASTNode doubleClass(Runtime runtime) {
   astVarMinPositive.variableValue = astMinPositive;
 
   astObj.classChildren.add(astVarMinPositive);
+
+  return astObj;
+}
+
+ASTNode listClass(Runtime runtime) {
+  final ClassNode astObj = ClassNode();
+
+  astObj.classChildren.add(
+      FuncDefNode()
+        ..funcName = 'filled'
+        ..funcPointer = listFilled
+  );
+
+  astObj.classChildren.add(
+      FuncDefNode()
+        ..funcName = 'empty'
+        ..funcPointer = listEmpty
+  );
 
   return astObj;
 }

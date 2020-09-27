@@ -10,6 +10,7 @@ module.exports = {
                 'Core/string', 
                 'Core/int',
                 'Core/map',
+                'Core/double'
               ],
             }
         ],
@@ -18,7 +19,8 @@ module.exports = {
          type: 'category',
          label: 'Contribute',
          items: [
-            'Contribute/contributing'
+            'Contribute/contributing',
+            'Contribute/walkthrough'
          ],
         },
     ]

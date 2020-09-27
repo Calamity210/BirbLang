@@ -1,7 +1,7 @@
 export default {
   "title": "BirbLang",
   "tagline": "Smol Programming Language",
-  "url": "https://Calamity210.github.io",
+  "url": "https://birbolang.web.app",
   "baseUrl": "/",
   "onBrokenLinks": "throw",
   "favicon": "img/favicon.ico",
@@ -9,6 +9,7 @@ export default {
     "@docusaurus/theme-live-codeblock"
   ],
   "plugins": [
+    "C:\\Users\\User\\Projects\\BirbLang\\docs\\node_modules\\@cmfcmf\\docusaurus-search-local\\src\\index.js",
     [
       "@docusaurus/plugin-content-docs",
       {
@@ -16,7 +17,7 @@ export default {
         "path": "community",
         "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/",
         "routeBasePath": "community",
-        "sidebarPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
+        "sidebarPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebarsCommunity.js",
         "showLastUpdateAuthor": true,
         "showLastUpdateTime": true
       }
@@ -99,16 +100,6 @@ export default {
         "dart"
       ],
       "defaultLanguage": "dart"
-    },
-    "algolia": {
-      "apiKey": "7a1c0622f793d186564c3bc2d235068e",
-      "indexName": "BIRB_DOCS",
-      "searchParameters": {
-        "facetFilters": [
-          "version:latest"
-        ]
-      },
-      "appId": "BH4D9OD16A"
     }
   },
   "presets": [
@@ -117,7 +108,7 @@ export default {
       {
         "docs": {
           "path": "docs",
-          "sidebarPath": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\sidebars.js",
+          "sidebarPath": "C:\\Users\\User\\Projects\\BirbLang\\docs\\sidebars.js",
           "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/",
           "showLastUpdateAuthor": true,
           "showLastUpdateTime": true,
@@ -133,7 +124,7 @@ export default {
           }
         },
         "theme": {
-          "customCss": "C:\\Users\\user\\Desktop\\Andy\\Projects\\BirbLang\\docs\\src\\css\\custom.css"
+          "customCss": "C:\\Users\\User\\Projects\\BirbLang\\docs\\src\\css\\custom.css"
         }
       }
     ]

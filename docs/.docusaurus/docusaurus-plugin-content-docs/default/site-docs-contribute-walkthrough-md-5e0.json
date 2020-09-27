@@ -1,0 +1,20 @@
+{
+  "unversionedId": "Contribute/walkthrough",
+  "id": "Contribute/walkthrough",
+  "isDocsHomePage": false,
+  "title": "Walkthrough",
+  "description": "This document should give you a quick overview to get you started on contributing to birb.",
+  "source": "@site/docs\\Contribute\\walkthrough.md",
+  "slug": "/walkthrough",
+  "permalink": "/docs/walkthrough",
+  "editUrl": "https://github.com/Calamity210/BirbLang/edit/master/docs/docs/Contribute/walkthrough.md",
+  "version": "current",
+  "lastUpdatedBy": "Calamity210",
+  "lastUpdatedAt": 1600029990,
+  "sidebar_label": "Walkthrough",
+  "sidebar": "BirbLang",
+  "previous": {
+    "title": "Contributing",
+    "permalink": "/docs/contributing"
+  }
+}

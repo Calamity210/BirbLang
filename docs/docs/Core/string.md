@@ -23,7 +23,7 @@ will print on two lines
 You can use the `+` operator to concat Strings:
 
 ```dart
-screm("Henlo " + "birb!") // "Henlo birb!"
+screm("Henlo " + "birb!"); // "Henlo birb!"
 ```
 
 ## Properties
@@ -366,3 +366,10 @@ Returns this String without any trailing whitespace.
 String henlo = "   Henlo Birb   ";
 String trimmed = henlo.trimRight(); /*   Henlo Birb*/
 ```
+
+## Operators
+
+|Operator|Description|
+| -- | -- |
+|+|Concatenates two `Strings` returning a single `String`|
+|*|Multiplies the `String` by the right value, ie: `"1" * 3 // => "111"`|

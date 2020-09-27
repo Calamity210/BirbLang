@@ -3,8 +3,9 @@ import 'package:test_process/test_process.dart';
 
 void main() {
   test.test(
-    'Starts and exits interactive mode succefully',
+    'Starts and exits interactive mode successfully',
     () async {
+
       final process = await TestProcess.start('dart', ['./lib/birb.dart']);
 
       process.stdin.writeln('quit()');

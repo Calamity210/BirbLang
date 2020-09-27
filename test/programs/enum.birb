@@ -1,0 +1,19 @@
+enum {
+    Beeper,
+    Grey,
+    Quaker,
+    Senegal,
+} Birb;
+
+scremLn(Birb.Beeper); // output [0, Beeper]
+scremLn(Birb.Grey); // output [1, Grey]
+scremLn(Birb.Quaker); // output [2, Quaker]
+scremLn(Birb.Senegal); // output [3, Senegal]
+
+// output enum {
+// output  Beeper,
+// output  Grey,
+// output  Quaker,
+// output  Senegal,
+//output }
+scremLn(Birb);

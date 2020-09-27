@@ -33,6 +33,10 @@
               "path": "/docs/contributing"
             },
             {
+              "id": "Contribute/walkthrough",
+              "path": "/docs/walkthrough"
+            },
+            {
               "id": "Core/int",
               "path": "/docs/Core/int"
             },

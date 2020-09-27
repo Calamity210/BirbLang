@@ -1,5 +1,8 @@
-import 'package:Birb/utils/ast/ast_node.dart';
+import 'dart:collection';
+
+import 'package:Birb/ast/ast_node.dart';
 import 'package:Birb/lexer/token.dart';
+import 'package:Birb/runtime/runtime.dart';
 
 class CompoundNode extends ASTNode {
   @override
@@ -18,6 +21,12 @@ class CompoundNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ compound }';
+  }
 }
 
 class FuncCallNode extends ASTNode {
@@ -31,7 +40,10 @@ class FuncCallNode extends ASTNode {
   ASTNode funcCallExpression;
 
   @override
-  List<ASTNode> funcCallArgs = [];
+  List<ASTNode> functionCallArgs = [];
+
+  @override
+  List<ASTNode> namedFunctionCallArgs = [];
 
   @override
   String variableName;
@@ -44,11 +56,18 @@ class FuncCallNode extends ASTNode {
       ..funcCallExpression = (funcCallExpression?.copy())
       ..variableName = variableName;
 
-    funcCallArgs.forEach((child) {
-      node.funcCallArgs.add(child?.copy());
+    functionCallArgs.forEach((child) {
+      node.functionCallArgs.add(child?.copy());
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return '${funcCallExpression.toString()}(${functionCallArgs.length})';
   }
 }
 
@@ -60,13 +79,16 @@ class FuncDefNode extends ASTNode {
   String funcName;
 
   @override
-  ASTNode funcDefBody;
+  ASTNode functionDefBody;
 
   @override
   ASTNode funcDefType;
 
   @override
-  List<ASTNode> funcDefArgs = [];
+  List<ASTNode> functionDefArgs = [];
+
+  @override
+  List<ASTNode> namedFunctionDefArgs = [];
 
   @override
   AstFuncPointer funcPointer;
@@ -85,16 +107,16 @@ class FuncDefNode extends ASTNode {
     final FuncDefNode node = FuncDefNode()
       ..scope = scope
       ..funcName = funcName
-      ..funcDefBody = (funcDefBody?.copy())
+      ..functionDefBody = (functionDefBody?.copy())
       ..funcDefType = (funcDefType?.copy())
-      ..funcDefArgs = []
+      ..functionDefArgs = []
       ..funcPointer = funcPointer
       ..futureFuncPointer = futureFuncPointer
       ..compChildren = []
       ..isSuperseding = isSuperseding;
 
-    funcDefArgs.forEach((child) {
-      node.funcDefArgs.add(child?.copy());
+    functionDefArgs.forEach((child) {
+      node.functionDefArgs.add(child?.copy());
     });
 
     compChildren.forEach((child) {
@@ -102,6 +124,13 @@ class FuncDefNode extends ASTNode {
     });
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return '$funcName (${functionDefArgs.length})';
   }
 }
 
@@ -113,13 +142,10 @@ class ClassNode extends ASTNode {
   String className;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode superClass;
-
-  @override
-  List funcDefinitions = [];
 
   @override
   ASTNode variableType;
@@ -141,10 +167,13 @@ class ClassNode extends ASTNode {
       child.parent = node;
     });
 
-    funcDefinitions.forEach((child) {
-      node.funcDefinitions.add(child?.copy());
-    });
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ class }';
   }
 }
 
@@ -165,6 +194,17 @@ class EnumNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    String enumStr = 'enum {\n';
+    enumElements.forEach((element) => enumStr += ' ${element.toString()},\n');
+    enumStr += '}';
+
+    return enumStr;
+  }
 }
 
 class ListNode extends ASTNode {
@@ -172,7 +212,7 @@ class ListNode extends ASTNode {
   ASTType type = ASTType.AST_LIST;
 
   @override
-  List listElements = [];
+  List listElements;
 
   @override
   List funcDefinitions = [];
@@ -194,6 +234,13 @@ class ListNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return listElements.toString();
+  }
 }
 
 class MapNode extends ASTNode {
@@ -201,7 +248,7 @@ class MapNode extends ASTNode {
   ASTType type = ASTType.AST_MAP;
 
   @override
-  Map<String, dynamic> map = {};
+  Map<String, dynamic> map;
 
   @override
   List funcDefinitions = [];
@@ -223,11 +270,21 @@ class MapNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    return map.toString();
+  }
 }
 
 class VariableNode extends ASTNode {
   @override
   ASTType type = ASTType.AST_VARIABLE;
+
+  @override
+  ASTNode ast;
 
   @override
   String variableName;
@@ -242,7 +299,7 @@ class VariableNode extends ASTNode {
   bool isFinal;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   List<ASTNode> enumElements = [];
@@ -264,6 +321,12 @@ class VariableNode extends ASTNode {
     enumElements.forEach((element) => node.enumElements.add(element?.copy()));
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return variableName;
   }
 }
 
@@ -293,7 +356,7 @@ class VarModNode extends ASTNode {
   ASTNode binaryOpRight;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   List<ASTNode> enumElements = [];
@@ -390,7 +453,7 @@ class VarAssignmentNode extends ASTNode {
   bool isFinal;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode copy() {
@@ -407,14 +470,22 @@ class VarAssignmentNode extends ASTNode {
 
     return node;
   }
+
 }
 
-class NullNode extends ASTNode {
+class NoSeebNode extends ASTNode {
   @override
   ASTType type = ASTType.AST_NULL;
 
   @override
-  ASTNode copy() => NullNode();
+  ASTNode copy() => NoSeebNode();
+
+  @override
+  String toString() {
+    super.toString();
+
+    return 'noSeeb';
+  }
 }
 
 class StringNode extends ASTNode {
@@ -422,17 +493,16 @@ class StringNode extends ASTNode {
   ASTType type = ASTType.AST_STRING;
 
   @override
-  String stringValue = '';
+  String stringValue;
 
   @override
   ASTNode copy() {
-    final StringNode node = StringNode()..scope = scope..stringValue = stringValue;
-    return node;
+    return StringNode()..scope = scope..stringValue = stringValue;
   }
 
   @override
   String toString() {
-   super.toString();
+    super.toString();
    return stringValue;
   }
 }
@@ -466,17 +536,13 @@ class IntNode extends ASTNode {
   ASTType type = ASTType.AST_INT;
 
   @override
-  int intVal = 0;
-
-  @override
-  double doubleVal = 0;
+  int intVal;
 
   @override
   ASTNode copy() {
     final IntNode node = IntNode()
       ..scope = scope
-      ..intVal = intVal
-      ..doubleVal = doubleVal;
+      ..intVal = intVal;
 
     return node;
   }
@@ -493,17 +559,13 @@ class DoubleNode extends ASTNode {
   ASTType type = ASTType.AST_DOUBLE;
 
   @override
-  double doubleVal = 0;
-
-  @override
-  int intVal = 0;
+  double doubleVal;
 
   @override
   ASTNode copy() {
     final DoubleNode node = DoubleNode()
       ..scope = scope
-      ..intVal = intVal
-      ..doubleVal = doubleVal;
+      ..intVal = intVal;
 
     return node;
   }
@@ -538,6 +600,7 @@ class BoolNode extends ASTNode {
   @override
   String toString() {
     super.toString();
+
     return boolVal.toString();
   }
 }
@@ -556,6 +619,12 @@ class TypeNode extends ASTNode {
 
   @override
   ASTNode copy() => TypeNode();
+
+  @override
+  String toString() {
+    super.toString();
+    return '< Type >';
+  }
 }
 
 class BinaryOpNode extends ASTNode {
@@ -581,6 +650,15 @@ class BinaryOpNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    ASTNode visitedBiOp;
+    visitBinaryOp(initRuntime(null), this).then((value) => visitedBiOp = value);
+    return visitedBiOp.toString();
+  }
 }
 
 class UnaryOpNode extends ASTNode {
@@ -602,6 +680,15 @@ class UnaryOpNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+
+    ASTNode visitedUnaryOp;
+    visitUnaryOp(initRuntime(null), this).then((value) => visitedUnaryOp = value);
+    return visitedUnaryOp.toString();
+  }
 }
 
 class NoopNode extends ASTNode {
@@ -610,6 +697,12 @@ class NoopNode extends ASTNode {
 
   @override
   ASTNode copy() => NoopNode();
+
+  @override
+  String toString() {
+    super.toString();
+    return '{ NO-OP }';
+  }
 }
 
 class NewNode extends ASTNode {
@@ -647,6 +740,12 @@ class ReturnNode extends ASTNode {
     final ReturnNode node = ReturnNode()..scope = scope..returnValue = (returnValue?.copy());
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return returnValue.toString();
   }
 }
 
@@ -696,6 +795,7 @@ class TernaryNode extends ASTNode {
 
     return node;
   }
+
 }
 
 class IfNode extends ASTNode {
@@ -825,7 +925,7 @@ class AttributeAccessNode extends ASTNode {
   ASTType type = ASTType.AST_ATTRIBUTE_ACCESS;
 
   @override
-  List<ASTNode> classChildren = [];
+  ListQueue<ASTNode> classChildren = ListQueue();
 
   @override
   ASTNode binaryOpRight;
@@ -853,6 +953,12 @@ class AttributeAccessNode extends ASTNode {
 
     return node;
   }
+
+  @override
+  String toString() {
+    super.toString();
+    return '${binaryOpLeft.toString()}.${binaryOpRight.toString()}';
+  }
 }
 
 class ListAccessNode extends ASTNode {
@@ -873,6 +979,12 @@ class ListAccessNode extends ASTNode {
       ..binaryOpLeft = (binaryOpLeft?.copy());
 
     return node;
+  }
+
+  @override
+  String toString() {
+    super.toString();
+    return 'list[access]';
   }
 }
 

@@ -47,6 +47,11 @@
             "type": "link",
             "label": "Contributing",
             "href": "/docs/contributing"
+          },
+          {
+            "type": "link",
+            "label": "Walkthrough",
+            "href": "/docs/walkthrough"
           }
         ]
       }
@@ -54,6 +59,7 @@
   },
   "permalinkToSidebar": {
     "/docs/contributing": "BirbLang",
+    "/docs/walkthrough": "BirbLang",
     "/docs/Core/int": "BirbLang",
     "/docs/Core/map": "BirbLang",
     "/docs/Core/string": "BirbLang",

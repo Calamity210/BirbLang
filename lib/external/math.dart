@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:Birb/runtime/runtime.dart';
-import 'package:Birb/utils/ast/ast_node.dart';
-import 'package:Birb/utils/ast/ast_types.dart';
+import 'package:Birb/ast/ast_node.dart';
+import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 void registerMath(Runtime runtime) {
@@ -145,16 +145,11 @@ ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
 
   if (max is IntNode) {
     final int randVal = Random().nextInt(max.intVal);
-    final IntNode intNode = IntNode()
-      ..intVal = randVal
-      ..doubleVal = randVal.toDouble();
+    final IntNode intNode = IntNode()..intVal = randVal;
     return intNode;
   } else if (max is DoubleNode) {
     final double randVal = Random().nextDouble() * max.doubleVal;
-    final DoubleNode doubleNode = DoubleNode()
-      ..doubleVal = randVal
-      ..intVal = randVal.toInt();
-
+    final DoubleNode doubleNode = DoubleNode()..doubleVal = randVal;
     return doubleNode;
   } else if (max is StringNode) {
     final Random rand = Random();

@@ -82,17 +82,10 @@ void main() {
     final process = await TestProcess.start(
         'dart', ['./lib/birb.dart', './test/TestPrograms/test_runtime.birb']);
 
-    var line = await process.stdout.next;
-    test.expect(line, test.equals('Henlo am Birb'));
-
-    line = await process.stdout.next;
-    test.expect(line, test.equals('I am 10 years old'));
-
-    line = await process.stdout.next;
-    test.expect(line, test.equals('I like Seeb'));
-
-    line = await process.stdout.next;
-    test.expect(line, test.equals('There is only 1 item in my good list'));
+    test.expect(await process.stdout.next, test.equals('Henlo am Birb'));
+    test.expect(await process.stdout.next, test.equals('I am 10 years old'));
+    test.expect(await process.stdout.next, test.equals('I like Seeb'));
+    test.expect(await process.stdout.next, test.equals('There is only 1 item in my good list'));
   });
 
   test.group('All testFile programs run with expected results', () {
@@ -105,7 +98,7 @@ void main() {
   });
 
   test.group('All example programs run with expected results', () {
-    final Directory directory = Directory('./examples/');
+    final Directory directory = Directory('./test/programs/');
     directory.listSync().forEach((file) {
       test.test(file.path, () async {
         await _testBirbScriptWithExpectations(file);
@@ -116,8 +109,7 @@ void main() {
 
 Future _testBirbScriptWithExpectations(FileSystemEntity file) async {
   final expectations = ExpectationsParser(file);
-  final process =
-  await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
+  final process = await TestProcess.start('dart', ['./lib/birb.dart', file.path]);
   
   // skip dart Warning for interpreting ./lib/birb.dart as package URI
   final shouldFailOnError = !expectations.doesExpectError();
