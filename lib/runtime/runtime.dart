@@ -68,7 +68,7 @@ ASTNode listAddFuncPointer(Runtime runtime, ASTNode self, List args) {
 }
 
 ASTNode listRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_INT]);
+  expectArgs(args, [IntNode]);
 
   final ASTNode ast_int = args[0];
 
@@ -82,14 +82,14 @@ ASTNode listRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
 }
 
 ASTNode mapAddFuncPointer(Runtime runtime, ASTNode self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_ANY]);
+  expectArgs(args, [StringNode, AnyNode]);
 
   self.map[args[0]] = args[1];
   return self;
 }
 
 ASTNode mapRemoveFuncPointer(Runtime runtime, ASTNode self, List args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+  expectArgs(args, [StringNode]);
 
   final ASTNode astString = args[0];
 
@@ -2260,18 +2260,18 @@ Future<ASTNode> visitAssert(Runtime runtime, ASTNode node) async {
 }
 
 /// Expect arguments for a function
-void runtimeExpectArgs(List inArgs, List<ASTType> args) {
+void expectArgs(List inArgs, List<Type> args) {
   if (inArgs.length < args.length)
     throw InvalidArgumentsException('${inArgs.length} argument(s) were provided, while ${args.length} were expected');
 
   for (int i = 0; i < args.length; i++) {
-    if (args[i] == ASTType.AST_ANY)
+    if (args[i] == AnyNode)
       continue;
 
     final ASTNode ast = inArgs[i];
 
-    if (ast.type != args[i]) {
-      print('Received argument of type ${ast.type}, but expected ${args[i]}');
+    if (ast.runtimeType != args[i]) {
+      print('Received argument of type ${ast.runtimeType}, but expected ${args[i]}');
       throw const InvalidArgumentsException('Got unexpected arguments, terminating');
     }
   }

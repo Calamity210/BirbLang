@@ -15,7 +15,7 @@ void registerIO(Runtime runtime) {
 }
 
 Future<ASTNode> funcExecute(Runtime runtime, ASTNode self, List<ASTNode> args) async {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+  expectArgs(args, [StringNode]);
 
   final Lexer lexer = initLexer(args[0].stringValue);
   final Parser parser = initParser(lexer);
@@ -26,7 +26,7 @@ Future<ASTNode> funcExecute(Runtime runtime, ASTNode self, List<ASTNode> args) a
 }
 
 ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_INT]);
+  expectArgs(args, [IntNode]);
 
   final exitAST = args[0];
 

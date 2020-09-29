@@ -30,12 +30,12 @@ ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
       return left..strBuffer.clear();
 
     case 'write':
-      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
+      expectArgs(node.binaryOpRight.functionCallArgs, [StringNode]);
 
       return left..strBuffer.write((node.binaryOpRight.functionCallArgs[0]).stringValue);
 
     case 'writeAll':
-      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_LIST]);
+      expectArgs(node.binaryOpRight.functionCallArgs, [ListNode]);
 
       node.binaryOpRight.functionCallArgs[0].listElements.forEach((dynamic e) {
         left.strBuffer.write((e as ASTNode).stringValue);
@@ -44,12 +44,12 @@ ASTNode visitStrBufferMethods(ASTNode node, ASTNode left) {
       return left;
 
     case 'writeAsciiCode':
-      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
+      expectArgs(node.binaryOpRight.functionCallArgs, [IntNode]);
 
       return left..strBuffer.writeCharCode((node.binaryOpRight.functionCallArgs[0]).intVal);
 
     case 'writeLine':
-      runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
+      expectArgs(node.binaryOpRight.functionCallArgs, [StringNode]);
 
       return left..strBuffer.write(
   '${(node.binaryOpRight.functionCallArgs[0]).stringValue}\n');

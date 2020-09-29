@@ -43,7 +43,7 @@ Future<void> initStandards(Runtime runtime, String path) async {
 }
 
 Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+  expectArgs(args, [StringNode]);
 
   final ASTNode astStr = args[0];
   if (astStr.stringValue.startsWith('birb:')) {
@@ -447,7 +447,7 @@ ASTNode listClass(Runtime runtime) {
 }
 
 Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
-    runtimeExpectArgs(args, [ASTType.AST_STRING]);
+    expectArgs(args, [StringNode]);
 
     return await getVarDefByName(runtime, getScope(runtime, args[0]), args[0].stringValue);
 }

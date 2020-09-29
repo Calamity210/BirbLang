@@ -11,7 +11,7 @@ void registerConvert(Runtime runtime) {
 }
 
 ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_STRING]);
+  expectArgs(args, [StringNode]);
 
   final String jsonString = (args[0]).stringValue;
 
@@ -27,7 +27,7 @@ ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcEncodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_MAP]);
+  expectArgs(args, [MapNode]);
 
   final Map map = (args[0]).map;
 

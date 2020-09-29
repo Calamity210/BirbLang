@@ -56,22 +56,19 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
 
   switch (binaryOpRight.funcCallExpression.variableName) {
     case 'codeUnitAt':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs, [IntNode]);
 
         return IntNode()..intVal = left.stringValue
             .codeUnitAt(binaryOpRight.functionCallArgs[0].intVal);
 
     case 'compareTo':
-        runtimeExpectArgs(
-            binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
-
+        expectArgs(binaryOpRight.functionCallArgs, [StringNode]);
 
         return IntNode()..intVal = left.stringValue
               .compareTo(binaryOpRight.functionCallArgs[0].stringValue);
 
     case 'contains':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs, [StringNode, IntNode]);
 
         return BoolNode()..boolVal = left.stringValue
             .contains(
@@ -79,15 +76,15 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
               binaryOpRight.functionCallArgs[1].intVal);
 
     case 'endsWith':
-        runtimeExpectArgs(
-            binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
+        expectArgs(
+            binaryOpRight.functionCallArgs, [StringNode]);
 
         return BoolNode()..boolVal = left.stringValue
               .endsWith(binaryOpRight.functionCallArgs[0].stringValue);
 
     case 'indexOf':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [StringNode, IntNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -95,8 +92,8 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
               .indexOf(args[0].stringValue, args[1].intVal);
 
     case 'lastIndexOf':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [StringNode, IntNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -105,16 +102,16 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
               .lastIndexOf(args[0].stringValue, args[1].intVal);
 
     case 'padLeft':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_INT, ASTType.AST_STRING]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [IntNode, StringNode]);
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
         return left..stringValue = left.stringValue
             .padLeft(args[0].intVal, args[1].stringValue);
 
     case 'padRight':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_INT, ASTType.AST_STRING]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [IntNode, StringNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -122,8 +119,8 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             .padRight(args[0].intVal, args[1].stringValue);
 
     case 'replaceAll':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_STRING]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [StringNode, StringNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -131,8 +128,8 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             .replaceAll(args[0].stringValue, args[1].stringValue);
 
     case 'replaceFirst':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_STRING, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [StringNode, StringNode, IntNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -140,22 +137,22 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             args[0].stringValue, args[1].stringValue, args[2].intVal);
 
     case 'replaceRange':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_INT, ASTType.AST_INT, ASTType.AST_STRING]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [IntNode, IntNode, StringNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
         return left..stringValue.replaceRange(args[0].intVal, args[1].intVal, args[2].stringValue);
 
     case 'split':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_STRING]);
+        expectArgs(binaryOpRight.functionCallArgs, [StringNode]);
 
         return ListNode()..listElements = left.stringValue
             .split(binaryOpRight.functionCallArgs[0].stringValue);
 
     case 'startsWith':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs,
-            [ASTType.AST_STRING, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs,
+            [StringNode, IntNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 
@@ -163,7 +160,7 @@ ASTNode visitStringMethods(ASTNode node, ASTNode left) {
             .startsWith(args[0].stringValue, args[1].intVal);
 
     case 'substring':
-        runtimeExpectArgs(binaryOpRight.functionCallArgs, [ASTType.AST_INT, ASTType.AST_INT]);
+        expectArgs(binaryOpRight.functionCallArgs, [IntNode, IntNode]);
 
         final List<ASTNode> args = binaryOpRight.functionCallArgs;
 

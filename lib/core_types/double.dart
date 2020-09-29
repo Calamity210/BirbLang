@@ -43,8 +43,7 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
         return DoubleNode()..doubleVal = left.doubleVal.ceilToDouble();
 
     case 'clamp':
-        runtimeExpectArgs(node.binaryOpRight.functionCallArgs,
-            [ASTType.AST_DOUBLE, ASTType.AST_DOUBLE]);
+        expectArgs(node.binaryOpRight.functionCallArgs, [DoubleNode, DoubleNode]);
 
         final List<ASTNode> args = node.binaryOpRight.functionCallArgs;
 
@@ -54,8 +53,7 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
               .toDouble();
 
     case 'compareTo':
-        runtimeExpectArgs(
-            node.binaryOpRight.functionCallArgs, [ASTType.AST_DOUBLE]);
+        expectArgs(node.binaryOpRight.functionCallArgs, [DoubleNode]);
 
         return IntNode()
           ..intVal = left.doubleVal
@@ -69,7 +67,7 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
           ..doubleVal = left.doubleVal.floorToDouble();
 
     case 'remainder':
-        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_DOUBLE]);
+        expectArgs(node.binaryOpRight.functionCallArgs, [DoubleNode]);
 
         return DoubleNode()
           ..doubleVal = left.doubleVal
@@ -95,14 +93,14 @@ ASTNode visitDoubleMethods(ASTNode node, ASTNode left) {
               .toStringAsExponential(args.isEmpty ? 0 : args[0].intVal);
 
     case 'toStringAsFixed':
-        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
+        expectArgs(node.binaryOpRight.functionCallArgs, [IntNode]);
 
         return StringNode()
           ..stringValue = left.doubleVal
               .toStringAsFixed(node.binaryOpRight.functionCallArgs[0].intVal);
 
     case 'toStringAsPrecision':
-        runtimeExpectArgs(node.binaryOpRight.functionCallArgs, [ASTType.AST_INT]);
+        expectArgs(node.binaryOpRight.functionCallArgs, [IntNode]);
 
         return StringNode()
           ..stringValue = left.doubleVal

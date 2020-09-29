@@ -11,10 +11,10 @@ void registerHTTP(Runtime runtime) {
 
 Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   if (args.length == 3)
-    runtimeExpectArgs(args,
-        [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_FUNC_DEFINITION]);
+    expectArgs(args,
+        [StringNode, MapNode, FuncDefNode]);
   else
-    runtimeExpectArgs(args, [ASTType.AST_STRING, ASTType.AST_MAP]);
+    expectArgs(args, [StringNode, MapNode]);
 
   final String url = (args[0]).stringValue;
   final Map headers = (args[1]).map;
@@ -119,15 +119,10 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
 
 Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   if (args.length == 4)
-    runtimeExpectArgs(args, [
-      ASTType.AST_STRING,
-      ASTType.AST_MAP,
-      ASTType.AST_MAP,
-      ASTType.AST_FUNC_DEFINITION
-    ]);
+    expectArgs(args, [StringNode, MapNode, MapNode, FuncDefNode]);
   else
-    runtimeExpectArgs(
-        args, [ASTType.AST_STRING, ASTType.AST_MAP, ASTType.AST_MAP]);
+    expectArgs(
+        args, [StringNode, MapNode, MapNode]);
 
   final String url = (args[0]).stringValue;
   final Map bodyEarly = (args[1]).map;

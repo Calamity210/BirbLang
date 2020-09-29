@@ -10,7 +10,7 @@ void registerMath(Runtime runtime) {
 }
 
 ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [AnyNode]);
 
   final ASTNode max = args[0];
 
