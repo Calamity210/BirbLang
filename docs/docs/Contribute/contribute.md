@@ -30,7 +30,7 @@ $ dart lib/birb.dart
 Our style guide is a work in progress, for now please use dartfmt.
 :::
 
-:::error Ff you think your PR should be exempt from any of the below, let Calamity210#7999 know on discord.
+:::info If you think your PR should be exempt from any of the below, let Calamity210#7999 know on discord.
 - All PRs must have added tests to the `examples/` folder.
 - All PRs must have documented any relevant code within the docs/folder.
 :::
