@@ -20,7 +20,7 @@ void registerMath(Runtime runtime) {
 }
 
 ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
@@ -35,7 +35,7 @@ ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcASin(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
@@ -50,7 +50,7 @@ ASTNode funcASin(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcATan(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
@@ -65,7 +65,7 @@ ASTNode funcATan(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY, ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY, ASTType.AST_ANY]);
   final y = args[0], x = args[1];
   final yVal = y is DoubleNode ? y.doubleVal : y.intVal;
   final xVal = x is DoubleNode ? x.doubleVal : x.intVal;
@@ -80,7 +80,7 @@ ASTNode funcATan2(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcCos(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
@@ -95,7 +95,7 @@ ASTNode funcCos(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcExp(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final val = args[0];
 
   if (val is IntNode || val is DoubleNode) {
@@ -109,7 +109,7 @@ ASTNode funcExp(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final val = args[0];
 
   if (val is IntNode || val is DoubleNode) {
@@ -123,7 +123,7 @@ ASTNode funcLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcLog(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY, ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY, ASTType.AST_ANY]);
   final base = args[0], val = args[1];
 
   if ((base is IntNode || base is DoubleNode) &&
@@ -172,7 +172,7 @@ ASTNode funcRand(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcSin(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
@@ -187,7 +187,7 @@ ASTNode funcSin(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcTan(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  runtimeExpectArgs(args, [ASTType.AST_ANY]);
+  expectArgs(args, [ASTType.AST_ANY]);
   final radian = args[0];
 
   if (radian is IntNode || radian is DoubleNode) {
