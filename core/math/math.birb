@@ -11,8 +11,6 @@ const double log10e = 0.4342944819032518;
 const double sqrtHalf = 0.7071067811865476;
 const double sqrt2 = 1.4142135623730951;
 
-const double E = 2.718281828459045;
-
 var min(var a, var b) {
     return b < a ? b : a;
 }
