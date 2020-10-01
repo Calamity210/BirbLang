@@ -5,3 +5,16 @@ scremLn(min(10, 5.5).runtimeType); // output double
 scremLn(pi); // output 3.141592653589793
 
 scremLn(remap(8, 0, 10, 0, 100)); // output 80.0
+
+scremLn(sin(pi)); // output 1.2246467991473532e-16
+scremLn(cos(pi)); // output -1.0
+scremLn(tan(pi)); // output -1.2246467991473532e-16
+
+scremLn(asin(0)); // output 0.0
+scremLn(acos(-1)); // output 3.141592653589793
+scremLn(atan(0)); // output 0.0
+scremLn(atan2(0, -10)); // output 3.141592653589793
+
+scremLn(exp(1)); // output 2.718281828459045
+scremLn(log(4, 16)); // output 2.0
+scremLn(ln(E)); // output 1.0
