@@ -656,7 +656,7 @@ class BinaryOpNode extends ASTNode {
     super.toString();
 
     ASTNode visitedBiOp;
-    visitBinaryOp(initRuntime(null), this).then((value) => visitedBiOp = value);
+    visitBinaryOp(Runtime(null), this).then((value) => visitedBiOp = value);
     return visitedBiOp.toString();
   }
 }
@@ -686,7 +686,7 @@ class UnaryOpNode extends ASTNode {
     super.toString();
 
     ASTNode visitedUnaryOp;
-    visitUnaryOp(initRuntime(null), this).then((value) => visitedUnaryOp = value);
+    visitUnaryOp(Runtime(null), this).then((value) => visitedUnaryOp = value);
     return visitedUnaryOp.toString();
   }
 }

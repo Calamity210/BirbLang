@@ -17,8 +17,8 @@ void registerIO(Runtime runtime) {
 Future<ASTNode> funcExecute(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   expectArgs(args, [StringNode]);
 
-  final Lexer lexer = initLexer(args[0].stringValue);
-  final Parser parser = initParser(lexer);
+  final Lexer lexer = Lexer(args[0].stringValue);
+  final Parser parser = Parser(lexer);
   final ASTNode node = parse(parser);
   await visit(runtime, node);
 

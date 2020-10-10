@@ -40,13 +40,13 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
 
   final astObj = ClassNode();
   astObj.variableType = TypeNode();
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+  astObj.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_CLASS);
 
   // BODY
   var ast = VarDefNode();
   ast.variableName = 'body';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_STRING);
 
   var astVal = StringNode();
   astVal.stringValue = response.body;
@@ -58,7 +58,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast = VarDefNode();
   ast.variableName = 'bodyBytes';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_LIST);
 
   final astListVal = ListNode();
   astListVal.listElements = response.bodyBytes;
@@ -70,7 +70,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast = VarDefNode();
   ast.variableName = 'statusCode';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   var astIntVal = IntNode();
   astIntVal.intVal = response.statusCode;
@@ -82,7 +82,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast = VarDefNode();
   ast.variableName = 'contentLength';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   astIntVal = IntNode();
   astIntVal.intVal = response.contentLength;
@@ -94,7 +94,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast = VarDefNode();
   ast.variableName = 'reason';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_STRING);
 
   astVal = StringNode();
   astVal.stringValue = response.reasonPhrase;
@@ -106,7 +106,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
   ast = VarDefNode();
   ast.variableName = 'headers';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_MAP);
 
   final astMapVal = MapNode();
   astMapVal.map = response.headers;
@@ -153,13 +153,13 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
 
   final astObj = ClassNode();
   astObj.variableType = TypeNode();
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+  astObj.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_CLASS);
 
   // BODY
   var ast = VarDefNode();
   ast.variableName = 'body';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_STRING);
 
   var astVal = StringNode();
   astVal.stringValue = response.body;
@@ -171,7 +171,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast = VarDefNode();
   ast.variableName = 'bodyBytes';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_LIST);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_LIST);
 
   final astListVal = ListNode();
   astListVal.listElements = response.bodyBytes;
@@ -183,7 +183,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast = VarDefNode();
   ast.variableName = 'statusCode';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   var astIntVal = IntNode();
   astIntVal.intVal = response.statusCode;
@@ -195,7 +195,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast = VarDefNode();
   ast.variableName = 'contentLength';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   astIntVal = IntNode();
   astVal.intVal = response.contentLength;
@@ -207,7 +207,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast = VarDefNode();
   ast.variableName = 'reason';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_STRING);
 
   astVal = StringNode();
   astVal.stringValue = response.reasonPhrase;
@@ -219,7 +219,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
   ast = VarDefNode();
   ast.variableName = 'headers';
   ast.variableType = TypeNode();
-  ast.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
+  ast.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_MAP);
 
   final astMapVal = MapNode();
   astMapVal.map = response.headers;

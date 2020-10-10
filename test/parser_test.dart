@@ -7,9 +7,9 @@ import 'package:test/test.dart' as test;
 
 void main() {
   test.test("Parser doesn't crash" , () {
-    final Lexer lexer = initLexer(
+    final Lexer lexer = Lexer(
         File('./test/TestPrograms/test_parser.birb').readAsStringSync());
-    final Parser parser = initParser(lexer);
+    final Parser parser = Parser(lexer);
     final ASTNode ast = parse(parser);
 
     assert(parser != null);

@@ -55,14 +55,9 @@ enum TokenType {
 }
 
 class Token {
+  Token(this.type, this.value);
+
   TokenType type;
   String value;
-}
-
-Token initToken(TokenType type, String value) {
-  final token = Token()
-    ..type = type
-    ..value = value;
-  return token;
 }
 

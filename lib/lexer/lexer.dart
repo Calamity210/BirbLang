@@ -3,21 +3,15 @@ import 'package:Birb/utils/exceptions.dart';
 import 'package:Birb/lexer/token.dart';
 
 class Lexer {
+  Lexer(String program) {
+    this.program = program.trim();
+    currentChar = program.isEmpty ? '' : program[currentIndex];
+  }
+
   String program;
   String currentChar;
-  int currentIndex;
-  int lineNum;
-}
-
-/// Initializes and returns a new lexer
-Lexer initLexer(String program) {
-  final lexer = Lexer()
-    ..program = program.trim()
-    ..currentIndex = 0
-    ..lineNum = 1;
-  lexer.currentChar = program.isEmpty ? '' : lexer.program[lexer.currentIndex];
-
-  return lexer;
+  int currentIndex = 0;
+  int lineNum = 1;
 }
 
 /// Grabs next token from the lexer
@@ -73,7 +67,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case '-':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_SUB;
@@ -96,7 +90,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case '*':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_MUL;
@@ -116,7 +110,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case '&':
         String value = lexer.currentChar;
         advance(lexer);
@@ -127,10 +121,10 @@ Token getNextToken(Lexer lexer) {
 
           advance(lexer);
 
-          return initToken(TokenType.TOKEN_AND, value);
+          return Token(TokenType.TOKEN_AND, value);
         }
 
-        return initToken(TokenType.TOKEN_BITWISE_AND, value);
+        return Token(TokenType.TOKEN_BITWISE_AND, value);
         break;
       case '|':
         String value = lexer.currentChar;
@@ -140,10 +134,10 @@ Token getNextToken(Lexer lexer) {
         if (lexer.currentChar == '|') {
           value += lexer.currentChar;
           advance(lexer);
-          return initToken(TokenType.TOKEN_OR, value);
+          return Token(TokenType.TOKEN_OR, value);
         }
 
-        return initToken(TokenType.TOKEN_BITWISE_OR, value);
+        return Token(TokenType.TOKEN_BITWISE_OR, value);
 
       case '<':
         String value = lexer.currentChar;
@@ -153,17 +147,17 @@ Token getNextToken(Lexer lexer) {
         if (lexer.currentChar == '<') {
           value += lexer.currentChar;
           advance(lexer);
-          return initToken(TokenType.TOKEN_LSHIFT, value);
+          return Token(TokenType.TOKEN_LSHIFT, value);
         }
 
         // <=
         if (lexer.currentChar == '=') {
           value += lexer.currentChar;
           advance(lexer);
-          return initToken(TokenType.TOKEN_LESS_THAN_EQUAL, value);
+          return Token(TokenType.TOKEN_LESS_THAN_EQUAL, value);
         }
 
-        return initToken(TokenType.TOKEN_LESS_THAN, value);
+        return Token(TokenType.TOKEN_LESS_THAN, value);
       case '>':
         String value = lexer.currentChar;
         advance(lexer);
@@ -172,17 +166,17 @@ Token getNextToken(Lexer lexer) {
         if (lexer.currentChar == '>') {
           value += lexer.currentChar;
           advance(lexer);
-          return initToken(TokenType.TOKEN_RSHIFT, value);
+          return Token(TokenType.TOKEN_RSHIFT, value);
         }
 
         // >=
         if (lexer.currentChar == '=') {
           value += lexer.currentChar;
           advance(lexer);
-          return initToken(TokenType.TOKEN_GREATER_THAN_EQUAL, value);
+          return Token(TokenType.TOKEN_GREATER_THAN_EQUAL, value);
         }
 
-        return initToken(TokenType.TOKEN_GREATER_THAN, value);
+        return Token(TokenType.TOKEN_GREATER_THAN, value);
       case '=':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_EQUAL;
@@ -205,7 +199,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case '!':
         String value = lexer.currentChar;
         TokenType type = TokenType.TOKEN_NOT;
@@ -218,7 +212,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case '/':
         advance(lexer);
 
@@ -233,13 +227,13 @@ Token getNextToken(Lexer lexer) {
           skipBlockComment(lexer);
           continue;
         } else {
-          return initToken(TokenType.TOKEN_DIV, '/');
+          return Token(TokenType.TOKEN_DIV, '/');
         }
     }
 
     // END OF FILE
     if (lexer.currentChar == '' || lexer.currentChar == null)
-      return initToken(TokenType.TOKEN_EOF, '');
+      return Token(TokenType.TOKEN_EOF, '');
 
     switch (lexer.currentChar) {
       case '"':
@@ -297,7 +291,7 @@ Token getNextToken(Lexer lexer) {
           advance(lexer);
         }
 
-        return initToken(type, value);
+        return Token(type, value);
       case ':':
         return advanceWithToken(lexer, TokenType.TOKEN_COLON);
       default:
@@ -308,7 +302,7 @@ Token getNextToken(Lexer lexer) {
   }
 
   // END OF FILE
-  return initToken(TokenType.TOKEN_EOF, '');
+  return Token(TokenType.TOKEN_EOF, '');
 }
 
 /// Advances to the next character
@@ -331,7 +325,7 @@ bool isAtEnd(Lexer lexer) {
 /// Advances while returning a Token
 Token advanceWithToken(Lexer lexer, TokenType type) {
   final String value = lexer.currentChar;
-  final Token token = initToken(type, value);
+  final Token token = Token(type, value);
 
   advance(lexer);
   skipWhitespace(lexer);
@@ -403,7 +397,7 @@ Token collectString(Lexer lexer, [bool isRaw = false]) {
   }
 
   final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -426,7 +420,7 @@ Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
   }
 
   final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token = initToken(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+  final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
 
   advance(lexer);
 
@@ -452,7 +446,7 @@ Token collectNumber(Lexer lexer) {
         advance(lexer);
       }
 
-      return initToken(TokenType.TOKEN_INT_VALUE, value);
+      return Token(TokenType.TOKEN_INT_VALUE, value);
     }
   }
 
@@ -494,7 +488,7 @@ Token collectNumber(Lexer lexer) {
     }
   }
 
-  return initToken(type, value);
+  return Token(type, value);
 }
 
 /// Collects identifiers
@@ -514,7 +508,7 @@ Token collectId(Lexer lexer, [String prefix = '']) {
     advance(lexer);
   }
 
-  return initToken(TokenType.TOKEN_ID,
+  return Token(TokenType.TOKEN_ID,
       prefix + lexer.program.substring(initialIndex, lexer.currentIndex));
 }
 
