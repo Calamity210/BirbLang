@@ -96,13 +96,8 @@ void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
   if (scope == runtime.scope)
     return;
 
-  final List<ASTNode> garbage = [];
-
-  for (final ASTNode newDef in scope.variableDefinitions)
-    if (!oldDefList.contains(newDef))
-      scope.variableDefinitions.remove(newDef);
-
-  garbage.forEach((garb) => scope.variableDefinitions.remove(garb));
+  scope.variableDefinitions.where((newDef) => !oldDefList.contains(newDef))
+      .forEach((garb) => scope.variableDefinitions.remove(garb));
 }
 
 Future<ASTNode> runtimeFunctionCall(Runtime runtime, ASTNode fCall, ASTNode fDef) async {
