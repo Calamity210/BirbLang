@@ -630,7 +630,8 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
     return ast;
   }
 
-  switch (parser.curToken.value) {
+  if (parser.curToken.type == TokenType.TOKEN_ID) {
+    switch (parser.curToken.value) {
     case TRUE:
     case FALSE:
       return parseBool(parser, scope);
@@ -638,6 +639,7 @@ ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseNull(parser, scope);
     case NEW:
       return parseNew(parser, scope);
+  }
   }
 
   if (parser.curToken.type == TokenType.TOKEN_PLUS ||
