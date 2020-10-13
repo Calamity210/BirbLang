@@ -13,7 +13,7 @@ Future<void> main(List<String> arguments) async {
   final isInteractive = arguments.isEmpty;
 
   /// Runtime visitor
-  final Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
+  final Runtime runtime = isInteractive ? Runtime('') : Runtime(arguments[0]);
 
   Lexer lexer;
 
@@ -51,8 +51,8 @@ Future<void> main(List<String> arguments) async {
         }
 
         // Initialize and run program
-        lexer = initLexer(str);
-        parser = initParser(lexer);
+        lexer = Lexer(str);
+        parser = Parser(lexer);
         node = parse(parser);
         await visit(runtime, node);
       } catch (e) {
@@ -91,8 +91,8 @@ Future<void> main(List<String> arguments) async {
       }
     }
 
-    lexer = initLexer(program);
-    parser = initParser(lexer);
+    lexer = Lexer(program);
+    parser = Parser(lexer);
     node = parse(parser);
     await visit(runtime, node);
   } catch (e) {

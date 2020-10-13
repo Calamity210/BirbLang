@@ -10,47 +10,39 @@ import 'package:Birb/runtime/standards.dart';
 import 'package:Birb/lexer/token.dart';
 
 class Runtime {
-  Scope scope;
-  List listMethods;
-  List mapMethods;
+
+  Runtime(this.path) {
+    INITIALIZED_NOOP = NoopNode();
+    initStandards(this, path);
+
+    final LIST_ADD_FUNCTION_DEFINITION = FuncDefNode();
+    LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
+    LIST_ADD_FUNCTION_DEFINITION.funcPointer = listAddFuncPointer;
+    listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
+
+    final LIST_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
+    LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
+    LIST_REMOVE_FUNCTION_DEFINITION.funcPointer = listRemoveFuncPointer;
+    listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
+
+    final MAP_ADD_FUNCTION_DEFINITION = FuncDefNode();
+    MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
+    MAP_ADD_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
+    mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
+
+    final MAP_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
+    MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
+    MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
+    mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
+  }
+
+  Scope scope = initScope(true);
+  List listMethods = [];
+  List mapMethods = [];
   String stdoutBuffer;
   String path;
 
   List<Map> stack = [];
-}
-
-Runtime initRuntime(String path) {
-  final runtime = Runtime()
-    ..path = path
-    ..scope = initScope(true)
-    ..listMethods = []
-    ..mapMethods = [];
-
-  INITIALIZED_NOOP = NoopNode();
-
-  initStandards(runtime, path);
-
-  final LIST_ADD_FUNCTION_DEFINITION = FuncDefNode();
-  LIST_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  LIST_ADD_FUNCTION_DEFINITION.funcPointer = listAddFuncPointer;
-  runtime.listMethods.add(LIST_ADD_FUNCTION_DEFINITION);
-
-  final LIST_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
-  LIST_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  LIST_REMOVE_FUNCTION_DEFINITION.funcPointer = listRemoveFuncPointer;
-  runtime.listMethods.add(LIST_REMOVE_FUNCTION_DEFINITION);
-
-  final MAP_ADD_FUNCTION_DEFINITION = FuncDefNode();
-  MAP_ADD_FUNCTION_DEFINITION.funcName = 'add';
-  MAP_ADD_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
-  runtime.mapMethods.add(MAP_ADD_FUNCTION_DEFINITION);
-
-  final MAP_REMOVE_FUNCTION_DEFINITION = FuncDefNode();
-  MAP_REMOVE_FUNCTION_DEFINITION.funcName = 'remove';
-  MAP_REMOVE_FUNCTION_DEFINITION.funcPointer = mapAddFuncPointer;
-  runtime.mapMethods.add(MAP_REMOVE_FUNCTION_DEFINITION);
-
-  return runtime;
 }
 
 Scope getScope(Runtime runtime, ASTNode node) {
@@ -104,13 +96,8 @@ void collectAndSweepGarbage(Runtime runtime, List oldDefList, Scope scope) {
   if (scope == runtime.scope)
     return;
 
-  final List<ASTNode> garbage = [];
-
-  for (final ASTNode newDef in scope.variableDefinitions)
-    if (!oldDefList.contains(newDef))
-      scope.variableDefinitions.remove(newDef);
-
-  garbage.forEach((garb) => scope.variableDefinitions.remove(garb));
+  scope.variableDefinitions.where((newDef) => !oldDefList.contains(newDef))
+      .forEach((garb) => scope.variableDefinitions.remove(garb));
 }
 
 Future<ASTNode> runtimeFunctionCall(Runtime runtime, ASTNode fCall, ASTNode fDef) async {
@@ -1134,7 +1121,7 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
     if (left.type == ASTType.AST_LIST) {
       if (left.listElements.isNotEmpty && index < left.listElements.length) {
         if (left.listElements[index] is Map) {
-          final type = initDataTypeAs(DATATYPE.DATA_TYPE_MAP);
+          final type = DataType.as(DATATYPE.DATA_TYPE_MAP);
           final ASTNode mapAst = MapNode()
             ..typeValue = type
             ..scope = left.scope
@@ -1142,7 +1129,7 @@ Future<ASTNode> visitListAccess(Runtime runtime, ASTNode node) async {
 
           return mapAst;
         } else if (left.listElements[index] is String) {
-          final type = initDataTypeAs(DATATYPE.DATA_TYPE_STRING);
+          final type = DataType.as(DATATYPE.DATA_TYPE_STRING);
           final ASTNode stringAst = StringNode()
             ..typeValue = type
             ..scope = left.scope

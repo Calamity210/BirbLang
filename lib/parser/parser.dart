@@ -11,18 +11,15 @@ import 'package:Birb/lexer/token.dart';
 
 
 class Parser {
+
+  Parser(this.lexer) {
+    curToken = getNextToken(lexer);
+  }
+
   Lexer lexer;
   Token prevToken;
   Token curToken;
   DataType dataType;
-}
-
-/// Initializes and returns a parser with a lexer
-Parser initParser(Lexer lexer) {
-  final parser = Parser()..lexer = lexer;
-  parser.curToken = getNextToken(parser.lexer);
-
-  return parser;
 }
 
 /// Throws an UnexpectedTypeException
@@ -297,7 +294,7 @@ ASTNode parseType(Parser parser, Scope scope) {
   final ASTNode astType = initASTWithLine(TypeNode(), parser.lexer.lineNum)
     ..scope = scope;
 
-  final type = initDataType();
+  final type = DataType();
 
   var tokenValue = parser.curToken.value;
 
@@ -1430,7 +1427,7 @@ ASTNode parseVariableDefinition(
     final astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
     astType.scope = scope;
 
-    final type = initDataType()..type = DATATYPE.DATA_TYPE_ENUM;
+    final type = DataType()..type = DATATYPE.DATA_TYPE_ENUM;
     astType.typeValue = type;
 
     astVarDef.variableType = astType;

@@ -6,14 +6,14 @@ import 'package:test/test.dart' as test;
 
 void main() {
   test.test('Lexer handles empty input correctly', () {
-    final Lexer lexer = initLexer('');
+    final Lexer lexer = Lexer('');
     test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_EOF));
   });
 
   test.test('Lexer handles equal char after double char tokens correctly', () {
     void testInput(String input, List<TokenType> expectations) {
       // new line so that end of input errors don't get mixed up in this test
-      final lexer = initLexer(input + '\n');
+      final lexer = Lexer(input + '\n');
       for (final token in expectations) {
         test.expect(getNextToken(lexer).type, test.equals(token));
       }
@@ -27,13 +27,13 @@ void main() {
 
   test.group('Lexer handles end of input correctly for', () {
     test.test('comment', () {
-      final Lexer lexer = initLexer("// this is a comment that doesn't end with a new line");
+      final Lexer lexer = Lexer("// this is a comment that doesn't end with a new line");
       test.expect(getNextToken(lexer).type, test.equals(TokenType.TOKEN_EOF));
     });
 
     test.test('single character tokens', () {
       void testInput(String input, TokenType type, TokenType notType) {
-        final Lexer lexer = initLexer(input);
+        final Lexer lexer = Lexer(input);
         final token = getNextToken(lexer);
         test.expect(token.type, test.equals(type));
         test.expect(token, test.isNot(test.equals(notType)));
@@ -51,7 +51,7 @@ void main() {
 
   test.test('Lexer gets tokens correctly', () {
     final Lexer lexer =
-        initLexer(File('./test/TestPrograms/test_lexer.birb').readAsStringSync());
+        Lexer(File('./test/TestPrograms/test_lexer.birb').readAsStringSync());
 
     assert(lexer != null);
     test.expect(lexer.currentChar, test.equals('v'));
