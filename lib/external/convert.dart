@@ -6,8 +6,8 @@ import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 void registerConvert(Runtime runtime) {
-  registerGlobalFunction(runtime, 'decodeJson', funcDecodeJson);
-  registerGlobalFunction(runtime, 'encodeJson', funcEncodeJson);
+  runtime.registerGlobalFunction('decodeJson', funcDecodeJson);
+  runtime.registerGlobalFunction('encodeJson', funcEncodeJson);
 }
 
 ASTNode funcDecodeJson(Runtime runtime, ASTNode self, List<ASTNode> args) {

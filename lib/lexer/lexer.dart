@@ -12,532 +12,533 @@ class Lexer {
   String currentChar;
   int currentIndex = 0;
   int lineNum = 1;
-}
 
-/// Grabs next token from the lexer
-Token getNextToken(Lexer lexer) {
-  while (
-      lexer.currentIndex < lexer.program.length && lexer.currentChar != null) {
-    // Skip
-    if (lexer.currentChar == ' '
-        || lexer.currentChar == '\n'
-        || lexer.currentChar == '\r')
-      skipWhitespace(lexer);
 
-    // Collect a num
-    if (isNumeric(lexer.currentChar)) {
-      return collectNumber(lexer);
-    }
+  /// Grabs next token from the lexer
+  Token getNextToken() {
+    while (
+    currentIndex < program.length && currentChar != null) {
+      // Skip
+      if (currentChar == ' '
+          || currentChar == '\n'
+          || currentChar == '\r')
+        skipWhitespace();
 
-    if (lexer.currentChar == 'r') {
-      advance(lexer);
-
-      if (lexer.currentChar == '"')
-        collectString(lexer, true);
-      else if (lexer.currentChar == "'")
-        collectSingleQuoteString(lexer, true);
-
-      if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
-        return collectId(lexer, 'r');
+      // Collect a num
+      if (isNumeric(currentChar)) {
+        return collectNumber();
       }
-    }
 
-    // Collect identifiers
-    if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
-      return collectId(lexer);
-    }
+      if (currentChar == 'r') {
+        advance();
 
-    switch (lexer.currentChar) {
-      case '+':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_PLUS;
-        advance(lexer);
+        if (currentChar == '"')
+          collectString(true);
+        else if (currentChar == "'")
+          collectSingleQuoteString(true);
 
-        // ++
-        if (lexer.currentChar == '+') {
-          type = TokenType.TOKEN_PLUS_PLUS;
-          value += lexer.currentChar;
-          advance(lexer);
+        if (RegExp('[a-zA-Z_]').hasMatch(currentChar)) {
+          return collectId('r');
         }
+      }
 
-        // +=
-        else if (lexer.currentChar == '=') {
-          type = TokenType.TOKEN_PLUS_EQUAL;
-          value += lexer.currentChar;
-          advance(lexer);
-        }
+      // Collect identifiers
+      if (RegExp('[a-zA-Z_]').hasMatch(currentChar)) {
+        return collectId();
+      }
 
-        return Token(type, value);
-      case '-':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_SUB;
+      switch (currentChar) {
+        case '+':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_PLUS;
+          advance();
 
-        advance(lexer);
+          // ++
+          if (currentChar == '+') {
+            type = TokenType.TOKEN_PLUS_PLUS;
+            value += currentChar;
+            advance();
+          }
 
-        // --
-        if (lexer.currentChar == '-') {
-          type = TokenType.TOKEN_SUB_SUB;
-          value += lexer.currentChar;
+          // +=
+          else if (currentChar == '=') {
+            type = TokenType.TOKEN_PLUS_EQUAL;
+            value += currentChar;
+            advance();
+          }
 
-          advance(lexer);
-        }
+          return Token(type, value);
+        case '-':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_SUB;
 
-        // -=
-        else if (lexer.currentChar == '=') {
-          type = TokenType.TOKEN_SUB_EQUAL;
-          value += lexer.currentChar;
+          advance();
 
-          advance(lexer);
-        }
+          // --
+          if (currentChar == '-') {
+            type = TokenType.TOKEN_SUB_SUB;
+            value += currentChar;
 
-        return Token(type, value);
-      case '*':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_MUL;
-        advance(lexer);
+            advance();
+          }
 
-        // **
-        if (lexer.currentChar == '*') {
-          type = TokenType.TOKEN_MUL_MUL;
-          value += lexer.currentChar;
-          advance(lexer);
-        }
+          // -=
+          else if (currentChar == '=') {
+            type = TokenType.TOKEN_SUB_EQUAL;
+            value += currentChar;
 
-        // *=
-        else if (lexer.currentChar == '=') {
-          type = TokenType.TOKEN_MUL_EQUAL;
-          value += lexer.currentChar;
-          advance(lexer);
-        }
+            advance();
+          }
 
-        return Token(type, value);
-      case '&':
-        String value = lexer.currentChar;
-        advance(lexer);
+          return Token(type, value);
+        case '*':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_MUL;
+          advance();
 
-        // &&
-        if (lexer.currentChar == '&') {
-          value += lexer.currentChar;
+          // **
+          if (currentChar == '*') {
+            type = TokenType.TOKEN_MUL_MUL;
+            value += currentChar;
+            advance();
+          }
 
-          advance(lexer);
+          // *=
+          else if (currentChar == '=') {
+            type = TokenType.TOKEN_MUL_EQUAL;
+            value += currentChar;
+            advance();
+          }
 
-          return Token(TokenType.TOKEN_AND, value);
-        }
+          return Token(type, value);
+        case '&':
+          String value = currentChar;
+          advance();
 
-        return Token(TokenType.TOKEN_BITWISE_AND, value);
-        break;
-      case '|':
-        String value = lexer.currentChar;
-        advance(lexer);
+          // &&
+          if (currentChar == '&') {
+            value += currentChar;
 
-        // ||
-        if (lexer.currentChar == '|') {
-          value += lexer.currentChar;
-          advance(lexer);
-          return Token(TokenType.TOKEN_OR, value);
-        }
+            advance();
 
-        return Token(TokenType.TOKEN_BITWISE_OR, value);
+            return Token(TokenType.TOKEN_AND, value);
+          }
 
-      case '<':
-        String value = lexer.currentChar;
-        advance(lexer);
+          return Token(TokenType.TOKEN_BITWISE_AND, value);
+          break;
+        case '|':
+          String value = currentChar;
+          advance();
 
-        // <<
-        if (lexer.currentChar == '<') {
-          value += lexer.currentChar;
-          advance(lexer);
-          return Token(TokenType.TOKEN_LSHIFT, value);
-        }
+          // ||
+          if (currentChar == '|') {
+            value += currentChar;
+            advance();
+            return Token(TokenType.TOKEN_OR, value);
+          }
 
-        // <=
-        if (lexer.currentChar == '=') {
-          value += lexer.currentChar;
-          advance(lexer);
-          return Token(TokenType.TOKEN_LESS_THAN_EQUAL, value);
-        }
+          return Token(TokenType.TOKEN_BITWISE_OR, value);
 
-        return Token(TokenType.TOKEN_LESS_THAN, value);
-      case '>':
-        String value = lexer.currentChar;
-        advance(lexer);
+        case '<':
+          String value = currentChar;
+          advance();
 
-        // >>
-        if (lexer.currentChar == '>') {
-          value += lexer.currentChar;
-          advance(lexer);
-          return Token(TokenType.TOKEN_RSHIFT, value);
-        }
+          // <<
+          if (currentChar == '<') {
+            value += currentChar;
+            advance();
+            return Token(TokenType.TOKEN_LSHIFT, value);
+          }
 
-        // >=
-        if (lexer.currentChar == '=') {
-          value += lexer.currentChar;
-          advance(lexer);
-          return Token(TokenType.TOKEN_GREATER_THAN_EQUAL, value);
-        }
+          // <=
+          if (currentChar == '=') {
+            value += currentChar;
+            advance();
+            return Token(TokenType.TOKEN_LESS_THAN_EQUAL, value);
+          }
 
-        return Token(TokenType.TOKEN_GREATER_THAN, value);
-      case '=':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_EQUAL;
+          return Token(TokenType.TOKEN_LESS_THAN, value);
+        case '>':
+          String value = currentChar;
+          advance();
 
-        advance(lexer);
+          // >>
+          if (currentChar == '>') {
+            value += currentChar;
+            advance();
+            return Token(TokenType.TOKEN_RSHIFT, value);
+          }
 
-        // ==
-        if (lexer.currentChar == '=') {
-          type = TokenType.TOKEN_EQUALITY;
-          value += lexer.currentChar;
+          // >=
+          if (currentChar == '=') {
+            value += currentChar;
+            advance();
+            return Token(TokenType.TOKEN_GREATER_THAN_EQUAL, value);
+          }
 
-          advance(lexer);
-        }
+          return Token(TokenType.TOKEN_GREATER_THAN, value);
+        case '=':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_EQUAL;
 
-        // =>
-        if (lexer.currentChar == '>') {
-          type = TokenType.TOKEN_INLINE;
-          value += lexer.currentChar;
+          advance();
 
-          advance(lexer);
-        }
+          // ==
+          if (currentChar == '=') {
+            type = TokenType.TOKEN_EQUALITY;
+            value += currentChar;
 
-        return Token(type, value);
-      case '!':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_NOT;
-        advance(lexer);
+            advance();
+          }
 
-        // !=
-        if (lexer.currentChar == '=') {
-          type = TokenType.TOKEN_NOT_EQUAL;
-          value += lexer.currentChar;
-          advance(lexer);
-        }
+          // =>
+          if (currentChar == '>') {
+            type = TokenType.TOKEN_INLINE;
+            value += currentChar;
 
-        return Token(type, value);
-      case '/':
-        advance(lexer);
+            advance();
+          }
 
-        // Inline comment
-        if (lexer.currentChar == '/') {
-          advance(lexer);
-          skipInlineComment(lexer);
-          continue;
-        } else if (lexer.currentChar == '*') {
-          // Block comment
-          advance(lexer);
-          skipBlockComment(lexer);
-          continue;
-        } else {
-          return Token(TokenType.TOKEN_DIV, '/');
-        }
+          return Token(type, value);
+        case '!':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_NOT;
+          advance();
+
+          // !=
+          if (currentChar == '=') {
+            type = TokenType.TOKEN_NOT_EQUAL;
+            value += currentChar;
+            advance();
+          }
+
+          return Token(type, value);
+        case '/':
+          advance();
+
+          // Inline comment
+          if (currentChar == '/') {
+            advance();
+            skipInlineComment();
+            continue;
+          } else if (currentChar == '*') {
+            // Block comment
+            advance();
+            skipBlockComment();
+            continue;
+          } else {
+            return Token(TokenType.TOKEN_DIV, '/');
+          }
+      }
+
+      // END OF FILE
+      if (currentChar == '' || currentChar == null)
+        return Token(TokenType.TOKEN_EOF, '');
+
+      switch (currentChar) {
+        case '"':
+          return collectString();
+        case "'":
+          return collectSingleQuoteString();
+        case '{':
+          return advanceWithToken(TokenType.TOKEN_LBRACE);
+        case '}':
+          return advanceWithToken(TokenType.TOKEN_RBRACE);
+        case '(':
+          return advanceWithToken(TokenType.TOKEN_LPAREN);
+        case ')':
+          return advanceWithToken(TokenType.TOKEN_RPAREN);
+        case '[':
+          return advanceWithToken(TokenType.TOKEN_LBRACKET);
+        case ']':
+          return advanceWithToken(TokenType.TOKEN_RBRACKET);
+        case ';':
+          return advanceWithToken(TokenType.TOKEN_SEMI);
+        case ',':
+          return advanceWithToken(TokenType.TOKEN_COMMA);
+        case '.':
+          return advanceWithToken(TokenType.TOKEN_DOT);
+        case '%':
+          return advanceWithToken(TokenType.TOKEN_MOD);
+        case '~':
+          return advanceWithToken(TokenType.TOKEN_ONES_COMPLEMENT);
+        case '^':
+          return advanceWithToken(TokenType.TOKEN_BITWISE_XOR);
+        case '@':
+          return advanceWithToken(TokenType.TOKEN_ANON_ID);
+        case '?':
+          String value = currentChar;
+          TokenType type = TokenType.TOKEN_QUESTION;
+          advance();
+
+          // ??
+          if (currentChar == '?') {
+            type = TokenType.NOSEEB_AWARE_OPERATOR;
+            value += currentChar;
+            advance();
+
+            // ??=
+            if (currentChar == '=') {
+              type = TokenType.TOKEN_NOSEEB_ASSIGNMENT;
+              value += currentChar;
+              advance();
+            }
+          }
+
+          if (currentChar == '.') {
+            type = TokenType.TOKEN_NOSEEB_ACCESS;
+            value += currentChar;
+            advance();
+          }
+
+          return Token(type, value);
+        case ':':
+          return advanceWithToken(TokenType.TOKEN_COLON);
+        default:
+          throw UnexpectedTokenException(
+              '[Line $lineNum] Unexpected $currentChar');
+          break;
+      }
     }
 
     // END OF FILE
-    if (lexer.currentChar == '' || lexer.currentChar == null)
-      return Token(TokenType.TOKEN_EOF, '');
+    return Token(TokenType.TOKEN_EOF, '');
+  }
 
-    switch (lexer.currentChar) {
-      case '"':
-        return collectString(lexer);
-      case "'":
-        return collectSingleQuoteString(lexer);
-      case '{':
-        return advanceWithToken(lexer, TokenType.TOKEN_LBRACE);
-      case '}':
-        return advanceWithToken(lexer, TokenType.TOKEN_RBRACE);
-      case '(':
-        return advanceWithToken(lexer, TokenType.TOKEN_LPAREN);
-      case ')':
-        return advanceWithToken(lexer, TokenType.TOKEN_RPAREN);
-      case '[':
-        return advanceWithToken(lexer, TokenType.TOKEN_LBRACKET);
-      case ']':
-        return advanceWithToken(lexer, TokenType.TOKEN_RBRACKET);
-      case ';':
-        return advanceWithToken(lexer, TokenType.TOKEN_SEMI);
-      case ',':
-        return advanceWithToken(lexer, TokenType.TOKEN_COMMA);
-      case '.':
-        return advanceWithToken(lexer, TokenType.TOKEN_DOT);
-      case '%':
-        return advanceWithToken(lexer, TokenType.TOKEN_MOD);
-      case '~':
-        return advanceWithToken(lexer, TokenType.TOKEN_ONES_COMPLEMENT);
-      case '^':
-        return advanceWithToken(lexer, TokenType.TOKEN_BITWISE_XOR);
-      case '@':
-        return advanceWithToken(lexer, TokenType.TOKEN_ANON_ID);
-      case '?':
-        String value = lexer.currentChar;
-        TokenType type = TokenType.TOKEN_QUESTION;
-        advance(lexer);
-
-        // ??
-        if (lexer.currentChar == '?') {
-          type = TokenType.NOSEEB_AWARE_OPERATOR;
-          value += lexer.currentChar;
-          advance(lexer);
-
-          // ??=
-          if (lexer.currentChar == '=') {
-            type = TokenType.TOKEN_NOSEEB_ASSIGNMENT;
-            value += lexer.currentChar;
-            advance(lexer);
-          }
-        }
-
-        if (lexer.currentChar == '.') {
-          type = TokenType.TOKEN_NOSEEB_ACCESS;
-          value += lexer.currentChar;
-          advance(lexer);
-        }
-
-        return Token(type, value);
-      case ':':
-        return advanceWithToken(lexer, TokenType.TOKEN_COLON);
-      default:
-        throw UnexpectedTokenException(
-            '[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
-        break;
+  /// Advances to the next character
+  void advance() {
+    if (currentChar != '' &&
+        currentIndex < program.length - 1) {
+      currentIndex += 1;
+      currentChar = program[currentIndex];
+    } else if (currentIndex == program.length - 1) {
+      currentIndex++;
+      currentChar = null;
     }
   }
 
-  // END OF FILE
-  return Token(TokenType.TOKEN_EOF, '');
-}
-
-/// Advances to the next character
-void advance(Lexer lexer) {
-  if (lexer.currentChar != '' &&
-      lexer.currentIndex < lexer.program.length - 1) {
-    lexer.currentIndex += 1;
-    lexer.currentChar = lexer.program[lexer.currentIndex];
-  } else if (lexer.currentIndex == lexer.program.length - 1) {
-    lexer.currentIndex++;
-    lexer.currentChar = null;
+  /// Checks whether the input has been fully consumed
+  bool isAtEnd() {
+    return currentIndex == program.length;
   }
-}
 
-/// Checks whether the input has been fully consumed
-bool isAtEnd(Lexer lexer) {
-  return lexer.currentIndex == lexer.program.length;
-}
+  /// Advances while returning a Token
+  Token advanceWithToken(TokenType type) {
+    final String value = currentChar;
+    final Token token = Token(type, value);
 
-/// Advances while returning a Token
-Token advanceWithToken(Lexer lexer, TokenType type) {
-  final String value = lexer.currentChar;
-  final Token token = Token(type, value);
+    advance();
+    skipWhitespace();
 
-  advance(lexer);
-  skipWhitespace(lexer);
-
-  return token;
-}
-
-/// Expects a character and throws UnexpectedTokenException if
-/// the wrong character is received
-void expect(Lexer lexer, String c) {
-  if (lexer.currentChar != c)
-    throw UnexpectedTokenException(
-        'Error: [Line ${lexer.lineNum}] Lexer expected the current char to be `$c`, but it was `${lexer.currentChar}`.');
-}
-
-/// Skips any whitespaces since we don't want to have whitespace tokens
-void skipWhitespace(Lexer lexer) {
-  while (lexer.currentChar == ' ' ||
-      lexer.currentChar == '\n' ||
-      lexer.currentChar == '\r') {
-
-    if (lexer.currentChar == '')
-      return;
-
-    if (lexer.currentChar == '\n')
-      ++lexer.lineNum;
-    advance(lexer);
+    return token;
   }
-}
 
-/// Skip comments since they are only notes for the developers
-void skipInlineComment(Lexer lexer) {
-  while (lexer.currentChar != '\n' &&
-      lexer.currentChar != '\n' &&
-      !isAtEnd(lexer)) {
-    advance(lexer);
+  /// Expects a character and throws UnexpectedTokenException if
+  /// the wrong character is received
+  void expect(String c) {
+    if (currentChar != c)
+      throw UnexpectedTokenException(
+          'Error: [Line $lineNum] Lexer expected the current char to be `$c`, but it was `$currentChar`.');
   }
-}
 
-/// Skips block comments
-void skipBlockComment(Lexer lexer) {
-  while (true) {
-    advance(lexer);
+  /// Skips any whitespaces since we don't want to have whitespace tokens
+  void skipWhitespace() {
+    while (currentChar == ' ' ||
+        currentChar == '\n' ||
+        currentChar == '\r') {
 
-    if (lexer.currentChar == '*') {
-      advance(lexer);
-
-      if (lexer.currentChar == '/') {
-        advance(lexer);
+      if (currentChar == '')
         return;
-      }
-    }
-  }
-}
 
-/// Collect a string from within double quotation marks
-Token collectString(Lexer lexer, [bool isRaw = false]) {
-  expect(lexer, '"');
-  advance(lexer);
-
-  final int initialIndex = lexer.currentIndex;
-
-  while (lexer.currentChar != '"') {
-    if (lexer.currentIndex == lexer.program.length - 1)
-      throw UnexpectedTokenException(
-          '[Line ${lexer.lineNum}] Missing closing `"`');
-
-    advance(lexer);
-  }
-
-  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
-
-  advance(lexer);
-
-  return token;
-}
-
-/// Collect a string from within single quotation marks
-Token collectSingleQuoteString(Lexer lexer, [bool isRaw = false]) {
-  expect(lexer, '\'');
-  advance(lexer);
-
-  final int initialIndex = lexer.currentIndex;
-
-  while (lexer.currentChar != '\'') {
-    if (lexer.currentIndex == lexer.program.length - 1)
-      throw UnexpectedTokenException(
-          '[Line ${lexer.lineNum}] Missing closing `\'`');
-
-    advance(lexer);
-  }
-
-  final String value = lexer.program.substring(initialIndex, lexer.currentIndex);
-  final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
-
-  advance(lexer);
-
-  return token;
-}
-
-/// Collect numeric tokens
-Token collectNumber(Lexer lexer) {
-  TokenType type = TokenType.TOKEN_INT_VALUE;
-  String value = '';
-
-  if (lexer.currentChar == '0') {
-    value += lexer.currentChar;
-    advance(lexer);
-
-    // 0x | 0X
-    if (lexer.currentChar == 'x' || lexer.currentChar == 'X') {
-      value += lexer.currentChar;
-      advance(lexer);
-
-      while (RegExp('[0-9a-fA-F]').hasMatch(lexer.currentChar)) {
-        value += lexer.currentChar;
-        advance(lexer);
-      }
-
-      return Token(TokenType.TOKEN_INT_VALUE, value);
+      if (currentChar == '\n')
+        ++lineNum;
+      advance();
     }
   }
 
-  while (isNumeric(lexer.currentChar)) {
-    value += lexer.currentChar;
-    advance(lexer);
+  /// Skip comments since they are only notes for the developers
+  void skipInlineComment() {
+    while (currentChar != '\n' &&
+        currentChar != '\n' &&
+        !isAtEnd()) {
+      advance();
+    }
   }
 
-  // double
-  if (lexer.currentChar == '.') {
-    if (isNumeric(lexer.program[lexer.currentIndex + 1])) {
+  /// Skips block comments
+  void skipBlockComment() {
+    while (true) {
+      advance();
+
+      if (currentChar == '*') {
+        advance();
+
+        if (currentChar == '/') {
+          advance();
+          return;
+        }
+      }
+    }
+  }
+
+  /// Collect a string from within double quotation marks
+  Token collectString([bool isRaw = false]) {
+    expect('"');
+    advance();
+
+    final int initialIndex = currentIndex;
+
+    while (currentChar != '"') {
+      if (currentIndex == program.length - 1)
+        throw UnexpectedTokenException(
+            '[Line $lineNum] Missing closing `"`');
+
+      advance();
+    }
+
+    final String value = program.substring(initialIndex, currentIndex);
+    final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+
+    advance();
+
+    return token;
+  }
+
+  /// Collect a string from within single quotation marks
+  Token collectSingleQuoteString([bool isRaw = false]) {
+    expect('\'');
+    advance();
+
+    final int initialIndex = currentIndex;
+
+    while (currentChar != '\'') {
+      if (currentIndex == program.length - 1)
+        throw UnexpectedTokenException(
+            '[Line $lineNum] Missing closing `\'`');
+
+      advance();
+    }
+
+    final String value = program.substring(initialIndex, currentIndex);
+    final Token token = Token(TokenType.TOKEN_STRING_VALUE, isRaw ? value : value.escape());
+
+    advance();
+
+    return token;
+  }
+
+  /// Collect numeric tokens
+  Token collectNumber() {
+    TokenType type = TokenType.TOKEN_INT_VALUE;
+    String value = '';
+
+    if (currentChar == '0') {
+      value += currentChar;
+      advance();
+
+      // 0x | 0X
+      if (currentChar == 'x' || currentChar == 'X') {
+        value += currentChar;
+        advance();
+
+        while (RegExp('[0-9a-fA-F]').hasMatch(currentChar)) {
+          value += currentChar;
+          advance();
+        }
+
+        return Token(TokenType.TOKEN_INT_VALUE, value);
+      }
+    }
+
+    while (isNumeric(currentChar)) {
+      value += currentChar;
+      advance();
+    }
+
+    // double
+    if (currentChar == '.') {
+      if (isNumeric(program[currentIndex + 1])) {
+        type = TokenType.TOKEN_DOUBLE_VALUE;
+        value += currentChar;
+
+        advance();
+
+        while (isNumeric(currentChar)) {
+          value += currentChar;
+          advance();
+        }
+      }
+    }
+
+    if (currentChar == 'e') {
       type = TokenType.TOKEN_DOUBLE_VALUE;
-      value += lexer.currentChar;
+      value += currentChar;
 
-      advance(lexer);
+      advance();
 
-      while (isNumeric(lexer.currentChar)) {
-        value += lexer.currentChar;
-        advance(lexer);
+      if (currentChar == '+' || currentChar == '-') {
+        value += currentChar;
+
+        advance();
+      }
+
+      while (isNumeric(currentChar)) {
+        value += currentChar;
+        advance();
       }
     }
+
+    return Token(type, value);
   }
 
-  if (lexer.currentChar == 'e') {
-    type = TokenType.TOKEN_DOUBLE_VALUE;
-    value += lexer.currentChar;
+  /// Collects identifiers
+  Token collectId([String prefix = '']) {
+    final int initialIndex = currentIndex;
 
-    advance(lexer);
+    // Identifiers can only start with `_` or any alphabet
+    if (RegExp('[a-zA-Z_]').hasMatch(currentChar)) {
+      advance();
 
-    if (lexer.currentChar == '+' || lexer.currentChar == '-') {
-      value += lexer.currentChar;
-
-      advance(lexer);
+      while (RegExp('[a-zA-Z0-9_]').hasMatch(currentChar))
+        advance();
     }
 
-    while (isNumeric(lexer.currentChar)) {
-      value += lexer.currentChar;
-      advance(lexer);
+    // Nullable?
+    if (currentChar == '?' && RegExp(r'\s').hasMatch(program[currentIndex + 1])) {
+      advance();
+    }
+
+    return Token(TokenType.TOKEN_ID,
+        prefix + program.substring(initialIndex, currentIndex));
+  }
+
+  /// Check if the character is numeric
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    } else {
+      return double.tryParse(s) != null || int.tryParse(s) != null;
     }
   }
-
-  return Token(type, value);
 }
 
-/// Collects identifiers
-Token collectId(Lexer lexer, [String prefix = '']) {
-  final int initialIndex = lexer.currentIndex;
-
-  // Identifiers can only start with `_` or any alphabet
-  if (RegExp('[a-zA-Z_]').hasMatch(lexer.currentChar)) {
-    advance(lexer);
-
-    while (RegExp('[a-zA-Z0-9_]').hasMatch(lexer.currentChar))
-      advance(lexer);
-  }
-
-  // Nullable?
-  if (lexer.currentChar == '?' && RegExp(r'\s').hasMatch(lexer.program[lexer.currentIndex + 1])) {
-    advance(lexer);
-  }
-
-  return Token(TokenType.TOKEN_ID,
-      prefix + lexer.program.substring(initialIndex, lexer.currentIndex));
-}
-
-/// Check if the character is numeric
-bool isNumeric(String s) {
-  if (s == null) {
-    return false;
-  } else {
-    return double.tryParse(s) != null || int.tryParse(s) != null;
-  }
-}
-
-extension on String {
+  extension on String {
   String escape() {
     String escapedString = this;
 
     escapedString = escapedString
-    .replaceAll(r'\f', '\x0C')
-    .replaceAll(r'\n', '\x0A')
-    .replaceAll(r'\r', '\x0D')
-    .replaceAll(r'\t', '\x09')
-    .replaceAll(r'\v', '\x0B')
-    .replaceAll(r'\\', '\x5C')
-    .replaceAll(r"\'", '\x27')
-    .replaceAll(r'\"', '\x22')
-    .replaceAllMapped(RegExp(r'\\x(.){2}'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
-    .replaceAllMapped(RegExp(r'\\u(.{1,5});'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
-    .replaceAll(r'\$', '\$')
-    .replaceAll(r'$', '\x1B[');
+        .replaceAll(r'\f', '\x0C')
+        .replaceAll(r'\n', '\x0A')
+        .replaceAll(r'\r', '\x0D')
+        .replaceAll(r'\t', '\x09')
+        .replaceAll(r'\v', '\x0B')
+        .replaceAll(r'\\', '\x5C')
+        .replaceAll(r"\'", '\x27')
+        .replaceAll(r'\"', '\x22')
+        .replaceAllMapped(RegExp(r'\\x(.){2}'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
+        .replaceAllMapped(RegExp(r'\\u(.{1,5});'), (m) => String.fromCharCode(int.parse(m.group(1), radix: 16)))
+        .replaceAll(r'\$', '\$')
+        .replaceAll(r'$', '\x1B[');
 
     return escapedString;
   }

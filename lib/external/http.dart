@@ -5,8 +5,8 @@ import 'package:Birb/ast/ast_types.dart';
 import 'package:http/http.dart';
 
 void registerHTTP(Runtime runtime) {
-  registerGlobalFutureFunction(runtime, 'GET', funcGet);
-  registerGlobalFutureFunction(runtime, 'POST', funcPost);
+  runtime.registerGlobalFutureFunction('GET', funcGet);
+  runtime.registerGlobalFutureFunction('POST', funcPost);
 }
 
 Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async {
@@ -36,7 +36,7 @@ Future<ASTNode> funcGet(Runtime runtime, ASTNode self, List<ASTNode> args) async
 
   final Response response = await get(url, headers: head);
   if (args.length == 3)
-    await visitFuncCall(runtime, funCall);
+    await runtime.visitFuncCall(funCall);
 
   final astObj = ClassNode();
   astObj.variableType = TypeNode();
@@ -149,7 +149,7 @@ Future<ASTNode> funcPost(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
 
   final Response response = await post(url, body: body, headers: headers);
   if (args.length == 4)
-    await visitCompound(runtime, funCall);
+    await runtime.visitCompound(funCall);
 
   final astObj = ClassNode();
   astObj.variableType = TypeNode();

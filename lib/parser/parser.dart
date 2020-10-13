@@ -13,1587 +13,1588 @@ import 'package:Birb/lexer/token.dart';
 class Parser {
 
   Parser(this.lexer) {
-    curToken = getNextToken(lexer);
+    curToken = lexer.getNextToken();
   }
 
   Lexer lexer;
   Token prevToken;
   Token curToken;
   DataType dataType;
-}
 
-/// Throws an UnexpectedTypeException
-void parserTypeError(Parser parser) => throw UnexpectedTypeException(
-    '[Line ${parser.lexer.lineNum}] Invalid type');
 
-/// Throws a SyntaxException
-void parserSyntaxError(Parser parser) =>
-    throw SyntaxException('[Line ${parser.lexer.lineNum}] Syntax error');
+  /// Throws an UnexpectedTypeException
+  void parserTypeError() => throw UnexpectedTypeException(
+      '[Line ${lexer.lineNum}] Invalid type');
 
-/// Throws a UnexpectedTokenException
-void parserUnexpectedToken(Parser parser, TokenType type) =>
-    throw UnexpectedTokenException(
-        '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
+  /// Throws a SyntaxException
+  void parserSyntaxError() =>
+      throw SyntaxException('[Line ${lexer.lineNum}] Syntax error');
 
-/// Sets the ast to be a child of a class
-ASTNode asClassChild(ASTNode ast, ASTNode object) {
-  ast.isClassChild = true;
-  ast.parent = object;
-  return ast;
-}
+  /// Throws a UnexpectedTokenException
+  void parserUnexpectedToken(TokenType type) =>
+      throw UnexpectedTokenException(
+          '[Line ${lexer.lineNum}] Unexpected token `${curToken.value}`, was expecting `$type`');
 
-/// Check if the token is a DataType
-bool isDataType(Parser parser) {
-  final String tokenValue = parser.curToken.value;
-
-  final List dataTypes = [
-    'void',
-    'var',
-    'int',
-    'String',
-    'StrBuffer',
-    'double',
-    'bool',
-    'class',
-    'enum',
-    'List',
-    'Map',
-    'Source'
-  ];
-
-  final int lineNum = parser.lexer.lineNum;
-  final int curIndex = parser.lexer.currentIndex;
-  final String curChar = parser.lexer.currentChar;
-
-  final bool isDot = getNextToken(parser.lexer).type == TokenType.TOKEN_DOT;
-
-  parser.lexer
-    ..lineNum = lineNum
-    ..currentIndex = curIndex
-    ..currentChar = curChar;
-
-  for (final String type in dataTypes) {
-    if (!isDot && type == tokenValue || type + '?' == tokenValue)
-      return true;
+  /// Sets the ast to be a child of a class
+  ASTNode asClassChild(ASTNode ast, ASTNode object) {
+    ast.isClassChild = true;
+    ast.parent = object;
+    return ast;
   }
 
-  return false;
-}
+  /// Check if the token is a DataType
+  bool isDataType() {
+    final String tokenValue = curToken.value;
 
-/// Check if the current token is a variable modifier
-bool isModifier(String tokenValue) {
-  return tokenValue == CONST || tokenValue == FINAL;
-}
+    final List dataTypes = [
+      'void',
+      'var',
+      'int',
+      'String',
+      'StrBuffer',
+      'double',
+      'bool',
+      'class',
+      'enum',
+      'List',
+      'Map',
+      'Source'
+    ];
 
-/// Parses a single statement compound
-/// ie:
-/// ```dart
-///  if (. . .)
-///   screm("foo")
-/// ```
-ASTNode parseOneStatementCompound(Parser parser, Scope scope) {
-  final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
-  compound.scope = scope;
+    final int lineNum = lexer.lineNum;
+    final int curIndex = lexer.currentIndex;
+    final String curChar = lexer.currentChar;
 
-  final statement = parseStatement(parser, scope);
-  compound.compoundValue.add(statement);
+    final bool isDot = lexer.getNextToken().type == TokenType.TOKEN_DOT;
 
-  return compound;
-}
+    lexer
+      ..lineNum = lineNum
+      ..currentIndex = curIndex
+      ..currentChar = curChar;
 
-ASTNode parse(Parser parser, {Scope scope}) {
-  return parseStatements(parser, scope);
-}
+    for (final String type in dataTypes) {
+      if (!isDot && type == tokenValue || type + '?' == tokenValue)
+        return true;
+    }
 
-void eat(Parser parser, TokenType type) {
-  if (parser.curToken.type != type) {
-    parserUnexpectedToken(parser, type);
-  } else {
-    parser.prevToken = parser.curToken;
-    parser.curToken = getNextToken(parser.lexer);
-  }
-}
-
-ASTNode parseStatement(Parser parser, Scope scope) {
-  switch (parser.curToken.type) {
-    case TokenType.TOKEN_ID:
-      {
-        final tokenValue = parser.curToken.value;
-
-        if (isModifier(tokenValue)) {
-          eat(parser, TokenType.TOKEN_ID);
-          if (tokenValue == FINAL)
-            return parseDefinition(parser, scope, false, true);
-
-          return parseDefinition(parser, scope, true);
-        }
-
-        if (isDataType(parser)) {
-          return parseDefinition(parser, scope);
-        }
-
-        switch (tokenValue) {
-          case WHILE:
-            return parseWhile(parser, scope);
-          case FOR:
-            return parseFor(parser, scope);
-          case IF:
-            return parseIf(parser, scope);
-          case SWITCH:
-            return parseSwitch(parser, scope);
-          case FALSE:
-          case TRUE:
-            return parseBool(parser, scope);
-          case NULL:
-            return parseNull(parser, scope);
-          case RETURN:
-            return parseReturn(parser, scope);
-          case THROW:
-            return parseThrow(parser, scope);
-          case BREAK:
-            return parseBreak(parser, scope);
-          case NEXT:
-            return parseNext(parser, scope);
-          case NEW:
-            return parseNew(parser, scope);
-          case ITERATE:
-            return parseIterate(parser, scope);
-          case ASSERT:
-            return parseAssert(parser, scope);
-        }
-
-        eat(parser, TokenType.TOKEN_ID);
-
-        var a = parseVariable(parser, scope);
-
-        while (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-          a = parseFunctionCall(parser, scope, a);
-        }
-
-        while (parser.curToken.type == TokenType.TOKEN_DOT) {
-          eat(parser, TokenType.TOKEN_DOT);
-
-          final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum)..binaryOpLeft = a;
-
-          eat(parser, TokenType.TOKEN_ID);
-
-          final varAST = parseVariable(parser, scope);
-
-          ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-              ? parseFunctionCall(parser, scope, varAST)
-              : varAST;
-          a = ast;
-        }
-
-        while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-          final astListAccess = initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
-          astListAccess.binaryOpLeft = a;
-          eat(parser, TokenType.TOKEN_LBRACKET);
-
-          astListAccess.listAccessPointer = parseExpression(parser, scope);
-
-          eat(parser, TokenType.TOKEN_RBRACKET);
-
-          a = astListAccess;
-        }
-
-        if (a != null)
-          return a;
-      }
-      break;
-    case TokenType.TOKEN_LESS_THAN:
-      eat(parser, TokenType.TOKEN_LESS_THAN);
-
-      final String annotation = parser.curToken.value;
-      eat(parser, TokenType.TOKEN_ID);
-
-      eat(parser, TokenType.TOKEN_GREATER_THAN);
-
-      switch (annotation) {
-        case SUPERSEDE:
-          return parseDefinition(
-              parser,
-              scope,
-              parser.curToken.value == 'const',
-              parser.curToken.value == 'final',
-              true);
-        default:
-          throw UnexpectedTokenException(
-              'No annotation ${parser.curToken.value} found!');
-      }
-      break;
-    case TokenType.TOKEN_NUMBER_VALUE:
-    case TokenType.TOKEN_STRING_VALUE:
-    case TokenType.TOKEN_DOUBLE_VALUE:
-    case TokenType.TOKEN_INT_VALUE:
-      return parseExpression(parser, scope);
-    case TokenType.TOKEN_PLUS_PLUS:
-    case TokenType.TOKEN_SUB_SUB:
-    case TokenType.TOKEN_MUL_MUL:
-      {
-        final Token operator = parser.curToken;
-        eat(parser, operator.type);
-
-        final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
-          ..binaryOpRight = parseStatement(parser, scope)
-          ..binaryOperator = operator
-          ..scope = scope;
-
-        return astVarMod;
-      }
-      break;
-    case TokenType.TOKEN_LBRACE:
-      final int lineNum = parser.lexer.lineNum;
-      while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-        if (parser.lexer.currentIndex == parser.lexer.program.length)
-          throw UnexpectedTokenException('[Lines $lineNum-${parser.lexer.lineNum}] No closing brace `}` was found');
-        eat(parser, parser.curToken.type);
-      }
-      eat(parser, TokenType.TOKEN_RBRACE);
-
-      return initASTWithLine(NoopNode(), lineNum);
-
-    case TokenType.TOKEN_LBRACKET:
-      return parseList(parser, scope);
-
-    default:
-      return initASTWithLine(NoopNode(), parser.lexer.lineNum);
+    return false;
   }
 
-  return initASTWithLine(NoopNode(), parser.lexer.lineNum);
-}
+  /// Check if the current token is a variable modifier
+  bool isModifier(String tokenValue) {
+    return tokenValue == CONST || tokenValue == FINAL;
+  }
 
-ASTNode parseStatements(Parser parser, Scope scope) {
-  final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
-  compound.scope = scope;
+  /// Parses a single statement compound
+  /// ie:
+  /// ```dart
+  ///  if (. . .)
+  ///   screm("foo")
+  /// ```
+  ASTNode parseOneStatementCompound(Scope scope) {
+    final compound = initASTWithLine(CompoundNode(), lexer.lineNum);
+    compound.scope = scope;
 
-  ASTNode statement = parseStatement(parser, scope);
+    final statement = parseStatement(scope);
+    compound.compoundValue.add(statement);
 
-  compound.compoundValue.add(statement);
+    return compound;
+  }
 
-  while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-      parser.prevToken?.type == TokenType.TOKEN_RBRACE &&
-          statement.type != ASTType.AST_NOOP) {
-    if (parser.curToken.type == TokenType.TOKEN_SEMI)
-      eat(parser, TokenType.TOKEN_SEMI);
+  ASTNode parse({Scope scope}) {
+    return parseStatements(scope);
+  }
 
-    statement = parseStatement(parser, scope);
+  void eat(TokenType type) {
+    if (curToken.type != type) {
+      parserUnexpectedToken(type);
+    } else {
+      prevToken = curToken;
+      curToken = lexer.getNextToken();
+    }
+  }
+
+  ASTNode parseStatement(Scope scope) {
+    switch (curToken.type) {
+      case TokenType.TOKEN_ID:
+        {
+          final tokenValue = curToken.value;
+
+          if (isModifier(tokenValue)) {
+            eat(TokenType.TOKEN_ID);
+            if (tokenValue == FINAL)
+              return parseDefinition(scope, false, true);
+
+            return parseDefinition(scope, true);
+          }
+
+          if (isDataType()) {
+            return parseDefinition(scope);
+          }
+
+          switch (tokenValue) {
+            case WHILE:
+              return parseWhile(scope);
+            case FOR:
+              return parseFor(scope);
+            case IF:
+              return parseIf(scope);
+            case SWITCH:
+              return parseSwitch(scope);
+            case FALSE:
+            case TRUE:
+              return parseBool(scope);
+            case NULL:
+              return parseNull(scope);
+            case RETURN:
+              return parseReturn(scope);
+            case THROW:
+              return parseThrow(scope);
+            case BREAK:
+              return parseBreak(scope);
+            case NEXT:
+              return parseNext(scope);
+            case NEW:
+              return parseNew(scope);
+            case ITERATE:
+              return parseIterate(scope);
+            case ASSERT:
+              return parseAssert(scope);
+          }
+
+          eat(TokenType.TOKEN_ID);
+
+          var a = parseVariable(scope);
+
+          while (curToken.type == TokenType.TOKEN_LPAREN) {
+            a = parseFunctionCall(scope, a);
+          }
+
+          while (curToken.type == TokenType.TOKEN_DOT) {
+            eat(TokenType.TOKEN_DOT);
+
+            final ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum)..binaryOpLeft = a;
+
+            eat(TokenType.TOKEN_ID);
+
+            final varAST = parseVariable(scope);
+
+            ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+                ? parseFunctionCall(scope, varAST)
+                : varAST;
+            a = ast;
+          }
+
+          while (curToken.type == TokenType.TOKEN_LBRACKET) {
+            final astListAccess = initASTWithLine(ListAccessNode(), lexer.lineNum);
+            astListAccess.binaryOpLeft = a;
+            eat(TokenType.TOKEN_LBRACKET);
+
+            astListAccess.listAccessPointer = parseExpression(scope);
+
+            eat(TokenType.TOKEN_RBRACKET);
+
+            a = astListAccess;
+          }
+
+          if (a != null)
+            return a;
+        }
+        break;
+      case TokenType.TOKEN_LESS_THAN:
+        eat(TokenType.TOKEN_LESS_THAN);
+
+        final String annotation = curToken.value;
+        eat(TokenType.TOKEN_ID);
+
+        eat(TokenType.TOKEN_GREATER_THAN);
+
+        switch (annotation) {
+          case SUPERSEDE:
+            return parseDefinition(
+                scope,
+                curToken.value == 'const',
+                curToken.value == 'final',
+                true);
+          default:
+            throw UnexpectedTokenException(
+                'No annotation ${curToken.value} found!');
+        }
+        break;
+      case TokenType.TOKEN_NUMBER_VALUE:
+      case TokenType.TOKEN_STRING_VALUE:
+      case TokenType.TOKEN_DOUBLE_VALUE:
+      case TokenType.TOKEN_INT_VALUE:
+        return parseExpression(scope);
+      case TokenType.TOKEN_PLUS_PLUS:
+      case TokenType.TOKEN_SUB_SUB:
+      case TokenType.TOKEN_MUL_MUL:
+        {
+          final Token operator = curToken;
+          eat(operator.type);
+
+          final ASTNode astVarMod = initASTWithLine(VarModNode(), lexer.lineNum)
+            ..binaryOpRight = parseStatement(scope)
+            ..binaryOperator = operator
+            ..scope = scope;
+
+          return astVarMod;
+        }
+        break;
+      case TokenType.TOKEN_LBRACE:
+        final int lineNum = lexer.lineNum;
+        while (curToken.type != TokenType.TOKEN_RBRACE) {
+          if (lexer.currentIndex == lexer.program.length)
+            throw UnexpectedTokenException('[Lines $lineNum-${lexer.lineNum}] No closing brace `}` was found');
+          eat(curToken.type);
+        }
+        eat(TokenType.TOKEN_RBRACE);
+
+        return initASTWithLine(NoopNode(), lineNum);
+
+      case TokenType.TOKEN_LBRACKET:
+        return parseList(scope);
+
+      default:
+        return initASTWithLine(NoopNode(), lexer.lineNum);
+    }
+
+    return initASTWithLine(NoopNode(), lexer.lineNum);
+  }
+
+  ASTNode parseStatements(Scope scope) {
+    final compound = initASTWithLine(CompoundNode(), lexer.lineNum);
+    compound.scope = scope;
+
+    ASTNode statement = parseStatement(scope);
 
     compound.compoundValue.add(statement);
+
+    while (curToken.type == TokenType.TOKEN_SEMI ||
+        prevToken?.type == TokenType.TOKEN_RBRACE &&
+            statement.type != ASTType.AST_NOOP) {
+      if (curToken.type == TokenType.TOKEN_SEMI)
+        eat(TokenType.TOKEN_SEMI);
+
+      statement = parseStatement(scope);
+
+      compound.compoundValue.add(statement);
+    }
+
+    if (curToken.type != TokenType.TOKEN_RBRACE &&
+        lexer.currentIndex != lexer.program.length)
+      throw UnexpectedTokenException(
+          'Error [Line ${lexer.lineNum}]: Expected `;` but found `${curToken.value}`');
+
+    return compound;
   }
 
-  if (parser.curToken.type != TokenType.TOKEN_RBRACE &&
-      parser.lexer.currentIndex != parser.lexer.program.length)
-    throw UnexpectedTokenException(
-        'Error [Line ${parser.lexer.lineNum}]: Expected `;` but found `${parser.curToken.value}`');
-
-  return compound;
-}
-
-ASTNode parseType(Parser parser, Scope scope) {
-  final ASTNode astType = initASTWithLine(TypeNode(), parser.lexer.lineNum)
-    ..scope = scope;
-
-  final type = DataType();
-
-  var tokenValue = parser.curToken.value;
-
-  if (tokenValue.endsWith('?'))
-    tokenValue =
-        tokenValue.replaceRange(tokenValue.length - 1, tokenValue.length, '');
-
-  switch (tokenValue) {
-    case 'void':
-      type.type = DATATYPE.DATA_TYPE_VOID;
-      break;
-    case 'String':
-      type.type = DATATYPE.DATA_TYPE_STRING;
-      break;
-    case 'StrBuffer':
-      type.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
-      break;
-    case 'var':
-      type.type = DATATYPE.DATA_TYPE_VAR;
-      break;
-    case 'int':
-      type.type = DATATYPE.DATA_TYPE_INT;
-      break;
-    case 'double':
-      type.type = DATATYPE.DATA_TYPE_DOUBLE;
-      break;
-    case 'bool':
-      type.type = DATATYPE.DATA_TYPE_BOOL;
-      break;
-    case 'class':
-      type.type = DATATYPE.DATA_TYPE_CLASS;
-      break;
-    case 'enum':
-      type.type = DATATYPE.DATA_TYPE_ENUM;
-      break;
-    case 'List':
-      type.type = DATATYPE.DATA_TYPE_LIST;
-      break;
-    case 'Map':
-      type.type = DATATYPE.DATA_TYPE_MAP;
-      break;
-    case 'Source':
-      type.type = DATATYPE.DATA_TYPE_SOURCE;
-      break;
-  }
-
-  astType.typeValue = type;
-
-  eat(parser, TokenType.TOKEN_ID);
-
-  return astType;
-}
-
-ASTNode parseDouble(Parser parser, Scope scope) {
-  final ast = initASTWithLine(DoubleNode(), parser.lexer.lineNum);
-  ast.scope = scope;
-  ast.doubleVal = double.parse(parser.curToken.value);
-
-  eat(parser, TokenType.TOKEN_DOUBLE_VALUE);
-
-  return ast;
-}
-
-ASTNode parseString(Parser parser, Scope scope) {
-  final ast = initASTWithLine(StringNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..stringValue = parser.curToken.value;
-
-  eat(parser, TokenType.TOKEN_STRING_VALUE);
-
-  return ast;
-}
-
-ASTNode parseInt(Parser parser, Scope scope) {
-  final ast = initASTWithLine(IntNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..intVal = int.tryParse(parser.curToken.value);
-
-  eat(parser, TokenType.TOKEN_INT_VALUE);
-
-  return ast;
-}
-
-ASTNode parseBool(Parser parser, Scope scope) {
-  final ast = initASTWithLine(BoolNode(), parser.lexer.lineNum)..scope = scope;
-
-  if (parser.curToken.value == 'false' || parser.curToken.value == 'true') {
-    ast.boolVal = parser.curToken.value == 'true';
-  } else {
-    print('Expected a boolean value, but got ${parser.curToken.value}');
-  }
-
-  eat(parser, TokenType.TOKEN_ID);
-
-  return ast;
-}
-
-ASTNode parseNull(Parser parser, Scope scope) {
-  final ast = initASTWithLine(NoSeebNode(), parser.lexer.lineNum)..scope = scope;
-
-  eat(parser, TokenType.TOKEN_ID);
-
-  return ast;
-}
-
-ASTNode parseVariable(Parser parser, Scope scope) {
-  final ast = initASTWithLine(VariableNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..variableName = parser.prevToken.value;
-
-  if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
-    final astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum)
-      ..variableAssignmentLeft = ast
-      ..variableValue = parseExpression(parser, scope)
+  ASTNode parseType(Scope scope) {
+    final ASTNode astType = initASTWithLine(TypeNode(), lexer.lineNum)
       ..scope = scope;
 
-    return astAssign;
-  }
+    final type = DataType();
 
-  if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-    eat(parser, TokenType.TOKEN_EQUAL);
-    final astAssign = initASTWithLine(VarAssignmentNode(), parser.lexer.lineNum);
-    astAssign.variableAssignmentLeft = ast;
-    astAssign.variableValue = parseExpression(parser, scope);
-    astAssign.scope = scope;
+    var tokenValue = curToken.value;
 
-    return astAssign;
-  }
-  if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
-      parser.curToken.type == TokenType.TOKEN_MUL_MUL) {
-    final Token operator = parser.curToken;
+    if (tokenValue.endsWith('?'))
+      tokenValue =
+          tokenValue.replaceRange(tokenValue.length - 1, tokenValue.length, '');
 
-    eat(parser, operator.type);
-
-    final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
-      ..binaryOpLeft = ast
-      ..binaryOperator = operator
-      ..scope = scope;
-
-    return astVarMod;
-  } else if (parser.curToken.type == TokenType.TOKEN_PLUS_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_SUB_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_MUL_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_DIV_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_MOD_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_NOSEEB_ASSIGNMENT) {
-    final Token operator = parser.curToken;
-
-    eat(parser, operator.type);
-
-    final ASTNode astVarMod = initASTWithLine(VarModNode(), parser.lexer.lineNum)
-      ..binaryOpLeft = ast
-      ..binaryOpRight = parseExpression(parser, scope)
-      ..binaryOperator = operator
-      ..scope = scope;
-
-    return astVarMod;
-  }
-
-  return ast;
-}
-
-ASTNode parseBrace(Parser parser, Scope scope) {
-  if (parser.prevToken.type != TokenType.TOKEN_ID)
-    return parseMap(parser, scope);
-
-  return parseClass(parser, scope);
-}
-
-ASTNode parseClass(Parser parser, Scope scope) {
-  final ASTNode ast = initASTWithLine(ClassNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..className = parser.prevToken.value
-    ..classChildren = ListQueue();
-
-  final newScope = initScope(false);
-
-  if (scope != null && scope.owner != null)
-      newScope.owner = scope.owner;
-
-  eat(parser, TokenType.TOKEN_LBRACE);
-
-  if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-    if (parser.curToken.type == TokenType.TOKEN_ID ||
-        parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
-      ast.classChildren
-          .add(asClassChild(parseDefinition(parser, newScope), ast));
+    switch (tokenValue) {
+      case 'void':
+        type.type = DATATYPE.DATA_TYPE_VOID;
+        break;
+      case 'String':
+        type.type = DATATYPE.DATA_TYPE_STRING;
+        break;
+      case 'StrBuffer':
+        type.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
+        break;
+      case 'var':
+        type.type = DATATYPE.DATA_TYPE_VAR;
+        break;
+      case 'int':
+        type.type = DATATYPE.DATA_TYPE_INT;
+        break;
+      case 'double':
+        type.type = DATATYPE.DATA_TYPE_DOUBLE;
+        break;
+      case 'bool':
+        type.type = DATATYPE.DATA_TYPE_BOOL;
+        break;
+      case 'class':
+        type.type = DATATYPE.DATA_TYPE_CLASS;
+        break;
+      case 'enum':
+        type.type = DATATYPE.DATA_TYPE_ENUM;
+        break;
+      case 'List':
+        type.type = DATATYPE.DATA_TYPE_LIST;
+        break;
+      case 'Map':
+        type.type = DATATYPE.DATA_TYPE_MAP;
+        break;
+      case 'Source':
+        type.type = DATATYPE.DATA_TYPE_SOURCE;
+        break;
     }
 
-    while (parser.curToken.type == TokenType.TOKEN_SEMI ||
-        (parser.prevToken.type == TokenType.TOKEN_RBRACE &&
-            parser.curToken.type != TokenType.TOKEN_RBRACE)) {
-      if (parser.curToken.type == TokenType.TOKEN_SEMI)
-        eat(parser, TokenType.TOKEN_SEMI);
+    astType.typeValue = type;
 
-      if (parser.curToken.type == TokenType.TOKEN_ID ||
-          parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
-        ast.classChildren
-            .add(asClassChild(parseDefinition(parser, newScope), ast));
-      }
-    }
+    eat(TokenType.TOKEN_ID);
+
+    return astType;
   }
 
-  eat(parser, TokenType.TOKEN_RBRACE);
-
-  return ast;
-}
-
-ASTNode parseEnum(Parser parser, Scope scope) {
-  final ast = initASTWithLine(EnumNode(), parser.lexer.lineNum);
-  ast.scope = scope;
-  ast.enumElements = [];
-
-  final newScope = initScope(false);
-
-  if (scope != null) {
-    if (scope.owner != null) {
-      newScope.owner = scope.owner;
-    }
-  }
-
-  eat(parser, TokenType.TOKEN_LBRACE);
-
-  if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-    if (parser.curToken.type == TokenType.TOKEN_ID) {
-      eat(parser, TokenType.TOKEN_ID);
-      ast.enumElements.add(parseVariable(parser, newScope));
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      eat(parser, TokenType.TOKEN_COMMA);
-
-      if (parser.curToken.type == TokenType.TOKEN_ID) {
-        eat(parser, TokenType.TOKEN_ID);
-        ast.enumElements.add(parseVariable(parser, newScope));
-      }
-    }
-  }
-
-  eat(parser, TokenType.TOKEN_RBRACE);
-
-  return ast;
-}
-
-ASTNode parseMap(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_LBRACE);
-
-  final ast = initASTWithLine(MapNode(), parser.lexer.lineNum);
-  ast.scope = scope;
-  ast.map = {};
-
-  if (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-    if (parser.curToken.type == TokenType.TOKEN_STRING_VALUE) {
-      final String key = parser.curToken.value;
-      eat(parser, TokenType.TOKEN_STRING_VALUE);
-
-      if (parser.curToken.type == TokenType.TOKEN_COLON)
-        eat(parser, TokenType.TOKEN_COLON);
-      else
-        throw UnexpectedTokenException(
-            'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-
-      if (parser.curToken.type == TokenType.TOKEN_COMMA)
-        throw UnexpectedTokenException(
-            'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-      ast.map[key] = parseExpression(parser, scope);
-    } else
-      throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');
-  }
-
-  while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-    eat(parser, TokenType.TOKEN_COMMA);
-
-    final String key = parser.curToken.value;
-    eat(parser, TokenType.TOKEN_STRING_VALUE);
-
-    if (parser.curToken.type == TokenType.TOKEN_COLON)
-      eat(parser, TokenType.TOKEN_COLON);
-    else
-      throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-
-    if (parser.curToken.type == TokenType.TOKEN_COMMA)
-      throw UnexpectedTokenException(
-          'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-
-    ast.map[key] = parseExpression(parser, scope);
-  }
-
-  eat(parser, TokenType.TOKEN_RBRACE);
-  return ast;
-}
-
-ASTNode parseList(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_LBRACKET);
-  final ast = initASTWithLine(ListNode(), parser.lexer.lineNum);
-  ast.scope = scope;
-  ast.listElements = [];
-
-  if (parser.curToken.type != TokenType.TOKEN_RBRACKET) {
-    ast.listElements.add(parseExpression(parser, scope));
-  }
-
-  while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-    eat(parser, TokenType.TOKEN_COMMA);
-    ast.listElements.add(parseExpression(parser, scope));
-  }
-
-  eat(parser, TokenType.TOKEN_RBRACKET);
-  return ast;
-}
-
-ASTNode parseFactor(Parser parser, Scope scope, bool isMap) {
-  while (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB ||
-      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
-      parser.curToken.type == TokenType.TOKEN_NOT ||
-      parser.curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
-    final unOpOperator = parser.curToken;
-    eat(parser, unOpOperator.type);
-
-    final ast = initASTWithLine(UnaryOpNode(), parser.lexer.lineNum);
+  ASTNode parseDouble(Scope scope) {
+    final ast = initASTWithLine(DoubleNode(), lexer.lineNum);
     ast.scope = scope;
-    ast.unaryOperator = unOpOperator;
-    ast.unaryOpRight = parseTerm(parser, scope);
+    ast.doubleVal = double.parse(curToken.value);
+
+    eat(TokenType.TOKEN_DOUBLE_VALUE);
 
     return ast;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_ID) {
-    switch (parser.curToken.value) {
-    case TRUE:
-    case FALSE:
-      return parseBool(parser, scope);
-    case NULL:
-      return parseNull(parser, scope);
-    case NEW:
-      return parseNew(parser, scope);
-  }
+  ASTNode parseString(Scope scope) {
+    final ast = initASTWithLine(StringNode(), lexer.lineNum)
+      ..scope = scope
+      ..stringValue = curToken.value;
+
+    eat(TokenType.TOKEN_STRING_VALUE);
+
+    return ast;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB ||
-      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
-      parser.curToken.type == TokenType.TOKEN_NOT ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
-      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
-      parser.curToken.type == TokenType.TOKEN_LSHIFT ||
-      parser.curToken.type == TokenType.TOKEN_RSHIFT) {
-    eat(parser, parser.curToken.type);
+  ASTNode parseInt(Scope scope) {
+    final ast = initASTWithLine(IntNode(), lexer.lineNum)
+      ..scope = scope
+      ..intVal = int.tryParse(curToken.value);
 
-    var a = parseVariable(parser, scope).binaryOpRight;
+    eat(TokenType.TOKEN_INT_VALUE);
 
-    while (parser.curToken.type == TokenType.TOKEN_DOT) {
-      eat(parser, TokenType.TOKEN_DOT);
-      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      ast.binaryOpLeft = a;
-      eat(parser, TokenType.TOKEN_ID);
-      final varAST = parseVariable(parser, scope);
-      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFunctionCall(parser, scope, varAST)
-          : varAST;
-      a = ast;
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_DOT) {
-      eat(parser, TokenType.TOKEN_DOT);
-      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      ast.binaryOpLeft = a;
-      eat(parser, TokenType.TOKEN_ID);
-      final varAST = parseVariable(parser, scope);
-      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFunctionCall(parser, scope, varAST)
-          : varAST;
-      a = ast;
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-      final astListAccess =
-          initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
-      astListAccess.binaryOpLeft = a;
-
-      eat(parser, TokenType.TOKEN_LBRACKET);
-      astListAccess.listAccessPointer = parseExpression(parser, scope);
-      eat(parser, TokenType.TOKEN_RBRACKET);
-
-      a = astListAccess;
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_LPAREN)
-      a = parseFunctionCall(parser, scope, a);
-
-    if (a != null)
-      return a;
+    return ast;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_ID) {
-    eat(parser, parser.curToken.type);
+  ASTNode parseBool(Scope scope) {
+    final ast = initASTWithLine(BoolNode(), lexer.lineNum)..scope = scope;
 
-    var a = parseVariable(parser, scope);
-
-    while (parser.curToken.type == TokenType.TOKEN_DOT) {
-      eat(parser, TokenType.TOKEN_DOT);
-      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      ast.binaryOpLeft = a;
-      eat(parser, TokenType.TOKEN_ID);
-      final varAST = parseVariable(parser, scope);
-      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFunctionCall(parser, scope, varAST)
-          : varAST;
-      a = ast;
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_LBRACKET) {
-      final astListAccess =
-          initASTWithLine(ListAccessNode(), parser.lexer.lineNum);
-      astListAccess.binaryOpLeft = a;
-
-      eat(parser, TokenType.TOKEN_LBRACKET);
-      astListAccess.listAccessPointer = parseExpression(parser, scope);
-      eat(parser, TokenType.TOKEN_RBRACKET);
-
-      a = astListAccess;
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_LPAREN)
-      a = parseFunctionCall(parser, scope, a);
-
-    if (a != null)
-      return a;
-  }
-
-  /* */
-  if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    eat(parser, TokenType.TOKEN_LPAREN);
-    final astExpression = parseExpression(parser, scope);
-    eat(parser, TokenType.TOKEN_RPAREN);
-
-    return astExpression;
-  }
-
-  switch (parser.curToken.type) {
-    case TokenType.TOKEN_NUMBER_VALUE:
-    case TokenType.TOKEN_INT_VALUE:
-      return parseInt(parser, scope);
-    case TokenType.TOKEN_DOUBLE_VALUE:
-      return parseDouble(parser, scope);
-    case TokenType.TOKEN_STRING_VALUE:
-      return parseString(parser, scope);
-    case TokenType.TOKEN_LBRACE:
-      return parseBrace(parser, scope);
-    case TokenType.TOKEN_LBRACKET:
-      return parseList(parser, scope);
-    default:
-      throw UnexpectedTokenException('Unexpected ${parser.curToken.value}');
-      break;
-  }
-}
-
-ASTNode parseTerm(Parser parser, Scope scope, {bool isFuncDefArgs = false}) {
-  final tokenValue = parser.curToken.value;
-
-  if (isModifier(tokenValue)) {
-    eat(parser, TokenType.TOKEN_ID);
-    if (tokenValue == FINAL)
-      return parseDefinition(parser, scope, false, true, false, true);
-
-    return parseDefinition(parser, scope, true, false, false, true);
-  }
-
-  if (isDataType(parser))
-    return parseDefinition(parser, scope, false, false, false, true);
-
-  var node = parseFactor(parser, scope, false);
-  ASTNode astBinaryOp;
-
-  if (parser.curToken.type == TokenType.TOKEN_LPAREN)
-    node = parseFunctionCall(parser, scope, node);
-
-  while (parser.curToken.type == TokenType.TOKEN_DIV ||
-      parser.curToken.type == TokenType.TOKEN_MUL ||
-      parser.curToken.type == TokenType.TOKEN_LESS_THAN ||
-      parser.curToken.type == TokenType.TOKEN_GREATER_THAN ||
-      parser.curToken.type == TokenType.TOKEN_LESS_THAN_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_GREATER_THAN_EQUAL ||
-      parser.curToken.type == TokenType.TOKEN_EQUALITY ||
-      parser.curToken.type == TokenType.TOKEN_NOT_EQUAL) {
-    final binaryOpOperator = parser.curToken;
-    eat(parser, binaryOpOperator.type);
-
-    astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
-
-    astBinaryOp.binaryOpLeft = node;
-    astBinaryOp.binaryOperator = binaryOpOperator;
-    astBinaryOp.binaryOpRight = parseFactor(parser, scope, false);
-
-    node = astBinaryOp;
-  }
-  return node;
-}
-
-ASTNode parseExpression(Parser parser, Scope scope,
-    {bool isFuncDefArgs = false}) {
-  var node = parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
-  ASTNode astBinaryOp;
-
-  while (parser.curToken.type == TokenType.TOKEN_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB ||
-      parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-      parser.curToken.type == TokenType.TOKEN_SUB_SUB ||
-      parser.curToken.type == TokenType.TOKEN_NOT ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_AND ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_OR ||
-      parser.curToken.type == TokenType.TOKEN_BITWISE_XOR ||
-      parser.curToken.type == TokenType.TOKEN_LSHIFT ||
-      parser.curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
-      parser.curToken.type == TokenType.TOKEN_RSHIFT) {
-    if (parser.curToken.type == TokenType.TOKEN_PLUS_PLUS ||
-        parser.curToken.type == TokenType.TOKEN_SUB_SUB) {
-      final binaryOp = parser.curToken;
-      eat(parser, binaryOp.type);
-
-      astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
-      astBinaryOp.scope = scope;
-
-      astBinaryOp.binaryOpLeft = node;
-      astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight =
-          parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
-
-      node = astBinaryOp;
+    if (curToken.value == 'false' || curToken.value == 'true') {
+      ast.boolVal = curToken.value == 'true';
     } else {
-      final binaryOp = parser.curToken;
-      eat(parser, binaryOp.type);
-
-      astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
-      astBinaryOp.scope = scope;
-
-      astBinaryOp.binaryOpLeft = node;
-      astBinaryOp.binaryOperator = binaryOp;
-      astBinaryOp.binaryOpRight =
-          parseTerm(parser, scope, isFuncDefArgs: isFuncDefArgs);
-
-      node = astBinaryOp;
+      print('Expected a boolean value, but got ${curToken.value}');
     }
+
+    eat(TokenType.TOKEN_ID);
+
+    return ast;
   }
 
-  while (parser.curToken.type == TokenType.TOKEN_AND ||
-      parser.curToken.type == TokenType.TOKEN_OR) {
-    final binaryOp = parser.curToken;
-    eat(parser, binaryOp.type);
+  ASTNode parseNull(Scope scope) {
+    final ast = initASTWithLine(NoSeebNode(), lexer.lineNum)..scope = scope;
 
-    astBinaryOp = initASTWithLine(BinaryOpNode(), parser.lexer.lineNum);
-    astBinaryOp.scope = scope;
+    eat(TokenType.TOKEN_ID);
 
-    astBinaryOp.binaryOpLeft = node;
-    astBinaryOp.binaryOperator = binaryOp;
-    astBinaryOp.binaryOpRight = parseTerm(parser, scope);
-
-    node = astBinaryOp;
+    return ast;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_QUESTION)
-    return parseTernary(parser, scope, node);
+  ASTNode parseVariable(Scope scope) {
+    final ast = initASTWithLine(VariableNode(), lexer.lineNum)
+      ..scope = scope
+      ..variableName = prevToken.value;
 
-  return node;
-}
+    if (curToken.type == TokenType.TOKEN_RBRACE) {
+      final astAssign = initASTWithLine(VarAssignmentNode(), lexer.lineNum)
+        ..variableAssignmentLeft = ast
+        ..variableValue = parseExpression(scope)
+        ..scope = scope;
 
-ASTNode parseBreak(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
+      return astAssign;
+    }
 
-  return initASTWithLine(BreakNode(), parser.lexer.lineNum);
-}
+    if (curToken.type == TokenType.TOKEN_EQUAL) {
+      eat(TokenType.TOKEN_EQUAL);
+      final astAssign = initASTWithLine(VarAssignmentNode(), lexer.lineNum);
+      astAssign.variableAssignmentLeft = ast;
+      astAssign.variableValue = parseExpression(scope);
+      astAssign.scope = scope;
 
-ASTNode parseNext(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
+      return astAssign;
+    }
+    if (curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB_SUB ||
+        curToken.type == TokenType.TOKEN_MUL_MUL) {
+      final Token operator = curToken;
 
-  return initASTWithLine(NextNode(), parser.lexer.lineNum);
-}
+      eat(operator.type);
 
-ASTNode parseNew(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
+      final ASTNode astVarMod = initASTWithLine(VarModNode(), lexer.lineNum)
+        ..binaryOpLeft = ast
+        ..binaryOperator = operator
+        ..scope = scope;
 
-  final ASTNode newAST = initASTWithLine(NewNode(), parser.lexer.lineNum)
-    ..newValue = parseExpression(parser, scope);
+      return astVarMod;
+    } else if (curToken.type == TokenType.TOKEN_PLUS_EQUAL ||
+        curToken.type == TokenType.TOKEN_SUB_EQUAL ||
+        curToken.type == TokenType.TOKEN_MUL_EQUAL ||
+        curToken.type == TokenType.TOKEN_DIV_EQUAL ||
+        curToken.type == TokenType.TOKEN_MOD_EQUAL ||
+        curToken.type == TokenType.TOKEN_NOSEEB_ASSIGNMENT) {
+      final Token operator = curToken;
 
-  return newAST;
-}
+      eat(operator.type);
 
-ASTNode parseReturn(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  final ast = initASTWithLine(ReturnNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..returnValue = parseExpression(parser, scope) ?? NoSeebNode();
+      final ASTNode astVarMod = initASTWithLine(VarModNode(), lexer.lineNum)
+        ..binaryOpLeft = ast
+        ..binaryOpRight = parseExpression(scope)
+        ..binaryOperator = operator
+        ..scope = scope;
 
-  return ast;
-}
+      return astVarMod;
+    }
 
-ASTNode parseThrow(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  final ast = initASTWithLine(ThrowNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..throwValue = parseExpression(parser, scope) ?? NoSeebNode();
-
-  return ast;
-}
-
-ASTNode parseIf(Parser parser, Scope scope) {
-  final ast = initASTWithLine(IfNode(), parser.lexer.lineNum);
-  eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPAREN);
-
-  ast.ifExpression = parseExpression(parser, scope);
-
-  eat(parser, TokenType.TOKEN_RPAREN);
-
-  ast.scope = scope;
-
-  if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-    eat(parser, TokenType.TOKEN_LBRACE);
-    ast.ifBody = parseStatements(parser, scope);
-    eat(parser, TokenType.TOKEN_RBRACE);
-  } else {
-    ast.ifBody = parseOneStatementCompound(parser, scope);
+    return ast;
   }
 
-  if (parser.curToken.value == ELSE) {
-    eat(parser, TokenType.TOKEN_ID);
+  ASTNode parseBrace(Scope scope) {
+    if (prevToken.type != TokenType.TOKEN_ID)
+      return parseMap(scope);
 
-    if (parser.curToken.value == IF) {
-      ast.ifElse = parseIf(parser, scope);
-      ast.ifElse.scope = scope;
-    } else {
-      if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-        eat(parser, TokenType.TOKEN_LBRACE);
-        ast.elseBody = parseStatements(parser, scope);
-        ast.elseBody.scope = scope;
-        eat(parser, TokenType.TOKEN_RBRACE);
-      } else {
-        final compound = initASTWithLine(CompoundNode(), parser.lexer.lineNum);
-        compound.scope = scope;
-        final statement = parseStatement(parser, scope);
-        eat(parser, TokenType.TOKEN_SEMI);
-        compound.compoundValue.add(statement);
+    return parseClass(scope);
+  }
 
-        ast.elseBody = compound;
-        ast.elseBody.scope = scope;
+  ASTNode parseClass(Scope scope) {
+    final ASTNode ast = initASTWithLine(ClassNode(), lexer.lineNum)
+      ..scope = scope
+      ..className = prevToken.value
+      ..classChildren = ListQueue();
+
+    final newScope = Scope(false);
+
+    if (scope != null && scope.owner != null)
+      newScope.owner = scope.owner;
+
+    eat(TokenType.TOKEN_LBRACE);
+
+    if (curToken.type != TokenType.TOKEN_RBRACE) {
+      if (curToken.type == TokenType.TOKEN_ID ||
+          curToken.type == TokenType.TOKEN_LESS_THAN) {
+        ast.classChildren
+            .add(asClassChild(parseDefinition(newScope), ast));
+      }
+
+      while (curToken.type == TokenType.TOKEN_SEMI ||
+          (prevToken.type == TokenType.TOKEN_RBRACE &&
+              curToken.type != TokenType.TOKEN_RBRACE)) {
+        if (curToken.type == TokenType.TOKEN_SEMI)
+          eat(TokenType.TOKEN_SEMI);
+
+        if (curToken.type == TokenType.TOKEN_ID ||
+            curToken.type == TokenType.TOKEN_LESS_THAN) {
+          ast.classChildren
+              .add(asClassChild(parseDefinition(newScope), ast));
+        }
       }
     }
+
+    eat(TokenType.TOKEN_RBRACE);
+
+    return ast;
   }
 
-  return ast;
-}
+  ASTNode parseEnum(Scope scope) {
+    final ast = initASTWithLine(EnumNode(), lexer.lineNum);
+    ast.scope = scope;
+    ast.enumElements = [];
 
-ASTNode parseSwitch(Parser parser, Scope scope) {
-  final ASTNode switchAST = initASTWithLine(SwitchNode(), parser.lexer.lineNum)
-    ..switchCases = {};
+    final newScope = Scope(false);
 
-  eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPAREN);
+    if (scope != null) {
+      if (scope.owner != null) {
+        newScope.owner = scope.owner;
+      }
+    }
 
-  switchAST.switchExpression = parseExpression(parser, scope);
+    eat(TokenType.TOKEN_LBRACE);
 
-  eat(parser, TokenType.TOKEN_RPAREN);
-  eat(parser, TokenType.TOKEN_LBRACE);
-  eat(parser, TokenType.TOKEN_ID);
+    if (curToken.type != TokenType.TOKEN_RBRACE) {
+      if (curToken.type == TokenType.TOKEN_ID) {
+        eat(TokenType.TOKEN_ID);
+        ast.enumElements.add(parseVariable(newScope));
+      }
 
-  ASTNode caseAST = parseStatement(parser, scope);
+      while (curToken.type == TokenType.TOKEN_COMMA) {
+        eat(TokenType.TOKEN_COMMA);
 
-  eat(parser, TokenType.TOKEN_COLON);
-  eat(parser, TokenType.TOKEN_LBRACE);
+        if (curToken.type == TokenType.TOKEN_ID) {
+          eat(TokenType.TOKEN_ID);
+          ast.enumElements.add(parseVariable(newScope));
+        }
+      }
+    }
 
-  ASTNode caseFuncAST = parseStatements(parser, scope);
+    eat(TokenType.TOKEN_RBRACE);
 
-  eat(parser, TokenType.TOKEN_RBRACE);
+    return ast;
+  }
 
-  switchAST.switchCases[caseAST] = caseFuncAST;
+  ASTNode parseMap(Scope scope) {
+    eat(TokenType.TOKEN_LBRACE);
 
-  while (parser.curToken.value == CASE) {
-    eat(parser, TokenType.TOKEN_ID);
+    final ast = initASTWithLine(MapNode(), lexer.lineNum);
+    ast.scope = scope;
+    ast.map = {};
 
-    caseAST = parseStatement(parser, scope);
+    if (curToken.type != TokenType.TOKEN_RBRACE) {
+      if (curToken.type == TokenType.TOKEN_STRING_VALUE) {
+        final String key = curToken.value;
+        eat(TokenType.TOKEN_STRING_VALUE);
 
-    eat(parser, TokenType.TOKEN_COLON);
-    eat(parser, TokenType.TOKEN_LBRACE);
+        if (curToken.type == TokenType.TOKEN_COLON)
+          eat(TokenType.TOKEN_COLON);
+        else
+          throw UnexpectedTokenException(
+              'Error: [Line ${lexer.lineNum}] Unexpected token `${curToken.value}`, expected `:`.');
 
-    caseFuncAST = parseStatements(parser, scope);
+        if (curToken.type == TokenType.TOKEN_COMMA)
+          throw UnexpectedTokenException(
+              'Error: [Line ${lexer.lineNum}] Expected value for key `$key`');
+        ast.map[key] = parseExpression(scope);
+      } else
+        throw UnexpectedTokenException(
+            'Error: [Line ${lexer.lineNum}] Maps can only hold strings as keys.');
+    }
 
-    eat(parser, TokenType.TOKEN_RBRACE);
+    while (curToken.type == TokenType.TOKEN_COMMA) {
+      eat(TokenType.TOKEN_COMMA);
+
+      final String key = curToken.value;
+      eat(TokenType.TOKEN_STRING_VALUE);
+
+      if (curToken.type == TokenType.TOKEN_COLON)
+        eat(TokenType.TOKEN_COLON);
+      else
+        throw UnexpectedTokenException(
+            'Error: [Line ${lexer.lineNum}] Unexpected token `${curToken.value}`, expected `:`.');
+
+      if (curToken.type == TokenType.TOKEN_COMMA)
+        throw UnexpectedTokenException(
+            'Error: [Line ${lexer.lineNum}] Expected value for key `$key`');
+
+      ast.map[key] = parseExpression(scope);
+    }
+
+    eat(TokenType.TOKEN_RBRACE);
+    return ast;
+  }
+
+  ASTNode parseList(Scope scope) {
+    eat(TokenType.TOKEN_LBRACKET);
+    final ast = initASTWithLine(ListNode(), lexer.lineNum);
+    ast.scope = scope;
+    ast.listElements = [];
+
+    if (curToken.type != TokenType.TOKEN_RBRACKET) {
+      ast.listElements.add(parseExpression(scope));
+    }
+
+    while (curToken.type == TokenType.TOKEN_COMMA) {
+      eat(TokenType.TOKEN_COMMA);
+      ast.listElements.add(parseExpression(scope));
+    }
+
+    eat(TokenType.TOKEN_RBRACKET);
+    return ast;
+  }
+
+  ASTNode parseFactor(Scope scope, bool isMap) {
+    while (curToken.type == TokenType.TOKEN_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB ||
+        curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB_SUB ||
+        curToken.type == TokenType.TOKEN_NOT ||
+        curToken.type == TokenType.TOKEN_ONES_COMPLEMENT) {
+      final unOpOperator = curToken;
+      eat(unOpOperator.type);
+
+      final ast = initASTWithLine(UnaryOpNode(), lexer.lineNum);
+      ast.scope = scope;
+      ast.unaryOperator = unOpOperator;
+      ast.unaryOpRight = parseTerm(scope);
+
+      return ast;
+    }
+
+    if (curToken.type == TokenType.TOKEN_ID) {
+      switch (curToken.value) {
+        case TRUE:
+        case FALSE:
+          return parseBool(scope);
+        case NULL:
+          return parseNull(scope);
+        case NEW:
+          return parseNew(scope);
+      }
+    }
+
+    if (curToken.type == TokenType.TOKEN_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB ||
+        curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB_SUB ||
+        curToken.type == TokenType.TOKEN_NOT ||
+        curToken.type == TokenType.TOKEN_BITWISE_AND ||
+        curToken.type == TokenType.TOKEN_BITWISE_OR ||
+        curToken.type == TokenType.TOKEN_BITWISE_XOR ||
+        curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
+        curToken.type == TokenType.TOKEN_LSHIFT ||
+        curToken.type == TokenType.TOKEN_RSHIFT) {
+      eat(curToken.type);
+
+      var a = parseVariable(scope).binaryOpRight;
+
+      while (curToken.type == TokenType.TOKEN_DOT) {
+        eat(TokenType.TOKEN_DOT);
+        final ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum);
+        ast.binaryOpLeft = a;
+        eat(TokenType.TOKEN_ID);
+        final varAST = parseVariable(scope);
+        ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+            ? parseFunctionCall(scope, varAST)
+            : varAST;
+        a = ast;
+      }
+
+      while (curToken.type == TokenType.TOKEN_DOT) {
+        eat(TokenType.TOKEN_DOT);
+        final ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum);
+        ast.binaryOpLeft = a;
+        eat(TokenType.TOKEN_ID);
+        final varAST = parseVariable(scope);
+        ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+            ? parseFunctionCall(scope, varAST)
+            : varAST;
+        a = ast;
+      }
+
+      while (curToken.type == TokenType.TOKEN_LBRACKET) {
+        final astListAccess =
+        initASTWithLine(ListAccessNode(), lexer.lineNum);
+        astListAccess.binaryOpLeft = a;
+
+        eat(TokenType.TOKEN_LBRACKET);
+        astListAccess.listAccessPointer = parseExpression(scope);
+        eat(TokenType.TOKEN_RBRACKET);
+
+        a = astListAccess;
+      }
+
+      while (curToken.type == TokenType.TOKEN_LPAREN)
+        a = parseFunctionCall(scope, a);
+
+      if (a != null)
+        return a;
+    }
+
+    if (curToken.type == TokenType.TOKEN_ID) {
+      eat(curToken.type);
+
+      var a = parseVariable(scope);
+
+      while (curToken.type == TokenType.TOKEN_DOT) {
+        eat(TokenType.TOKEN_DOT);
+        final ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum);
+        ast.binaryOpLeft = a;
+        eat(TokenType.TOKEN_ID);
+        final varAST = parseVariable(scope);
+        ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+            ? parseFunctionCall(scope, varAST)
+            : varAST;
+        a = ast;
+      }
+
+      while (curToken.type == TokenType.TOKEN_LBRACKET) {
+        final astListAccess =
+        initASTWithLine(ListAccessNode(), lexer.lineNum);
+        astListAccess.binaryOpLeft = a;
+
+        eat(TokenType.TOKEN_LBRACKET);
+        astListAccess.listAccessPointer = parseExpression(scope);
+        eat(TokenType.TOKEN_RBRACKET);
+
+        a = astListAccess;
+      }
+
+      while (curToken.type == TokenType.TOKEN_LPAREN)
+        a = parseFunctionCall(scope, a);
+
+      if (a != null)
+        return a;
+    }
+
+    /* */
+    if (curToken.type == TokenType.TOKEN_LPAREN) {
+      eat(TokenType.TOKEN_LPAREN);
+      final astExpression = parseExpression(scope);
+      eat(TokenType.TOKEN_RPAREN);
+
+      return astExpression;
+    }
+
+    switch (curToken.type) {
+      case TokenType.TOKEN_NUMBER_VALUE:
+      case TokenType.TOKEN_INT_VALUE:
+        return parseInt(scope);
+      case TokenType.TOKEN_DOUBLE_VALUE:
+        return parseDouble(scope);
+      case TokenType.TOKEN_STRING_VALUE:
+        return parseString(scope);
+      case TokenType.TOKEN_LBRACE:
+        return parseBrace(scope);
+      case TokenType.TOKEN_LBRACKET:
+        return parseList(scope);
+      default:
+        throw UnexpectedTokenException('Unexpected ${curToken.value}');
+        break;
+    }
+  }
+
+  ASTNode parseTerm(Scope scope, {bool isFuncDefArgs = false}) {
+    final tokenValue = curToken.value;
+
+    if (isModifier(tokenValue)) {
+      eat(TokenType.TOKEN_ID);
+      if (tokenValue == FINAL)
+        return parseDefinition(scope, false, true, false, true);
+
+      return parseDefinition(scope, true, false, false, true);
+    }
+
+    if (isDataType())
+      return parseDefinition(scope, false, false, false, true);
+
+    var node = parseFactor(scope, false);
+    ASTNode astBinaryOp;
+
+    if (curToken.type == TokenType.TOKEN_LPAREN)
+      node = parseFunctionCall(scope, node);
+
+    while (curToken.type == TokenType.TOKEN_DIV ||
+        curToken.type == TokenType.TOKEN_MUL ||
+        curToken.type == TokenType.TOKEN_LESS_THAN ||
+        curToken.type == TokenType.TOKEN_GREATER_THAN ||
+        curToken.type == TokenType.TOKEN_LESS_THAN_EQUAL ||
+        curToken.type == TokenType.TOKEN_GREATER_THAN_EQUAL ||
+        curToken.type == TokenType.TOKEN_EQUALITY ||
+        curToken.type == TokenType.TOKEN_NOT_EQUAL) {
+      final binaryOpOperator = curToken;
+      eat(binaryOpOperator.type);
+
+      astBinaryOp = initASTWithLine(BinaryOpNode(), lexer.lineNum);
+
+      astBinaryOp.binaryOpLeft = node;
+      astBinaryOp.binaryOperator = binaryOpOperator;
+      astBinaryOp.binaryOpRight = parseFactor(scope, false);
+
+      node = astBinaryOp;
+    }
+    return node;
+  }
+
+  ASTNode parseExpression(Scope scope,
+      {bool isFuncDefArgs = false}) {
+    var node = parseTerm(scope, isFuncDefArgs: isFuncDefArgs);
+    ASTNode astBinaryOp;
+
+    while (curToken.type == TokenType.TOKEN_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB ||
+        curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+        curToken.type == TokenType.TOKEN_SUB_SUB ||
+        curToken.type == TokenType.TOKEN_NOT ||
+        curToken.type == TokenType.TOKEN_BITWISE_AND ||
+        curToken.type == TokenType.TOKEN_BITWISE_OR ||
+        curToken.type == TokenType.TOKEN_BITWISE_XOR ||
+        curToken.type == TokenType.TOKEN_LSHIFT ||
+        curToken.type == TokenType.NOSEEB_AWARE_OPERATOR ||
+        curToken.type == TokenType.TOKEN_RSHIFT) {
+      if (curToken.type == TokenType.TOKEN_PLUS_PLUS ||
+          curToken.type == TokenType.TOKEN_SUB_SUB) {
+        final binaryOp = curToken;
+        eat(binaryOp.type);
+
+        astBinaryOp = initASTWithLine(BinaryOpNode(), lexer.lineNum);
+        astBinaryOp.scope = scope;
+
+        astBinaryOp.binaryOpLeft = node;
+        astBinaryOp.binaryOperator = binaryOp;
+        astBinaryOp.binaryOpRight =
+            parseTerm(scope, isFuncDefArgs: isFuncDefArgs);
+
+        node = astBinaryOp;
+      } else {
+        final binaryOp = curToken;
+        eat(binaryOp.type);
+
+        astBinaryOp = initASTWithLine(BinaryOpNode(), lexer.lineNum);
+        astBinaryOp.scope = scope;
+
+        astBinaryOp.binaryOpLeft = node;
+        astBinaryOp.binaryOperator = binaryOp;
+        astBinaryOp.binaryOpRight =
+            parseTerm(scope, isFuncDefArgs: isFuncDefArgs);
+
+        node = astBinaryOp;
+      }
+    }
+
+    while (curToken.type == TokenType.TOKEN_AND ||
+        curToken.type == TokenType.TOKEN_OR) {
+      final binaryOp = curToken;
+      eat(binaryOp.type);
+
+      astBinaryOp = initASTWithLine(BinaryOpNode(), lexer.lineNum);
+      astBinaryOp.scope = scope;
+
+      astBinaryOp.binaryOpLeft = node;
+      astBinaryOp.binaryOperator = binaryOp;
+      astBinaryOp.binaryOpRight = parseTerm(scope);
+
+      node = astBinaryOp;
+    }
+
+    if (curToken.type == TokenType.TOKEN_QUESTION)
+      return parseTernary(scope, node);
+
+    return node;
+  }
+
+  ASTNode parseBreak(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+
+    return initASTWithLine(BreakNode(), lexer.lineNum);
+  }
+
+  ASTNode parseNext(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+
+    return initASTWithLine(NextNode(), lexer.lineNum);
+  }
+
+  ASTNode parseNew(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+
+    final ASTNode newAST = initASTWithLine(NewNode(), lexer.lineNum)
+      ..newValue = parseExpression(scope);
+
+    return newAST;
+  }
+
+  ASTNode parseReturn(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+    final ast = initASTWithLine(ReturnNode(), lexer.lineNum)
+      ..scope = scope
+      ..returnValue = parseExpression(scope) ?? NoSeebNode();
+
+    return ast;
+  }
+
+  ASTNode parseThrow(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+    final ast = initASTWithLine(ThrowNode(), lexer.lineNum)
+      ..scope = scope
+      ..throwValue = parseExpression(scope) ?? NoSeebNode();
+
+    return ast;
+  }
+
+  ASTNode parseIf(Scope scope) {
+    final ast = initASTWithLine(IfNode(), lexer.lineNum);
+    eat(TokenType.TOKEN_ID);
+    eat(TokenType.TOKEN_LPAREN);
+
+    ast.ifExpression = parseExpression(scope);
+
+    eat(TokenType.TOKEN_RPAREN);
+
+    ast.scope = scope;
+
+    if (curToken.type == TokenType.TOKEN_LBRACE) {
+      eat(TokenType.TOKEN_LBRACE);
+      ast.ifBody = parseStatements(scope);
+      eat(TokenType.TOKEN_RBRACE);
+    } else {
+      ast.ifBody = parseOneStatementCompound(scope);
+    }
+
+    if (curToken.value == ELSE) {
+      eat(TokenType.TOKEN_ID);
+
+      if (curToken.value == IF) {
+        ast.ifElse = parseIf(scope);
+        ast.ifElse.scope = scope;
+      } else {
+        if (curToken.type == TokenType.TOKEN_LBRACE) {
+          eat(TokenType.TOKEN_LBRACE);
+          ast.elseBody = parseStatements(scope);
+          ast.elseBody.scope = scope;
+          eat(TokenType.TOKEN_RBRACE);
+        } else {
+          final compound = initASTWithLine(CompoundNode(), lexer.lineNum);
+          compound.scope = scope;
+          final statement = parseStatement(scope);
+          eat(TokenType.TOKEN_SEMI);
+          compound.compoundValue.add(statement);
+
+          ast.elseBody = compound;
+          ast.elseBody.scope = scope;
+        }
+      }
+    }
+
+    return ast;
+  }
+
+  ASTNode parseSwitch(Scope scope) {
+    final ASTNode switchAST = initASTWithLine(SwitchNode(), lexer.lineNum)
+      ..switchCases = {};
+
+    eat(TokenType.TOKEN_ID);
+    eat(TokenType.TOKEN_LPAREN);
+
+    switchAST.switchExpression = parseExpression(scope);
+
+    eat(TokenType.TOKEN_RPAREN);
+    eat(TokenType.TOKEN_LBRACE);
+    eat(TokenType.TOKEN_ID);
+
+    ASTNode caseAST = parseStatement(scope);
+
+    eat(TokenType.TOKEN_COLON);
+    eat(TokenType.TOKEN_LBRACE);
+
+    ASTNode caseFuncAST = parseStatements(scope);
+
+    eat(TokenType.TOKEN_RBRACE);
 
     switchAST.switchCases[caseAST] = caseFuncAST;
+
+    while (curToken.value == CASE) {
+      eat(TokenType.TOKEN_ID);
+
+      caseAST = parseStatement(scope);
+
+      eat(TokenType.TOKEN_COLON);
+      eat(TokenType.TOKEN_LBRACE);
+
+      caseFuncAST = parseStatements(scope);
+
+      eat(TokenType.TOKEN_RBRACE);
+
+      switchAST.switchCases[caseAST] = caseFuncAST;
+    }
+
+    // Default case (REQUIRED)
+    eat(TokenType.TOKEN_ID);
+    eat(TokenType.TOKEN_COLON);
+    eat(TokenType.TOKEN_LBRACE);
+
+    final ASTNode defaultFuncAST = parseStatements(scope);
+
+    eat(TokenType.TOKEN_RBRACE);
+
+    switchAST.switchDefault = defaultFuncAST;
+
+    eat(TokenType.TOKEN_RBRACE);
+
+    return switchAST;
   }
 
-  // Default case (REQUIRED)
-  eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_COLON);
-  eat(parser, TokenType.TOKEN_LBRACE);
+  ASTNode parseTernary(Scope scope, ASTNode expr) {
+    final ternary = initASTWithLine(TernaryNode(), lexer.lineNum);
+    ternary.ternaryExpression = expr;
 
-  final ASTNode defaultFuncAST = parseStatements(parser, scope);
+    eat(TokenType.TOKEN_QUESTION);
 
-  eat(parser, TokenType.TOKEN_RBRACE);
+    ternary.ternaryBody = parseTerm(scope);
 
-  switchAST.switchDefault = defaultFuncAST;
+    eat(TokenType.TOKEN_COLON);
 
-  eat(parser, TokenType.TOKEN_RBRACE);
+    ternary.ternaryElseBody = parseTerm(scope);
 
-  return switchAST;
-}
-
-ASTNode parseTernary(Parser parser, Scope scope, ASTNode expr) {
-  final ternary = initASTWithLine(TernaryNode(), parser.lexer.lineNum);
-  ternary.ternaryExpression = expr;
-
-  eat(parser, TokenType.TOKEN_QUESTION);
-
-  ternary.ternaryBody = parseTerm(parser, scope);
-
-  eat(parser, TokenType.TOKEN_COLON);
-
-  ternary.ternaryElseBody = parseTerm(parser, scope);
-
-  return ternary;
-}
-
-ASTNode parseIterate(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  final astVar = parseExpression(parser, scope);
-  eat(parser, TokenType.TOKEN_ID);
-
-  ASTNode astFuncName;
-
-  if (isModifier(parser.curToken.value)) {
-    eat(parser, TokenType.TOKEN_ID);
-    if (parser.curToken.value == FINAL)
-      return parseDefinition(parser, scope, false, true);
-
-    return parseDefinition(parser, scope, true);
+    return ternary;
   }
 
-  if (isDataType(parser)) {
-    astFuncName = parseDefinition(parser, scope);
-  } else {
-    eat(parser, TokenType.TOKEN_ID);
-    astFuncName = parseVariable(parser, scope);
+  ASTNode parseIterate(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+    final astVar = parseExpression(scope);
+    eat(TokenType.TOKEN_ID);
+
+    ASTNode astFuncName;
+
+    if (isModifier(curToken.value)) {
+      eat(TokenType.TOKEN_ID);
+      if (curToken.value == FINAL)
+        return parseDefinition(scope, false, true);
+
+      return parseDefinition(scope, true);
+    }
+
+    if (isDataType()) {
+      astFuncName = parseDefinition(scope);
+    } else {
+      eat(TokenType.TOKEN_ID);
+      astFuncName = parseVariable(scope);
+    }
+
+    final ast = initASTWithLine(IterateNode(), lexer.lineNum);
+    ast.iterateIterable = astVar;
+    ast.iterateFunction = astFuncName;
+
+    return ast;
   }
 
-  final ast = initASTWithLine(IterateNode(), parser.lexer.lineNum);
-  ast.iterateIterable = astVar;
-  ast.iterateFunction = astFuncName;
+  ASTNode parseAssert(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+    final ast = initASTWithLine(AssertNode(), lexer.lineNum);
+    ast.assertExpression = parseExpression(scope);
 
-  return ast;
-}
+    return ast;
+  }
 
-ASTNode parseAssert(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  final ast = initASTWithLine(AssertNode(), parser.lexer.lineNum);
-  ast.assertExpression = parseExpression(parser, scope);
+  ASTNode parseWhile(Scope scope) {
+    eat(TokenType.TOKEN_ID);
+    eat(TokenType.TOKEN_LPAREN);
+    final ast = initASTWithLine(WhileNode(), lexer.lineNum);
+    ast.whileExpression = parseExpression(scope);
+    eat(TokenType.TOKEN_RPAREN);
 
-  return ast;
-}
+    if (curToken.type == TokenType.TOKEN_LBRACE) {
+      eat(TokenType.TOKEN_LBRACE);
+      ast.whileBody = parseStatements(scope);
+      eat(TokenType.TOKEN_RBRACE);
+      ast.scope = scope;
+    } else {
+      ast.whileBody = parseOneStatementCompound(scope);
+      ast.whileBody.scope = scope;
+    }
 
-ASTNode parseWhile(Parser parser, Scope scope) {
-  eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPAREN);
-  final ast = initASTWithLine(WhileNode(), parser.lexer.lineNum);
-  ast.whileExpression = parseExpression(parser, scope);
-  eat(parser, TokenType.TOKEN_RPAREN);
+    return ast;
+  }
 
-  if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-    eat(parser, TokenType.TOKEN_LBRACE);
-    ast.whileBody = parseStatements(parser, scope);
-    eat(parser, TokenType.TOKEN_RBRACE);
+  ASTNode parseFor(Scope scope) {
+    final ast = ForNode();
+
+    eat(TokenType.TOKEN_ID);
+    eat(TokenType.TOKEN_LPAREN);
+
+    ast.forInitStatement = parseStatement(scope);
+    eat(TokenType.TOKEN_SEMI);
+
+    ast.forConditionStatement = parseExpression(scope);
+    eat(TokenType.TOKEN_SEMI);
+
+    ast.forChangeStatement = parseStatement(scope);
+
+    eat(TokenType.TOKEN_RPAREN);
+
+    if (curToken.type == TokenType.TOKEN_LBRACE) {
+      eat(TokenType.TOKEN_LBRACE);
+      ast.forBody = parseStatements(scope);
+      ast.forBody.scope = scope;
+      eat(TokenType.TOKEN_RBRACE);
+    } else {
+      ast.forBody = parseOneStatementCompound(scope);
+      ast.forBody.scope = scope;
+    }
+
+    return ast;
+  }
+
+  ASTNode parseFunctionCall(Scope scope, ASTNode expr) {
+    final ast = initASTWithLine(FuncCallNode(), lexer.lineNum);
+    ast.funcCallExpression = expr;
+    eat(TokenType.TOKEN_LPAREN);
+
     ast.scope = scope;
-  } else {
-    ast.whileBody = parseOneStatementCompound(parser, scope);
-    ast.whileBody.scope = scope;
-  }
 
-  return ast;
-}
+    if (curToken.type != TokenType.TOKEN_RPAREN) {
+      var astExpr = parseExpression(scope);
 
-ASTNode parseFor(Parser parser, Scope scope) {
-  final ast = ForNode();
-
-  eat(parser, TokenType.TOKEN_ID);
-  eat(parser, TokenType.TOKEN_LPAREN);
-
-  ast.forInitStatement = parseStatement(parser, scope);
-  eat(parser, TokenType.TOKEN_SEMI);
-
-  ast.forConditionStatement = parseExpression(parser, scope);
-  eat(parser, TokenType.TOKEN_SEMI);
-
-  ast.forChangeStatement = parseStatement(parser, scope);
-
-  eat(parser, TokenType.TOKEN_RPAREN);
-
-  if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-    eat(parser, TokenType.TOKEN_LBRACE);
-    ast.forBody = parseStatements(parser, scope);
-    ast.forBody.scope = scope;
-    eat(parser, TokenType.TOKEN_RBRACE);
-  } else {
-    ast.forBody = parseOneStatementCompound(parser, scope);
-    ast.forBody.scope = scope;
-  }
-
-  return ast;
-}
-
-ASTNode parseFunctionCall(Parser parser, Scope scope, ASTNode expr) {
-  final ast = initASTWithLine(FuncCallNode(), parser.lexer.lineNum);
-  ast.funcCallExpression = expr;
-  eat(parser, TokenType.TOKEN_LPAREN);
-
-  ast.scope = scope;
-
-  if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
-    var astExpr = parseExpression(parser, scope);
-
-    while (parser.curToken.type == TokenType.TOKEN_DOT) {
-      eat(parser, TokenType.TOKEN_DOT);
-      final AttributeAccessNode ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      ast.binaryOpLeft = astExpr;
-      eat(parser, TokenType.TOKEN_ID);
-      final ASTNode varAST = parseVariable(parser, scope);
-      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFunctionCall(parser, scope, varAST)
-          : varAST;
-      astExpr = ast;
-    }
-
-    if (parser.curToken.type == TokenType.TOKEN_COLON) {
-      eat(parser, TokenType.TOKEN_COLON);
-      astExpr.variableValue = parseExpression(parser, scope);
-
-      ast.namedFunctionCallArgs.add(astExpr);
-    }
-    else {
-      if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
-        astExpr.scope = initScope(false);
+      while (curToken.type == TokenType.TOKEN_DOT) {
+        eat(TokenType.TOKEN_DOT);
+        final AttributeAccessNode ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum);
+        ast.binaryOpLeft = astExpr;
+        eat(TokenType.TOKEN_ID);
+        final ASTNode varAST = parseVariable(scope);
+        ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+            ? parseFunctionCall(scope, varAST)
+            : varAST;
+        astExpr = ast;
       }
 
-      ast.functionCallArgs.add(astExpr);
-    }
-
-    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      eat(parser, TokenType.TOKEN_COMMA);
-      astExpr = parseExpression(parser, scope);
-
-      if (parser.curToken.type == TokenType.TOKEN_COLON) {
-        eat(parser, TokenType.TOKEN_COLON);
-        astExpr.variableValue = parseExpression(parser, scope);
+      if (curToken.type == TokenType.TOKEN_COLON) {
+        eat(TokenType.TOKEN_COLON);
+        astExpr.variableValue = parseExpression(scope);
 
         ast.namedFunctionCallArgs.add(astExpr);
       }
       else {
         if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
-          astExpr.scope = initScope(false);
+          astExpr.scope = Scope(false);
         }
 
         ast.functionCallArgs.add(astExpr);
       }
-    }
-  }
 
-  eat(parser, TokenType.TOKEN_RPAREN);
+      while (curToken.type == TokenType.TOKEN_COMMA) {
+        eat(TokenType.TOKEN_COMMA);
+        astExpr = parseExpression(scope);
 
-  return ast;
-}
+        if (curToken.type == TokenType.TOKEN_COLON) {
+          eat(TokenType.TOKEN_COLON);
+          astExpr.variableValue = parseExpression(scope);
 
-ASTNode parseDefinition(Parser parser, Scope scope,
-    [bool isConst = false,
-    bool isFinal = false,
-    bool isSuperseding = false,
-    bool isFuncDefArgs = false]) {
-  if (parser.curToken.type == TokenType.TOKEN_LESS_THAN) {
-    eat(parser, TokenType.TOKEN_LESS_THAN);
-
-    final String annotation = parser.curToken.value;
-    eat(parser, TokenType.TOKEN_ID);
-
-    eat(parser, TokenType.TOKEN_GREATER_THAN);
-
-    switch (annotation) {
-      case SUPERSEDE:
-        isConst = parser.curToken.value == 'const';
-        isFinal = parser.curToken.value == 'final';
-        isSuperseding = true;
-        break;
-      default:
-        throw UnexpectedTokenException(
-            'No annotation `${parser.curToken.value}` found!');
-    }
-  }
-
-  final bool isNullable = parser.curToken.value.endsWith('?');
-
-  // TODO(Calamity): refactor
-  if (parser.curToken.value == 'const') {
-    isConst = true;
-    eat(parser, TokenType.TOKEN_ID);
-  }
-
-  final ASTNode astType = parseType(parser, scope);
-
-  parser.dataType = astType.typeValue;
-
-  String name;
-  bool isEnum = false;
-
-  // TODO(Calamity): refactor
-  if (parser.prevToken.value == 'StrBuffer' &&
-      parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    final strBuffer = parseStrBuffer(parser, scope, isConst, isFinal);
-    if (isNullable) {
-      strBuffer.isNullable = true;
-    } else if (!isFuncDefArgs && strBuffer.variableValue == null ||
-        strBuffer.variableValue is NoSeebNode) {
-      throw UnexpectedTypeException(
-          'Error [Line: ${parser.lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
-    }
-
-    return strBuffer;
-  }
-
-  if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
-    name = parser.curToken.value;
-
-    if (parser.curToken.type == TokenType.TOKEN_ID)
-      eat(parser, TokenType.TOKEN_ID);
-    else
-      eat(parser, TokenType.TOKEN_ANON_ID);
-  } else
-    isEnum = true;
-
-  // Function Definition
-  if (parser.curToken.type == TokenType.TOKEN_LPAREN) {
-    return parseFunctionDefinition(parser, scope, name, astType);
-  } else {
-    final varDef = parseVariableDefinition(
-        parser, scope, name, astType, isEnum, isConst, isFinal, isSuperseding);
-
-    if (isNullable) {
-      varDef.isNullable = true;
-    } else if (!isFuncDefArgs && varDef.variableValue == null ||
-        varDef.variableValue is NoSeebNode) {
-      throw UnexpectedTypeException(
-          'Error [Line ${parser.lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
-    }
-
-    return varDef;
-  }
-}
-
-ASTNode parseFunctionDefinition(
-    Parser parser, Scope scope, String funcName, ASTNode astType) {
-  final ast = initASTWithLine(FuncDefNode(), parser.lexer.lineNum)
-    ..funcName = funcName
-    ..funcDefType = astType
-    ..functionDefArgs = [];
-
-  final newScope = initScope(false)..owner = ast;
-
-  eat(parser, TokenType.TOKEN_LPAREN);
-
-  if (parser.curToken.type != TokenType.TOKEN_RPAREN) {
-
-    if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-      eat(parser, TokenType.TOKEN_LBRACE);
-      ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
-
-      while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-        eat(parser, TokenType.TOKEN_COMMA);
-        ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
-      }
-      eat(parser, TokenType.TOKEN_RBRACE);
-    }
-    else
-    ast.functionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
-
-    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      eat(parser, TokenType.TOKEN_COMMA);
-
-      // Named parameters
-      if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-        eat(parser, TokenType.TOKEN_LBRACE);
-        ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
-
-        while (parser.curToken.type != TokenType.TOKEN_RBRACE) {
-          eat(parser, TokenType.TOKEN_COMMA);
-          ast.namedFunctionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+          ast.namedFunctionCallArgs.add(astExpr);
         }
-        eat(parser, TokenType.TOKEN_RBRACE);
-      } else {
-        ast.functionDefArgs.add(parseExpression(parser, scope, isFuncDefArgs: true));
+        else {
+          if (astExpr.type == ASTType.AST_FUNC_DEFINITION) {
+            astExpr.scope = Scope(false);
+          }
+
+          ast.functionCallArgs.add(astExpr);
+        }
+      }
+    }
+
+    eat(TokenType.TOKEN_RPAREN);
+
+    return ast;
+  }
+
+  ASTNode parseDefinition(Scope scope,
+      [bool isConst = false,
+        bool isFinal = false,
+        bool isSuperseding = false,
+        bool isFuncDefArgs = false]) {
+    if (curToken.type == TokenType.TOKEN_LESS_THAN) {
+      eat(TokenType.TOKEN_LESS_THAN);
+
+      final String annotation = curToken.value;
+      eat(TokenType.TOKEN_ID);
+
+      eat(TokenType.TOKEN_GREATER_THAN);
+
+      switch (annotation) {
+        case SUPERSEDE:
+          isConst = curToken.value == 'const';
+          isFinal = curToken.value == 'final';
+          isSuperseding = true;
+          break;
+        default:
+          throw UnexpectedTokenException(
+              'No annotation `${curToken.value}` found!');
+      }
+    }
+
+    final bool isNullable = curToken.value.endsWith('?');
+
+    // TODO(Calamity): refactor
+    if (curToken.value == 'const') {
+      isConst = true;
+      eat(TokenType.TOKEN_ID);
+    }
+
+    final ASTNode astType = parseType(scope);
+
+    dataType = astType.typeValue;
+
+    String name;
+    bool isEnum = false;
+
+    // TODO(Calamity): refactor
+    if (prevToken.value == 'StrBuffer' &&
+        curToken.type == TokenType.TOKEN_LPAREN) {
+      final strBuffer = parseStrBuffer(scope, isConst, isFinal);
+      if (isNullable) {
+        strBuffer.isNullable = true;
+      } else if (!isFuncDefArgs && strBuffer.variableValue == null ||
+          strBuffer.variableValue is NoSeebNode) {
+        throw UnexpectedTypeException(
+            'Error [Line: ${lexer.lineNum}]Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
       }
 
+      return strBuffer;
+    }
+
+    if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM) {
+      name = curToken.value;
+
+      if (curToken.type == TokenType.TOKEN_ID)
+        eat(TokenType.TOKEN_ID);
+      else
+        eat(TokenType.TOKEN_ANON_ID);
+    } else
+      isEnum = true;
+
+    // Function Definition
+    if (curToken.type == TokenType.TOKEN_LPAREN) {
+      return parseFunctionDefinition(scope, name, astType);
+    } else {
+      final varDef = parseVariableDefinition(
+          scope, name, astType, isEnum, isConst, isFinal, isSuperseding);
+
+      if (isNullable) {
+        varDef.isNullable = true;
+      } else if (!isFuncDefArgs && varDef.variableValue == null ||
+          varDef.variableValue is NoSeebNode) {
+        throw UnexpectedTypeException(
+            'Error [Line ${lexer.lineNum}]: Non-nullable variables cannot be given a null value, add the `?` suffix to a variable type to make it nullable');
+      }
+
+      return varDef;
     }
   }
 
-  eat(parser, TokenType.TOKEN_RPAREN);
+  ASTNode parseFunctionDefinition(
+      Scope scope, String funcName, ASTNode astType) {
+    final ast = initASTWithLine(FuncDefNode(), lexer.lineNum)
+      ..funcName = funcName
+      ..funcDefType = astType
+      ..functionDefArgs = [];
 
-  if (parser.curToken.type == TokenType.TOKEN_INLINE) {
-    eat(parser, TokenType.TOKEN_INLINE);
-    ast.functionDefBody = parseOneStatementCompound(parser, newScope);
+    final newScope = Scope(false)..owner = ast;
+
+    eat(TokenType.TOKEN_LPAREN);
+
+    if (curToken.type != TokenType.TOKEN_RPAREN) {
+
+      if (curToken.type == TokenType.TOKEN_LBRACE) {
+        eat(TokenType.TOKEN_LBRACE);
+        ast.namedFunctionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+
+        while (curToken.type != TokenType.TOKEN_RBRACE) {
+          eat(TokenType.TOKEN_COMMA);
+          ast.namedFunctionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+        }
+        eat(TokenType.TOKEN_RBRACE);
+      }
+      else
+        ast.functionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+
+      while (curToken.type == TokenType.TOKEN_COMMA) {
+        eat(TokenType.TOKEN_COMMA);
+
+        // Named parameters
+        if (curToken.type == TokenType.TOKEN_LBRACE) {
+          eat(TokenType.TOKEN_LBRACE);
+          ast.namedFunctionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+
+          while (curToken.type != TokenType.TOKEN_RBRACE) {
+            eat(TokenType.TOKEN_COMMA);
+            ast.namedFunctionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+          }
+          eat(TokenType.TOKEN_RBRACE);
+        } else {
+          ast.functionDefArgs.add(parseExpression(scope, isFuncDefArgs: true));
+        }
+
+      }
+    }
+
+    eat(TokenType.TOKEN_RPAREN);
+
+    if (curToken.type == TokenType.TOKEN_INLINE) {
+      eat(TokenType.TOKEN_INLINE);
+      ast.functionDefBody = parseOneStatementCompound(newScope);
+      ast.functionDefBody.scope = newScope;
+
+      return ast;
+    }
+
+    if (curToken.type == TokenType.TOKEN_RBRACE) {
+      ASTNode childDef;
+
+      if (isModifier(curToken.value)) {
+        eat(TokenType.TOKEN_ID);
+        if (curToken.value == FINAL)
+          return parseDefinition(scope, false, true);
+
+        return parseDefinition(scope, true);
+      }
+      if (isDataType()) {
+        childDef = parseDefinition(scope);
+      } else {
+        eat(TokenType.TOKEN_ID);
+        childDef = parseVariable(scope);
+      }
+
+      childDef.scope = newScope;
+      ast.compChildren.add(childDef);
+
+      while (curToken.type == TokenType.TOKEN_COMMA) {
+        eat(TokenType.TOKEN_COMMA);
+
+        if (isModifier(curToken.value)) {
+          eat(TokenType.TOKEN_ID);
+          if (curToken.value == FINAL)
+            return parseDefinition(scope, false, true);
+
+          return parseDefinition(scope, true);
+        }
+
+        if (isDataType()) {
+          childDef = parseDefinition(scope);
+        } else {
+          eat(TokenType.TOKEN_ID);
+          childDef = parseVariable(scope);
+        }
+
+        childDef.scope = newScope;
+        ast.compChildren.add(childDef);
+      }
+      return ast;
+    }
+
+    if (curToken.type == TokenType.TOKEN_EQUAL) {
+      eat(TokenType.TOKEN_EQUAL);
+
+      ASTNode childDef;
+
+      if (isModifier(curToken.value)) {
+        eat(TokenType.TOKEN_ID);
+        if (curToken.value == FINAL)
+          return parseDefinition(scope, false, true);
+
+        return parseDefinition(scope, true);
+      }
+
+      if (isDataType()) {
+        childDef = parseDefinition(scope);
+      } else {
+        eat(TokenType.TOKEN_ID);
+        childDef = parseVariable(scope);
+      }
+
+      childDef.scope = newScope;
+      ast.compChildren.add(childDef);
+
+      while (curToken.type == TokenType.TOKEN_COMMA) {
+        eat(TokenType.TOKEN_COMMA);
+
+        if (isModifier(curToken.value)) {
+          eat(TokenType.TOKEN_ID);
+          if (curToken.value == FINAL)
+            return parseDefinition(scope, false, true);
+
+          return parseDefinition(scope, true);
+        }
+
+        if (isDataType()) {
+          childDef = parseDefinition(scope);
+        } else {
+          eat(TokenType.TOKEN_ID);
+          childDef = parseVariable(scope);
+        }
+
+        childDef.scope = newScope;
+        ast.compChildren.add(childDef);
+      }
+      return ast;
+    }
+    eat(TokenType.TOKEN_LBRACE);
+    ast.functionDefBody = parseStatements(newScope);
     ast.functionDefBody.scope = newScope;
+    eat(TokenType.TOKEN_RBRACE);
 
     return ast;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_RBRACE) {
-    ASTNode childDef;
+  ASTNode parseVariableDefinition(
+      Scope scope, String name, ASTNode astType,
+      [bool isEnum = false,
+        bool isConst = false,
+        bool isFinal = false,
+        bool isSuperseding = false]) {
+    final astVarDef = initASTWithLine(VarDefNode(), lexer.lineNum)
+      ..scope = scope
+      ..variableName = name
+      ..variableType = astType
+      ..isFinal = isFinal
+      ..isSuperseding = isSuperseding;
 
-    if (isModifier(parser.curToken.value)) {
-      eat(parser, TokenType.TOKEN_ID);
-      if (parser.curToken.value == FINAL)
-        return parseDefinition(parser, scope, false, true);
+    if (isEnum) {
+      final astType = initASTWithLine(TypeNode(), lexer.lineNum);
+      astType.scope = scope;
 
-      return parseDefinition(parser, scope, true);
+      final type = DataType()..type = DATATYPE.DATA_TYPE_ENUM;
+      astType.typeValue = type;
+
+      astVarDef.variableType = astType;
+      astVarDef.variableValue = parseEnum(scope);
+      astVarDef.variableName = curToken.value;
+      eat(TokenType.TOKEN_ID);
     }
-    if (isDataType(parser)) {
-      childDef = parseDefinition(parser, scope);
-    } else {
-      eat(parser, TokenType.TOKEN_ID);
-      childDef = parseVariable(parser, scope);
+
+    if (curToken.value == 'follows') {
+      eat(TokenType.TOKEN_ID);
+
+      final VariableNode superClass =
+      initASTWithLine(VariableNode(), lexer.lineNum)
+        ..scope = scope
+        ..variableName = curToken.value;
+
+      eat(TokenType.TOKEN_ID);
+
+      astVarDef.variableValue = parseClass(scope);
+      astVarDef.variableValue.superClass = superClass;
+
+      return astVarDef;
     }
 
-    childDef.scope = newScope;
-    ast.compChildren.add(childDef);
+    // Class
+    if (curToken.type == TokenType.TOKEN_LBRACE) {
+      astVarDef.variableValue = parseExpression(scope);
 
-    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      eat(parser, TokenType.TOKEN_COMMA);
+      switch (astVarDef.variableValue.type) {
+        case ASTType.AST_CLASS:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
+            parserTypeError();
+          break;
+        case ASTType.AST_ENUM:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
+            parserTypeError();
+          break;
+        case ASTType.AST_COMPOUND:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
+            parserTypeError();
+          break;
+        default:
+          break;
+      }
+    }
 
-      if (isModifier(parser.curToken.value)) {
-        eat(parser, TokenType.TOKEN_ID);
-        if (parser.curToken.value == FINAL)
-          return parseDefinition(parser, scope, false, true);
+    if (curToken.type == TokenType.TOKEN_EQUAL) {
+      if (isEnum)
+        parserSyntaxError();
 
-        return parseDefinition(parser, scope, true);
+      eat(TokenType.TOKEN_EQUAL);
+
+      astVarDef.variableValue = parseExpression(scope);
+
+      while (curToken.type == TokenType.TOKEN_DOT) {
+        eat(TokenType.TOKEN_DOT);
+        final ast = initASTWithLine(AttributeAccessNode(), lexer.lineNum);
+        ast.binaryOpLeft = astVarDef.variableValue;
+        eat(TokenType.TOKEN_ID);
+        final varAST = parseVariable(scope);
+        ast.binaryOpRight = curToken.type == TokenType.TOKEN_LPAREN
+            ? parseFunctionCall(scope, varAST)
+            : varAST;
+        astVarDef.variableValue = ast;
       }
 
-      if (isDataType(parser)) {
-        childDef = parseDefinition(parser, scope);
-      } else {
-        eat(parser, TokenType.TOKEN_ID);
-        childDef = parseVariable(parser, scope);
+      switch (astVarDef.variableValue.type) {
+        case ASTType.AST_STRING:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program.replaceAll(
+                  RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'),
+                  astVarDef.variableValue.stringValue);
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
+            parserTypeError();
+          break;
+        case ASTType.AST_STRING_BUFFER:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program.replaceAll(name,
+                  astVarDef.variableValue.strBuffer.toString());
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
+            parserTypeError();
+          break;
+        case ASTType.AST_INT:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program
+                  .replaceAll(name, '${astVarDef.variableValue.intVal}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
+            parserTypeError();
+          break;
+        case ASTType.AST_DOUBLE:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program
+                  .replaceAll(name, '${astVarDef.variableValue.doubleVal}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
+            parserTypeError();
+          break;
+        case ASTType.AST_BOOL:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program
+                  .replaceAll(name, '${astVarDef.variableValue.boolVal}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
+            parserTypeError();
+          break;
+        case ASTType.AST_LIST:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program
+                  .replaceAll(name, '${astVarDef.variableValue.listElements}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
+            parserTypeError();
+          break;
+        case ASTType.AST_MAP:
+          if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
+            astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
+            astVarDef.variableType = astType;
+            if (isConst)
+              lexer.program = lexer.program
+                  .replaceAll(name, '${astVarDef.variableValue.map}');
+          }
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
+            parserTypeError();
+          break;
+        case ASTType.AST_COMPOUND:
+          if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
+            parserTypeError();
+          break;
+        default:
+          break;
       }
-
-      childDef.scope = newScope;
-      ast.compChildren.add(childDef);
     }
-    return ast;
-  }
-
-  if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-    eat(parser, TokenType.TOKEN_EQUAL);
-
-    ASTNode childDef;
-
-    if (isModifier(parser.curToken.value)) {
-      eat(parser, TokenType.TOKEN_ID);
-      if (parser.curToken.value == FINAL)
-        return parseDefinition(parser, scope, false, true);
-
-      return parseDefinition(parser, scope, true);
-    }
-
-    if (isDataType(parser)) {
-      childDef = parseDefinition(parser, scope);
-    } else {
-      eat(parser, TokenType.TOKEN_ID);
-      childDef = parseVariable(parser, scope);
-    }
-
-    childDef.scope = newScope;
-    ast.compChildren.add(childDef);
-
-    while (parser.curToken.type == TokenType.TOKEN_COMMA) {
-      eat(parser, TokenType.TOKEN_COMMA);
-
-      if (isModifier(parser.curToken.value)) {
-        eat(parser, TokenType.TOKEN_ID);
-        if (parser.curToken.value == FINAL)
-          return parseDefinition(parser, scope, false, true);
-
-        return parseDefinition(parser, scope, true);
-      }
-
-      if (isDataType(parser)) {
-        childDef = parseDefinition(parser, scope);
-      } else {
-        eat(parser, TokenType.TOKEN_ID);
-        childDef = parseVariable(parser, scope);
-      }
-
-      childDef.scope = newScope;
-      ast.compChildren.add(childDef);
-    }
-    return ast;
-  }
-  eat(parser, TokenType.TOKEN_LBRACE);
-  ast.functionDefBody = parseStatements(parser, newScope);
-  ast.functionDefBody.scope = newScope;
-  eat(parser, TokenType.TOKEN_RBRACE);
-
-  return ast;
-}
-
-ASTNode parseVariableDefinition(
-    Parser parser, Scope scope, String name, ASTNode astType,
-    [bool isEnum = false,
-    bool isConst = false,
-    bool isFinal = false,
-    bool isSuperseding = false]) {
-  final astVarDef = initASTWithLine(VarDefNode(), parser.lexer.lineNum)
-    ..scope = scope
-    ..variableName = name
-    ..variableType = astType
-    ..isFinal = isFinal
-    ..isSuperseding = isSuperseding;
-
-  if (isEnum) {
-    final astType = initASTWithLine(TypeNode(), parser.lexer.lineNum);
-    astType.scope = scope;
-
-    final type = DataType()..type = DATATYPE.DATA_TYPE_ENUM;
-    astType.typeValue = type;
-
-    astVarDef.variableType = astType;
-    astVarDef.variableValue = parseEnum(parser, scope);
-    astVarDef.variableName = parser.curToken.value;
-    eat(parser, TokenType.TOKEN_ID);
-  }
-
-  if (parser.curToken.value == 'follows') {
-    eat(parser, TokenType.TOKEN_ID);
-
-    final VariableNode superClass =
-        initASTWithLine(VariableNode(), parser.lexer.lineNum)
-          ..scope = scope
-          ..variableName = parser.curToken.value;
-
-    eat(parser, TokenType.TOKEN_ID);
-
-    astVarDef.variableValue = parseClass(parser, scope);
-    astVarDef.variableValue.superClass = superClass;
 
     return astVarDef;
   }
 
-  // Class
-  if (parser.curToken.type == TokenType.TOKEN_LBRACE) {
-    astVarDef.variableValue = parseExpression(parser, scope);
+  ASTNode parseStrBuffer(Scope scope,
+      [bool isConst = false, bool isFinal = false]) {
+    eat(TokenType.TOKEN_LPAREN);
+    final ASTNode strBufferAST = initASTWithLine(StrBufferNode(), lexer.lineNum)
+      ..strBuffer = StringBuffer(curToken.value)
+      ..isFinal = isFinal;
 
-    switch (astVarDef.variableValue.type) {
-      case ASTType.AST_CLASS:
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_CLASS)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_ENUM:
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_ENUM)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_COMPOUND:
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
-          parserTypeError(parser);
-        break;
-      default:
-        break;
-    }
+    eat(TokenType.TOKEN_STRING_VALUE);
+    eat(TokenType.TOKEN_RPAREN);
+
+    return strBufferAST;
   }
 
-  if (parser.curToken.type == TokenType.TOKEN_EQUAL) {
-    if (isEnum)
-      parserSyntaxError(parser);
-
-    eat(parser, TokenType.TOKEN_EQUAL);
-
-    astVarDef.variableValue = parseExpression(parser, scope);
-
-    while (parser.curToken.type == TokenType.TOKEN_DOT) {
-      eat(parser, TokenType.TOKEN_DOT);
-      final ast = initASTWithLine(AttributeAccessNode(), parser.lexer.lineNum);
-      ast.binaryOpLeft = astVarDef.variableValue;
-      eat(parser, TokenType.TOKEN_ID);
-      final varAST = parseVariable(parser, scope);
-      ast.binaryOpRight = parser.curToken.type == TokenType.TOKEN_LPAREN
-          ? parseFunctionCall(parser, scope, varAST)
-          : varAST;
-      astVarDef.variableValue = ast;
-    }
-
-    switch (astVarDef.variableValue.type) {
-      case ASTType.AST_STRING:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_STRING;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program.replaceAll(
-                RegExp('[^"\'](?:${astVarDef.parent.className})?$name[^"\']'),
-                  astVarDef.variableValue.stringValue);
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_STRING_BUFFER:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_STRING_BUFFER;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program.replaceAll(name,
-                astVarDef.variableValue.strBuffer.toString());
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_STRING_BUFFER)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_INT:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_INT;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.intVal}');
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_INT)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_DOUBLE:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_DOUBLE;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.doubleVal}');
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_DOUBLE)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_BOOL:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_BOOL;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.boolVal}');
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_BOOL)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_LIST:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_LIST;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.listElements}');
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_LIST)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_MAP:
-        if (astType.typeValue.type == DATATYPE.DATA_TYPE_VAR) {
-          astType.typeValue.type = DATATYPE.DATA_TYPE_MAP;
-          astVarDef.variableType = astType;
-          if (isConst)
-            parser.lexer.program = parser.lexer.program
-                .replaceAll(name, '${astVarDef.variableValue.map}');
-        }
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_MAP)
-          parserTypeError(parser);
-        break;
-      case ASTType.AST_COMPOUND:
-        if (astType.typeValue.type != DATATYPE.DATA_TYPE_SOURCE)
-          parserTypeError(parser);
-        break;
-      default:
-        break;
-    }
-  }
-
-  return astVarDef;
-}
-
-ASTNode parseStrBuffer(Parser parser, Scope scope,
-    [bool isConst = false, bool isFinal = false]) {
-  eat(parser, TokenType.TOKEN_LPAREN);
-  final ASTNode strBufferAST = initASTWithLine(StrBufferNode(), parser.lexer.lineNum)
-    ..strBuffer = StringBuffer(parser.curToken.value)
-    ..isFinal = isFinal;
-
-  eat(parser, TokenType.TOKEN_STRING_VALUE);
-  eat(parser, TokenType.TOKEN_RPAREN);
-
-  return strBufferAST;
 }

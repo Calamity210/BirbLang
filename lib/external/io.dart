@@ -9,18 +9,16 @@ import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/scope.dart';
 
 void registerIO(Runtime runtime) {
-  registerGlobalFunction(runtime, 'exit', funcExit);
-  registerGlobalFunction(runtime, 'free', funcFree);
-  registerGlobalFutureFunction(runtime, 'execute', funcExecute);
+  runtime.registerGlobalFunction('exit', funcExit);
+  runtime.registerGlobalFunction('free', funcFree);
+  runtime.registerGlobalFutureFunction('execute', funcExecute);
 }
 
 Future<ASTNode> funcExecute(Runtime runtime, ASTNode self, List<ASTNode> args) async {
   expectArgs(args, [StringNode]);
 
-  final Lexer lexer = Lexer(args[0].stringValue);
-  final Parser parser = Parser(lexer);
-  final ASTNode node = parse(parser);
-  await visit(runtime, node);
+  final ASTNode node = Parser(Lexer(args[0].stringValue)).parse();
+  await runtime.visit(node);
 
   return AnyNode();
 }
@@ -36,7 +34,7 @@ ASTNode funcExit(Runtime runtime, ASTNode self, List<ASTNode> args) {
 }
 
 ASTNode funcFree(Runtime runtime, ASTNode self, List<ASTNode> args) {
-  final Scope scope = getScope(runtime, self);
+  final Scope scope = runtime.getScope(self);
 
   args.forEach((arg) {
     if (arg is! VariableNode)

@@ -9,10 +9,8 @@ void main() {
   test.test("Parser doesn't crash" , () {
     final Lexer lexer = Lexer(
         File('./test/TestPrograms/test_parser.birb').readAsStringSync());
-    final Parser parser = Parser(lexer);
-    final ASTNode ast = parse(parser);
+    final ASTNode ast = Parser(lexer).parse();
 
-    assert(parser != null);
     test.expect(ast.type, test.equals(ASTType.AST_COMPOUND));
   });
 }

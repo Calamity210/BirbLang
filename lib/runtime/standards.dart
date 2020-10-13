@@ -23,23 +23,23 @@ Future<void> initStandards(Runtime runtime, String path) async {
   }
 
 
-  registerGlobalVariable(runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
+  runtime.registerGlobalVariable('birbVer', StringNode()..stringValue = '0.0.1');
 
-  registerGlobalVariable(runtime, 'Date', dateClass(runtime));
-  registerGlobalVariable(runtime, 'double', doubleClass(runtime));
-  registerGlobalVariable(runtime, 'List', listClass(runtime));
-  registerGlobalVariable(runtime, 'Time', timeClass(runtime));
+  runtime.registerGlobalVariable('Date', dateClass(runtime));
+  runtime.registerGlobalVariable('double', doubleClass(runtime));
+  runtime.registerGlobalVariable('List', listClass(runtime));
+  runtime.registerGlobalVariable('Time', timeClass(runtime));
 
   // Functions
-  registerGlobalFunction(runtime, 'screm', funcScrem);
-  registerGlobalFunction(runtime, 'scremLn', funcScremLn);
-  registerGlobalFunction(runtime, 'scremF', funcScremF);
-  registerGlobalFunction(runtime, 'beep', funcBeep);
-  registerGlobalFunction(runtime, 'beepLn', funcBeepLn);
-  registerGlobalFunction(runtime, 'mock', funcMock);
+  runtime.registerGlobalFunction('screm', funcScrem);
+  runtime.registerGlobalFunction('scremLn', funcScremLn);
+  runtime.registerGlobalFunction('scremF', funcScremF);
+  runtime.registerGlobalFunction('beep', funcBeep);
+  runtime.registerGlobalFunction('beepLn', funcBeepLn);
+  runtime.registerGlobalFunction('mock', funcMock);
 
-  registerGlobalFutureFunction(runtime, 'grab', funcGrab);
-  registerGlobalFutureFunction(runtime, 'variableFromString', funcVarFromString);
+  runtime.registerGlobalFutureFunction('grab', funcGrab);
+  runtime.registerGlobalFutureFunction('variableFromString', funcVarFromString);
 }
 
 Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
@@ -51,9 +51,8 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     final String ps = Platform.pathSeparator;
 
     final Lexer lexer = Lexer(File('${Directory.current.path}${ps}core$ps$fileName$ps$fileName.birb').readAsStringSync());
-    final Parser parser = Parser(lexer);
-    final ASTNode node = parse(parser);
-    await visit(runtime, node);
+    final ASTNode node = Parser(lexer).parse();
+    await runtime.visit(node);
 
     return AnyNode();
   } else if (astStr.stringValue.startsWith('dart:')) {
@@ -82,19 +81,14 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
       throw const UnexpectedTokenException('Cannot import non-birb files.');
 
     final Response response = await get(astStr.stringValue);
-    final Lexer lexer = Lexer(response.body);
-    final Parser parser = Parser(lexer);
-    final ASTNode node = parse(parser);
-    await visit(runtime, node);
+    final ASTNode node = Parser(Lexer(response.body)).parse();
+    await runtime.visit(node);
 
     return AnyNode();
   }
   final String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
-
-  final Lexer lexer = Lexer(File(filename).readAsStringSync());
-  final Parser parser = Parser(lexer);
-  final ASTNode node = parse(parser);
-  await visit(runtime, node);
+  final ASTNode node = Parser(Lexer(File(filename).readAsStringSync())).parse();
+  await runtime.visit(node);
 
   return AnyNode();
 }
@@ -104,7 +98,7 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(Runtime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -133,7 +127,7 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(Runtime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -164,7 +158,7 @@ ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
   final StringNode strAST = args[0];
 
     String str = strAST.toString();
-    
+
     str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
       final int index = int.parse(match.group(1));
       return args[index + 1].toString();
@@ -185,7 +179,7 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(Runtime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -214,7 +208,7 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(Runtime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -449,5 +443,5 @@ ASTNode listClass(Runtime runtime) {
 Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
     expectArgs(args, [StringNode]);
 
-    return await getVarDefByName(runtime, getScope(runtime, args[0]), args[0].stringValue);
+    return await runtime.getVarDefByName(runtime.getScope(args[0]), args[0].stringValue);
 }
