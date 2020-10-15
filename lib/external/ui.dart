@@ -15,7 +15,6 @@ void registerUi(Runtime runtime) {
   runtime.registerGlobalVariable('Window', windowClass(runtime));
 }
 
-
 void keyCallback(Pointer<GLFWwindow> window, int key, int scancode, int action, int mods) async {
   final call = FuncCallNode();
   call.funcName = keyCall['func'].funcName;
