@@ -14,24 +14,17 @@ enum DATATYPE {
 }
 
 class DataType {
-  DATATYPE type;
+
+  DataType() {
+    modifiers.fillRange(0, 2, 0);
+  }
+
+  DataType.as(this.type) {
+    modifiers.fillRange(0, 2, 0);
+  }
+
+  DATATYPE type = DATATYPE.DATA_TYPE_VOID;
   List<int> modifiers = List<int>(3);
-}
-
-DataType initDataType() {
-  final dataType = DataType()
-    ..type = DATATYPE.DATA_TYPE_VOID
-    ..modifiers[0] = 0
-    ..modifiers[1] = 0
-    ..modifiers[2] = 0;
-
-  return dataType;
-}
-
-DataType initDataTypeAs(DATATYPE type) {
-  final dataType = initDataType()..type = type;
-
-  return dataType;
 }
 
 bool dataTypeHasModifier(DataType dataType, int modifier) {

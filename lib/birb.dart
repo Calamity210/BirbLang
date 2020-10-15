@@ -13,11 +13,7 @@ Future<void> main(List<String> arguments) async {
   final isInteractive = arguments.isEmpty;
 
   /// Runtime visitor
-  final Runtime runtime = isInteractive ? initRuntime('') : initRuntime(arguments[0]);
-
-  Lexer lexer;
-
-  Parser parser;
+  final Runtime runtime = isInteractive ? Runtime('') : Runtime(arguments[0]);
 
   /// Parsed program
   ASTNode node;
@@ -51,10 +47,8 @@ Future<void> main(List<String> arguments) async {
         }
 
         // Initialize and run program
-        lexer = initLexer(str);
-        parser = initParser(lexer);
-        node = parse(parser);
-        await visit(runtime, node);
+        node = Parser( Lexer(str)).parse();
+        await runtime.visit(node);
       } catch (e) {
         if (e is! BirbException)
           rethrow;
@@ -91,10 +85,8 @@ Future<void> main(List<String> arguments) async {
       }
     }
 
-    lexer = initLexer(program);
-    parser = initParser(lexer);
-    node = parse(parser);
-    await visit(runtime, node);
+    node = Parser(Lexer(program)).parse();
+    await runtime.visit(node);
   } catch (e) {
     if (e is! BirbException)
       rethrow;

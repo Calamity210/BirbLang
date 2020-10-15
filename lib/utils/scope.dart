@@ -3,13 +3,19 @@ import 'dart:collection';
 import 'package:Birb/ast/ast_node.dart';
 
 class Scope {
+
+  Scope(this.global) {
+    variableDefinitions = ListQueue();
+    functionDefinitions = ListQueue();
+  }
+
   ASTNode owner;
   ListQueue<ASTNode> variableDefinitions;
   ListQueue<ASTNode> functionDefinitions;
   bool global;
 
   Scope copy() {
-    final Scope scope = Scope();
+    final Scope scope = Scope(global);
 
     variableDefinitions.forEach((element) {
       scope.variableDefinitions.add(element.copy());
@@ -21,13 +27,4 @@ class Scope {
 
     return scope;
   }
-}
-
-Scope initScope(bool global) {
-  final scope = Scope()
-    ..variableDefinitions = ListQueue()
-    ..functionDefinitions = ListQueue()
-    ..global = global;
-
-  return scope;
 }

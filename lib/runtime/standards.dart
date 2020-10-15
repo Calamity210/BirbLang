@@ -24,23 +24,23 @@ Future<void> initStandards(Runtime runtime, String path) async {
   }
 
 
-  registerGlobalVariable(runtime, 'birbVer', StringNode()..stringValue = '0.0.1');
+  runtime.registerGlobalVariable('birbVer', StringNode()..stringValue = '0.0.1');
 
-  registerGlobalVariable(runtime, 'Date', dateClass(runtime));
-  registerGlobalVariable(runtime, 'double', doubleClass(runtime));
-  registerGlobalVariable(runtime, 'List', listClass(runtime));
-  registerGlobalVariable(runtime, 'Time', timeClass(runtime));
+  runtime.registerGlobalVariable('Date', dateClass(runtime));
+  runtime.registerGlobalVariable('double', doubleClass(runtime));
+  runtime.registerGlobalVariable('List', listClass(runtime));
+  runtime.registerGlobalVariable('Time', timeClass(runtime));
 
   // Functions
-  registerGlobalFunction(runtime, 'screm', funcScrem);
-  registerGlobalFunction(runtime, 'scremLn', funcScremLn);
-  registerGlobalFunction(runtime, 'scremF', funcScremF);
-  registerGlobalFunction(runtime, 'beep', funcBeep);
-  registerGlobalFunction(runtime, 'beepLn', funcBeepLn);
-  registerGlobalFunction(runtime, 'mock', funcMock);
+  runtime.registerGlobalFunction('screm', funcScrem);
+  runtime.registerGlobalFunction('scremLn', funcScremLn);
+  runtime.registerGlobalFunction('scremF', funcScremF);
+  runtime.registerGlobalFunction('beep', funcBeep);
+  runtime.registerGlobalFunction('beepLn', funcBeepLn);
+  runtime.registerGlobalFunction('mock', funcMock);
 
-  registerGlobalFutureFunction(runtime, 'grab', funcGrab);
-  registerGlobalFutureFunction(runtime, 'variableFromString', funcVarFromString);
+  runtime.registerGlobalFutureFunction('grab', funcGrab);
+  runtime.registerGlobalFutureFunction('variableFromString', funcVarFromString);
 }
 
 Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) async {
@@ -51,10 +51,9 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
     final String fileName = astStr.stringValue.split(':')[1];
     final String ps = Platform.pathSeparator;
 
-    final Lexer lexer = initLexer(File('${Directory.current.path}${ps}core$ps$fileName$ps$fileName.birb').readAsStringSync());
-    final Parser parser = initParser(lexer);
-    final ASTNode node = parse(parser);
-    await visit(runtime, node);
+    final Lexer lexer = Lexer(File('${Directory.current.path}${ps}core$ps$fileName$ps$fileName.birb').readAsStringSync());
+    final ASTNode node = Parser(lexer).parse();
+    await runtime.visit(node);
 
     return AnyNode();
   } else if (astStr.stringValue.startsWith('dart:')) {
@@ -86,19 +85,14 @@ Future<ASTNode> funcGrab(Runtime runtime, ASTNode self, List<ASTNode> args) asyn
       throw const UnexpectedTokenException('Cannot import non-birb files.');
 
     final Response response = await get(astStr.stringValue);
-    final Lexer lexer = initLexer(response.body);
-    final Parser parser = initParser(lexer);
-    final ASTNode node = parse(parser);
-    await visit(runtime, node);
+    final ASTNode node = Parser(Lexer(response.body)).parse();
+    await runtime.visit(node);
 
     return AnyNode();
   }
   final String filename = '$filePath${Platform.pathSeparator}${astStr.stringValue}';
-
-  final Lexer lexer = initLexer(File(filename).readAsStringSync());
-  final Parser parser = initParser(lexer);
-  final ASTNode node = parse(parser);
-  await visit(runtime, node);
+  final ASTNode node = Parser(Lexer(File(filename).readAsStringSync())).parse();
+  await runtime.visit(node);
 
   return AnyNode();
 }
@@ -108,7 +102,7 @@ ASTNode funcScrem(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -137,7 +131,7 @@ ASTNode funcScremLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -168,7 +162,7 @@ ASTNode funcScremF(Runtime runtime, ASTNode self, List<ASTNode> args) {
   final StringNode strAST = args[0];
 
     String str = strAST.toString();
-    
+
     str = str.replaceAllMapped(RegExp(r'\{([0-9]+)\}'), (match) {
       final int index = int.parse(match.group(1));
       return args[index + 1].toString();
@@ -189,7 +183,7 @@ ASTNode funcBeep(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -218,7 +212,7 @@ ASTNode funcBeepLn(Runtime runtime, ASTNode self, List<ASTNode> args) {
   for (int i = 0; i < args.length; i++) {
     ASTNode astArg = args[i];
     if (astArg is BinaryOpNode)
-      visitBinaryOp(initRuntime(filePath), astArg).then((value) => astArg = value);
+      Runtime(filePath).visitBinaryOp(astArg).then((value) => astArg = value);
 
     if (astArg is ClassNode) {
       String classToString = '';
@@ -259,7 +253,7 @@ ASTNode dateClass(Runtime runtime) {
   final VarDefNode astVarYear = VarDefNode();
   astVarYear.variableName = 'year';
   astVarYear.variableType = TypeNode();
-  astVarYear.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarYear.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntYear = IntNode();
   astIntYear.intVal = DateTime.now().year;
@@ -271,7 +265,7 @@ ASTNode dateClass(Runtime runtime) {
   final VarDefNode astVarMonth = VarDefNode();
   astVarMonth.variableName = 'month';
   astVarMonth.variableType = TypeNode();
-  astVarMonth.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarMonth.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntMonth = IntNode();
   astIntMonth.intVal = DateTime.now().month;
@@ -283,7 +277,7 @@ ASTNode dateClass(Runtime runtime) {
   final VarDefNode astVarDay = VarDefNode();
   astVarDay.variableName = 'day';
   astVarDay.variableType = TypeNode();
-  astVarDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarDay.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntDay = IntNode();
   astIntDay.intVal = DateTime.now().day;
@@ -295,7 +289,7 @@ ASTNode dateClass(Runtime runtime) {
   final VarDefNode astVarWeekDay = VarDefNode();
   astVarWeekDay.variableName = 'weekday';
   astVarWeekDay.variableType = TypeNode();
-  astVarWeekDay.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarWeekDay.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntWeekDay = IntNode();
   astIntWeekDay.intVal = DateTime.now().weekday;
@@ -309,13 +303,13 @@ ASTNode dateClass(Runtime runtime) {
 ASTNode timeClass(Runtime runtime) {
   final ClassNode astObj = ClassNode();
   astObj.variableType = TypeNode();
-  astObj.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_CLASS);
+  astObj.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_CLASS);
 
   // ADD HOURS TO TIME OBJECT
   final VarDefNode astVarHour = VarDefNode();
   astVarHour.variableName = 'hour';
   astVarHour.variableType = TypeNode();
-  astVarHour.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarHour.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntHour = IntNode();
   astIntHour.intVal = DateTime.now().hour;
@@ -327,7 +321,7 @@ ASTNode timeClass(Runtime runtime) {
   final VarDefNode astVarMinute = VarDefNode();
   astVarMinute.variableName = 'minute';
   astVarMinute.variableType = TypeNode();
-  astVarMinute.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarMinute.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntMinute = IntNode();
   astIntMinute.intVal = DateTime.now().minute;
@@ -339,7 +333,7 @@ ASTNode timeClass(Runtime runtime) {
   final VarDefNode astVarSeconds = VarDefNode();
   astVarSeconds.variableName = 'second';
   astVarSeconds.variableType = TypeNode();
-  astVarSeconds.variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+  astVarSeconds.variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntSeconds = IntNode();
   astIntSeconds.intVal = DateTime.now().second;
@@ -352,7 +346,7 @@ ASTNode timeClass(Runtime runtime) {
   astVarMilliSeconds.variableName = 'milliSecond';
   astVarMilliSeconds.variableType = TypeNode();
   astVarMilliSeconds.variableType.typeValue =
-      initDataTypeAs(DATATYPE.DATA_TYPE_INT);
+      DataType.as(DATATYPE.DATA_TYPE_INT);
 
   final IntNode astIntMilliSeconds = IntNode();
   astIntMilliSeconds.intVal = DateTime.now().millisecond;
@@ -370,7 +364,7 @@ ASTNode doubleClass(Runtime runtime) {
   final VarDefNode astVarInfinity = VarDefNode()
     ..variableName = 'infinity'
     ..variableType = TypeNode()
-    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+    ..variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_DOUBLE);
 
   final DoubleNode astInfinity = DoubleNode();
   astInfinity.doubleVal = 1 / 0;
@@ -382,7 +376,7 @@ ASTNode doubleClass(Runtime runtime) {
   final VarDefNode astVarNegInfinity = VarDefNode()
     ..variableName = 'negInfinity'
     ..variableType = TypeNode()
-    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+    ..variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_DOUBLE);
 
   final DoubleNode astNegInfinity = DoubleNode();
   astNegInfinity.doubleVal = -1 / 0;
@@ -394,7 +388,7 @@ ASTNode doubleClass(Runtime runtime) {
   final VarDefNode astVarNaN = VarDefNode()
     ..variableName = 'nan'
     ..variableType = TypeNode()
-    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+    ..variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_DOUBLE);
 
   final astNaN = DoubleNode();
   astNaN.doubleVal = 0 / 0;
@@ -407,7 +401,7 @@ ASTNode doubleClass(Runtime runtime) {
   final astVarMaxFinite = VarDefNode()
     ..variableName = 'maxFinite'
     ..variableType = TypeNode()
-    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+    ..variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_DOUBLE);
 
   final astMaxFinite = DoubleNode();
   astMaxFinite.doubleVal = 1.7976931348623157e+308;
@@ -420,7 +414,7 @@ ASTNode doubleClass(Runtime runtime) {
   final astVarMinPositive = VarDefNode()
     ..variableName = 'minPositive'
     ..variableType = TypeNode()
-    ..variableType.typeValue = initDataTypeAs(DATATYPE.DATA_TYPE_DOUBLE);
+    ..variableType.typeValue = DataType.as(DATATYPE.DATA_TYPE_DOUBLE);
 
   final astMinPositive = DoubleNode();
   astMinPositive.doubleVal = 5e-324;
@@ -453,5 +447,5 @@ ASTNode listClass(Runtime runtime) {
 Future<ASTNode> funcVarFromString(Runtime runtime, ASTNode self, List<ASTNode> args) async {
     expectArgs(args, [StringNode]);
 
-    return await getVarDefByName(runtime, getScope(runtime, args[0]), args[0].stringValue);
+    return await runtime.getVarDefByName(runtime.getScope(args[0]), args[0].stringValue);
 }

@@ -6,17 +6,17 @@ import 'package:Birb/ast/ast_types.dart';
 import 'package:Birb/utils/exceptions.dart';
 
 void registerMath(Runtime runtime) {
-  registerGlobalFunction(runtime, 'acos', funcACos);
-  registerGlobalFunction(runtime, 'asin', funcASin);
-  registerGlobalFunction(runtime, 'atan', funcATan);
-  registerGlobalFunction(runtime, 'atan2', funcATan2);
-  registerGlobalFunction(runtime, 'cos', funcCos);
-  registerGlobalFunction(runtime, 'exp', funcExp);
-  registerGlobalFunction(runtime, 'ln', funcLn);
-  registerGlobalFunction(runtime, 'log', funcLog);
-  registerGlobalFunction(runtime, 'rand', funcRand);
-  registerGlobalFunction(runtime, 'sin', funcSin);
-  registerGlobalFunction(runtime, 'tan', funcTan);
+  runtime.registerGlobalFunction('acos', funcACos);
+  runtime.registerGlobalFunction('asin', funcASin);
+  runtime.registerGlobalFunction('atan', funcATan);
+  runtime.registerGlobalFunction('atan2', funcATan2);
+  runtime.registerGlobalFunction('cos', funcCos);
+  runtime.registerGlobalFunction('exp', funcExp);
+  runtime.registerGlobalFunction('ln', funcLn);
+  runtime.registerGlobalFunction('log', funcLog);
+  runtime.registerGlobalFunction('rand', funcRand);
+  runtime.registerGlobalFunction('sin', funcSin);
+  runtime.registerGlobalFunction('tan', funcTan);
 }
 
 ASTNode funcACos(Runtime runtime, ASTNode self, List<ASTNode> args) {
