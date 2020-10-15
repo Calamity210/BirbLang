@@ -15,22 +15,26 @@ void registerUi(Runtime runtime) {
   runtime.registerGlobalVariable('Window', windowClass(runtime));
 }
 
-void keyCallback(Pointer<GLFWwindow> window, int key, int scancode, int action, int mods) async {
+Future<void> callBack(Map callBack, FuncCallNode call) async {
+  await keyCall['runtime'].visitFuncCall(call);
+}
+
+void keyCallback(Pointer<GLFWwindow> window, int key, int scancode, int action, int mods) {
   final call = FuncCallNode();
   call.funcName = keyCall['func'].funcName;
   call.functionCallArgs = [IntNode()..intVal = key, IntNode()..intVal = action];
   call.funcCallExpression = VariableNode()..variableName = keyCall['func'].funcName;
 
-  await keyCall['runtime'].visitFuncCall(call);
+  callBack(keyCall, call);
 }
 
-void mouseCallback(Pointer<GLFWwindow> window, int xPos, int yPos) async {
+void mouseCallback(Pointer<GLFWwindow> window, int xPos, int yPos) {
   final call = FuncCallNode();
   call.funcName = mouseCall['func'].funcName;
   call.functionCallArgs = [IntNode()..intVal = xPos, IntNode()..intVal = yPos];
   call.funcCallExpression = VariableNode()..variableName = mouseCall['func'].funcName;
 
-  await mouseCall['runtime'].visitFuncCall(call);
+  callBack(mouseCall, call);
 }
 
 ASTNode windowClass(Runtime runtime) {
