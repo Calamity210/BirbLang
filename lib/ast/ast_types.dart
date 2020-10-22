@@ -565,7 +565,7 @@ class DoubleNode extends ASTNode {
   ASTNode copy() {
     final DoubleNode node = DoubleNode()
       ..scope = scope
-      ..intVal = intVal;
+      ..doubleVal = doubleVal;
 
     return node;
   }

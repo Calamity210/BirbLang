@@ -17,3 +17,8 @@ scremLn(i.toStringAsExponential()); // output 1e+1
 scremLn(i.toUnsigned(1)); // output 1
 
 scremLn(i + 0xFFAAA); // output 1047221
+
+scremLn(i++); // output 11
+scremLn(i); // output 12
+
+scremLn(++i); // output 13

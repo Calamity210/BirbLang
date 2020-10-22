@@ -638,9 +638,13 @@ class Runtime {
             {
               final ASTNode variable = await visitVariable(left);
               if (variable.typeValue.type == DATATYPE.DATA_TYPE_INT) {
-                return variable..intVal += 1;
-              } else if (variable.variableType.typeValue.type == DATATYPE.DATA_TYPE_DOUBLE) {
-                return variable..doubleVal += 1;
+                final IntNode newVariable = variable.copy();
+                variable.intVal++;
+                return newVariable;
+              } else if (variable.typeValue.type == DATATYPE.DATA_TYPE_DOUBLE) {
+                final DoubleNode newVariable = variable.copy();
+                variable.doubleVal++;
+                return newVariable;
               }
             }
             break;
@@ -649,9 +653,13 @@ class Runtime {
               final ASTNode variable = await visitVariable(left);
 
               if (variable.variableType.typeValue.type == DATATYPE.DATA_TYPE_INT) {
-                return variable..intVal -= 1;
+                final IntNode newVariable = variable.copy();
+                variable.intVal--;
+                return newVariable;
               } else if (variable.variableType.typeValue.type == DATATYPE.DATA_TYPE_DOUBLE) {
-                return variable..doubleVal -= 1;
+                final DoubleNode newVariable = variable.copy();
+                variable.doubleVal--;
+                return newVariable;
               }
             }
             break;

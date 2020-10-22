@@ -32,3 +32,10 @@ scremLn(double.negInfinity); // output -Infinity
 scremLn(double.nan); // output NaN
 scremLn(double.maxFinite); // output 1.7976931348623157e+308
 scremLn(double.minPositive); // output 5e-324
+
+double i = 10.0;
+
+scremLn(i++); // output 10.0
+scremLn(i); // output 11.0
+
+scremLn(++i); // output 12.0
