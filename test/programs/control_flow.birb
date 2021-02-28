@@ -1,7 +1,7 @@
 int year = Date.year;
 
 if (year == 2020) {
-    scremLn("2020"); // output 2020
+    scremLn("2020");
 }
 
 // output 0
@@ -21,5 +21,3 @@ scremLn(year); // output 2030
 
 if (true)
   scremLn('Single Statement Compound'); // output Single Statement Compound
-
-scremLn('just testing'); // output just testing
